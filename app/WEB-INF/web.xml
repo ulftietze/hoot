@@ -1,0 +1,33 @@
+<web-app>  
+  <context-param>
+    <param-name>myinit</param-name>
+    <param-value>myinitvalue</param-value>
+  </context-param>
+
+  <listener>
+    <listener-class>hbv.MyContextListener</listener-class>
+  </listener>
+
+  <servlet>  
+    <servlet-name>helloServlet</servlet-name>  
+    <servlet-class>hbv.HelloServlet</servlet-class>  
+  </servlet>  
+
+  <servlet-mapping>
+    <servlet-name>helloServlet</servlet-name>
+    <url-pattern>/hello</url-pattern>
+  </servlet-mapping>	
+
+  <filter> 
+    <filter-name>myfilter</filter-name>
+    <filter-class>hbv.MyFilter</filter-class> 
+    <async-supported>true</async-supported> 
+  </filter> 
+
+  <filter-mapping> 
+    <filter-name>myfilter</filter-name>
+    <url-pattern>/*</url-pattern> 
+  </filter-mapping> 
+
+
+</web-app>  
