@@ -1,12 +1,9 @@
 {
   "request": {
     "method": "GET",
-    "url": "/getTimelinePersonal",
+    "url": "/getTimelinePersonal?lastPostId=15&quantity=100",
     "authorization": "Session Token",
-    "body": {
-      "lastPostId": 15,
-      "quantity": 100
-    }
+    "body": {}
   },
   "response": {
     "status": 200,

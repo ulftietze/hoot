@@ -1,11 +1,8 @@
 {
   "request": {
     "method": "GET",
-    "url": "/getTimelineGlobal",
-    "body": {
-      "lastPostId": 15,
-      "quantity": 100
-    }
+    "url": "/getTimelineGlobal?lastPostId=15&quantity=100",
+    "body": {}
   },
   "response": {
     "status": 200,

@@ -1,13 +1,8 @@
 {
   "request": {
     "method": "GET",
-    "url": "/getPostByTags",
-    "body": {
-      "tags": [
-        "abc",
-        "def"
-      ]
-    }
+    "url": "/getPostByTags?tags={abc,def,efg}",
+    "body": {}
   },
   "response": {
     "status": 200,

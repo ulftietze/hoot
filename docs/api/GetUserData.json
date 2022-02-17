@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "url": "/getUserData/{id}",
+    "url": "/getUserData?id={id}",
     "authorization": "Session Token",
     "body": {}
   },
