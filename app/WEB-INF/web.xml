@@ -11,15 +11,4 @@
     <listener>
         <listener-class>hbv.Listener.MyContextListener</listener-class>
     </listener>
-
-    <filter>
-        <filter-name>myfilter</filter-name>
-        <filter-class>hbv.Filter.MyFilter</filter-class>
-        <async-supported>true</async-supported>
-    </filter>
-
-    <filter-mapping>
-        <filter-name>myfilter</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
 </web-app>

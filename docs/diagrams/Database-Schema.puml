@@ -1,0 +1,102 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+class Historie {
+    +timestamp: DateTime
+    +currentLoggedIn: Integer
+    +postPerSecond: Float /'Durchschnitt seit letztem Timestamp'/
+    +requestsPerSecond: Float
+    +loginsPerSecond: Float
+    +currentlyRegisteredUsers: Integer
+    +trendingHashtags: String
+}
+
+enum Interaction {
+    LIKE
+    DISLIKE
+}
+
+class Reaction {
+    -user: User
+    -post: Post
+    -interaction: Interaction
+    -created: DateTime
+    -modified: DateTime
+}
+
+enum HootType {
+    Post
+    Comment
+    Poll /' TODO: Maybe or maybe not implement '/
+    Image
+}
+
+class Post {
+    -hoot: Hoot
+    -content: String
+}
+
+class Comment {
+    -hoot: Hoot
+    -parent: Hoot
+    -content: String
+}
+
+class Image {
+    -hoot: Hoot
+    -url: String
+    -content: String
+}
+
+class Hoot {
+    -user: User
+    -type: HootType
+    -created: DateTime
+    -modified: DateTime
+    +getContent(): String
+}
+
+class HootTags {
+    -hoot: Hoot
+    -tag: Tag
+}
+
+class Tag {
+    -tag: String /' Only lowercase! '/
+}
+
+class User {
+    -id: Integer /' TODO: Prüfen, ob uid: String  '/
+    -userName: String
+    -passwordHash: String
+    -lastLogin: DateTime
+    -created: DateTime
+    -modified: DateTime
+    +follow(User): void
+}
+
+class Follower {
+    -user: User
+    -following: User
+    -created: DateTime
+}
+
+/'
+    TODO: Multiplizität prüfen, Ein User eine Interaktion pro Post
+    ggf. Trigger
+'/
+User "0..*" -- "1..*" Follower
+User "1..*" - "*" Reaction
+Reaction "*" - "1" Hoot /'TODO: Aggregation&Komposition'/
+Interaction --+ Reaction
+
+Hoot <|-- Post
+Hoot <|-- Comment
+Hoot <|-- Image
+Hoot <|-- Poll /'TODO: Maybe or maybe not implement'/
+Hoot +- HootType
+
+Hoot "1" - "*" HootTags
+HootTags "*" -- "1" Tag
+
+@enduml
