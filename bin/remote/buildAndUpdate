@@ -10,6 +10,10 @@ if ! curl -f -s -o /dev/null https://informatik.hs-bremerhaven.de/$manager/ ; th
    exit 1
 fi
 
+# TODO: Prevent deleting, this is a workaround
+# TODO: When moving classes the old ones are not getting deleted
+rm -rf build
+
 echo compile
 mkdir -p build
 cp -r app/* build
@@ -24,5 +28,5 @@ ls $name.war
 
 echo deploy as $name
 curl -s -n -T $name.war "https://informatik.hs-bremerhaven.de/$manager/text/deploy?path=/$name&update=true"
-curl -s https://informatik.hs-bremerhaven.de/$name/hello|html2text
+#curl -s https://informatik.hs-bremerhaven.de/$name/hello|html2text
 
