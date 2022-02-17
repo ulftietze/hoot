@@ -1,37 +1,66 @@
-Sie haben in einem Verzeichnis
-das kleine tomcat-Kit installiert.
+# Hoots
 
-Sie haben hier vier kleine Skripte:
+"Hoots" is a small social media network. This project is created within
+"SWE3" and "Vernetzte Systeme" in the third semester. The name "Hoots"
+is based on the owl and the corresponding "hooting".
 
-- mkanddeploy.sh
-  kopiert app/* nach build,
-  kompiliert die java-Dateien in src
-  in das Verzeichnis build/WEB-INF/classes
-  hinein und deployt mit curl über die
-  manager-App in tomcat mit den
-  crendentials in .netrc
+## Quick Guide
 
-- clean.sh
-  löscht das build-Verzeichnis 
-  und die war-Datei
+### Development Process
 
-- undeploy.sh
-  undeployt die App
+Each team member will develop on its own docker machine. This prevents issues between different development tasks. The
+discussed development process is declared as follows:
 
-- list.sh
-  listet die aktiven WebApps auf
+- Clone repository on your machine
+- create and define path in your local docker
+- copy `.env.sample` to `.env' and set user and remote path
+- Make local changes
+- run `bin/deploy` (this will sync files with remote and update tomcat)
 
-In src liegt das java-Paket hbv
-mit Java-Beispieldateien.
+## Documentation
 
-In app befindet sich die 
-Deployment-Struktur mit
-html-Dateien
-WEB-INF, web.xml
-und den notwendigen Bibliotheken
-für die Laufzeit.
+### Scripts (local)
 
-In complibs befinden sich die jars,
-die zum Compilieren notwendig sind:
+These scripts are for the local development.
+
+Location: `/bin/`
+
+#### `deploy`
+
+- load environment settings from .env
+- rsync files to specified target
+- run the `buildAndUpdate` Task
+
+### Scripts (Docker)
+
+These scripts are for the handling on the remote server.
+
+Location: `/bin/remote/`
+
+#### `buildAndUpdate`
+
+- copies `app/*` to `build`
+- compile java-files in `src` to `build/WEB-INF/classes`
+- deploys via curl over the "manager-app" to the tomcat (credentials in .netrc)
+
+#### `clean`
+
+- delete `build`
+- delete `war`
+
+#### `undeploy`
+
+- undeploy application
+
+#### `list`
+
+- list active webapps
+
+In src liegt das java-Paket hbv mit Java-Beispieldateien.
+
+In app befindet sich die Deployment-Struktur mit html-Dateien WEB-INF, web.xml und den notwendigen Bibliotheken für die
+Laufzeit.
+
+In complibs befinden sich die jars, die zum Compilieren notwendig sind:
 servlets. 
 

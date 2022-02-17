@@ -1,0 +1,8 @@
+#!/bin/bash
+
+export $(echo $(cat .env | sed 's/#.*//g' | sed 's/\r//g' | xargs) | envsubst)
+
+# shellcheck disable=SC2046
+rsync -var --exclude '.git' --exclude '.idea' --exclude '.env' . "$REMOTE_USER"@"$REMOTE_HOST":"$REMOTE_PATH"
+
+ssh "$REMOTE_USER"@"$REMOTE_HOST" "cd $REMOTE_PATH && bin/remote/buildAndUpdate"
