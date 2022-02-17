@@ -27,8 +27,8 @@ package Frontend {
 
 package Requests {
     [GetPostById]
-    [GetPostByTags]
-    [GetPostByUser]
+    [GetHootsByTags]
+    [GetHootsByUser]
     [GetTimelineGlobal]
     [GetTimelinePersonal]
     [GetUserData]
@@ -46,9 +46,9 @@ package Requests {
     end note
 }
 
-[GetPostById] -[hidden]down-> [GetPostByTags]
-[GetPostByTags] -[hidden]down-> [GetPostByUser]
-[GetPostByUser] -[hidden]down-> [GetTimelineGlobal]
+[GetPostById] -[hidden]down-> [GetHootsByTags]
+[GetHootsByTags] -[hidden]down-> [GetHootsByUser]
+[GetHootsByUser] -[hidden]down-> [GetTimelineGlobal]
 [GetTimelineGlobal] -[hidden]down-> [GetTimelinePersonal]
 [GetTimelinePersonal] -[hidden]down-> [GetUserData]
 [GetUserData] -[hidden]down-> [SetUserData]
@@ -92,8 +92,8 @@ Requests -[hidden]r-> Backend
 [f.Timeline Full] -r-> [CreatePoll]
 [f.Timeline Personal] -r-> [CreatePoll]
 [f.My Profile Page] -r-> [CreatePoll]
-[f.Timeline Search] -r-> [GetPostByTags]
-[f.Any Profile Page] -r-> [GetPostByUser]
+[f.Timeline Search] -r-> [GetHootsByTags]
+[f.Any Profile Page] -r-> [GetHootsByUser]
 [f.My Profile Page] -r-> [GetUserData]
 [f.Login] -r-> [Login]
 [f.Registration] -r-> [Register]
@@ -105,9 +105,9 @@ Requests -[hidden]r-> Backend
 [Register] -r-> [b.User]
 [GetUserData] -r-> [b.User]
 [GetUserData] -r-> [b.Follower]
-[GetPostByUser] -r-> [b.Hoot]
-[GetPostByUser] -r-> [b.User]
-[GetPostByUser] -r-> [b.Reaction]
+[GetHootsByUser] -r-> [b.Hoot]
+[GetHootsByUser] -r-> [b.User]
+[GetHootsByUser] -r-> [b.Reaction]
 [GetTimelinePersonal] -r-> [b.Hoot]
 [GetTimelinePersonal] -r-> [b.User]
 [GetTimelinePersonal] -r-> [b.Reaction]
