@@ -1,0 +1,98 @@
+@startuml
+'https://plantuml.com/component-diagram
+/'TODO: Beautify (Probably never)'/
+
+package Frontend {
+    [f.Login]
+    [f.Registration]
+    [f.Timeline Personal]
+    [f.Timeline Full]
+    [f.Timeline Search]
+    [f.Any Profile Page]
+    [f.My Profile Page]
+    [f.Follower]
+    [f.Following]
+    [f.Settings]
+}
+
+[f.Login] -[hidden]down-> [f.Registration]
+[f.Registration] -[hidden]down-> [f.Timeline Personal]
+[f.Timeline Personal] -[hidden]down-> [f.Timeline Full]
+[f.Timeline Full] -[hidden]down-> [f.Timeline Search]
+[f.Timeline Search] -[hidden]down-> [f.Any Profile Page]
+[f.Any Profile Page] -[hidden]down-> [f.My Profile Page]
+[f.My Profile Page] -[hidden]down-> [f.Follower]
+[f.Follower] -[hidden]down-> [f.Following]
+[f.Following] -[hidden]down-> [f.Settings]
+
+package Requests {
+    [GetPostById]
+    [GetPostByTags]
+    [GetPostByUser]
+    [GetGlobalTimeline]
+    [GetTimelineForUser]
+    [GetUserData]
+    [SetUserData]
+    [Login]
+    [Register]
+
+    note right of [GetTimelineForUser]
+        Only available for current User
+        Id will be added via Filter
+    end note
+}
+
+[GetPostById] -[hidden]down-> [GetPostByTags]
+[GetPostByTags] -[hidden]down-> [GetPostByUser]
+[GetPostByUser] -[hidden]down-> [GetGlobalTimeline]
+[GetGlobalTimeline] -[hidden]down-> [GetTimelineForUser]
+[GetTimelineForUser] -[hidden]down-> [GetUserData]
+[GetUserData] -[hidden]down-> [SetUserData]
+[SetUserData] -[hidden]down-> [Login]
+[Login] -[hidden]down-> [Register]
+
+package Backend {
+    database "MySql" {
+        [b.Hoot]
+        [b.Reaction]
+        [b.User]
+        [b.Follower]
+        [b.History]
+    }
+}
+
+[b.Hoot] -[hidden]down-> [b.Reaction]
+[b.Reaction] -[hidden]down-> [b.User]
+[b.User] -[hidden]down-> [b.Follower]
+[b.Follower] -[hidden]down-> [b.History]
+
+Frontend -[hidden]r-> Requests
+Requests -[hidden]r-> Backend
+
+
+[f.Timeline Full] -r-> [GetGlobalTimeline]
+[f.Timeline Personal] -r-> [GetTimelineForUser]
+[f.Timeline Search] -r-> [GetPostByTags]
+[f.Any Profile Page] -r-> [GetPostByUser]
+[f.My Profile Page] -r-> [GetUserData]
+[f.Login] -r-> [Login]
+[f.Registration] -r-> [Register]
+[f.Follower] -r-> [GetUserData]
+[f.Following] -r-> [GetUserData]
+[f.Settings] -r-> [SetUserData]
+
+[Login] -r-> [b.User]
+[Register] -r-> [b.User]
+[GetUserData] -r-> [b.User]
+[GetUserData] -r-> [b.Follower]
+[GetPostByUser] -r-> [b.Hoot]
+[GetPostByUser] -r-> [b.User]
+[GetPostByUser] -r-> [b.Reaction]
+[GetTimelineForUser] -r-> [b.Hoot]
+[GetTimelineForUser] -r-> [b.User]
+[GetTimelineForUser] -r-> [b.Reaction]
+[GetGlobalTimeline] -r-> [b.Hoot]
+[GetGlobalTimeline] -r-> [b.User]
+[GetGlobalTimeline] -r-> [b.Reaction]
+
+@enduml
