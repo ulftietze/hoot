@@ -1,4 +1,4 @@
-package hbv.Servlets.Timeline;
+package hbv.Servlets.Hoots.Timeline;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -9,8 +9,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-@WebServlet("/getTimelineGlobal")
-public class GetTimelineGlobalServlet extends HttpServlet
+@WebServlet("/hoots/timeline/personal")
+public class TimelinePersonalServlet extends HttpServlet
 {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
     {
@@ -20,7 +20,7 @@ public class GetTimelineGlobalServlet extends HttpServlet
         out.println("<!doctype html><html>");
         out.println("<head> <meta charset='utf-8'>");
         out.println("<title>webapp</title> </head>");
-        out.println("<body>GetTimelineGlobalServlet</body>");
+        out.println("<body>GetTimelinePersonalServlet</body>");
         out.println("</html>");
 
         ServletContext context = getServletContext();

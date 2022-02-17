@@ -1,0 +1,40 @@
+{
+  "requests": [
+    {
+      "request": {
+        "method": "POST",
+        "url": "/hoots/post",
+        "authorization": "Session Token",
+        "body": {
+          "post": {
+            "content": "String",
+            "followersOnly": false
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "post": {
+            "id": 123,
+            "user": 42,
+            "created": "2010-15-2",
+            "content": "Moin was geht #abc #def",
+            "type": "Post",
+            "reactions": {
+              "LIKES": 0,
+              "DISLIKES": 0,
+              "...": 0
+            },
+            "tags": [
+              "abc",
+              "def"
+            ],
+            "comments": [
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-@WebServlet("/register")
+@WebServlet("/user/register")
 public class RegisterServlet extends HttpServlet
 {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException

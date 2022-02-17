@@ -1,0 +1,59 @@
+{
+  "requests": [
+    {
+      "request": {
+        "method": "GET",
+        "url": "/hoots/timeline/global",
+        "parameters": [
+          {
+            "lastPostId": 15,
+            "quantity": 100
+          }
+        ],
+        "body": {}
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "posts": [
+            {
+              "id": 123,
+              "user": 42,
+              "created": "2010-15-2",
+              "content": "Moin was geht",
+              "type": "Post|Image|Comment|Poll",
+              "reactions": {
+                "LIKES": 14,
+                "DISLIKES": 150,
+                "...": 123
+              },
+              "tags": [
+                "abc",
+                "def"
+              ],
+              "comments": [
+                {
+                  "id": 234,
+                  "parent": 123,
+                  "user": 42,
+                  "created": "2010-15-2",
+                  "content": "nix bei dir?",
+                  "type": "Post|Image|Comment|Poll",
+                  "reactions": {
+                    "LIKES": 14,
+                    "DISLIKES": 150,
+                    "...": 123
+                  },
+                  "tags": [
+                    "abc",
+                    "def"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
