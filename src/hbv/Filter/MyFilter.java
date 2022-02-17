@@ -7,11 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebFilter(
-        filterName = "TestFilter",
-        urlPatterns = {"/*"},
-        initParams = {@WebInitParam(name = "moin", value = "tach auch")}
-)
+@WebFilter(filterName = "TestFilter", urlPatterns = {"/*"}, initParams = {@WebInitParam(name = "moin", value = "tach auch")})
 public class MyFilter implements Filter
 {
     ServletContext ctx;
@@ -22,9 +18,7 @@ public class MyFilter implements Filter
     }
 
     public void doFilter(
-            ServletRequest request,
-            ServletResponse response,
-            FilterChain chain
+            ServletRequest request, ServletResponse response, FilterChain chain
     ) throws IOException, ServletException
     {
         HttpServletRequest  req = (HttpServletRequest) request;

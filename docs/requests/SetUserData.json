@@ -1,0 +1,37 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/setUserData",
+    "authorization": "Session Token",
+    "body": {
+      "user": {
+        "username": "ichwillandersheißen-thomasanders",
+        "password": "sehr-geheim-123",
+        "image": "base64"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "user": {
+        "id": 123,
+        "created": "1995-5-10",
+        "userName": "wolfgang",
+        "imageUrl": "/media/images/profile/abc.jpg",
+        "followers": [
+          {
+            "id": 1234,
+            "userName": "herbert"
+          }
+        ],
+        "following": [
+          {
+            "id": 1234,
+            "userName": "herbert"
+          }
+        ]
+      }
+    }
+  }
+}

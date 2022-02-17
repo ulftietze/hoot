@@ -1,5 +1,6 @@
 @startuml
 'https://plantuml.com/class-diagram
+/' TODO: Beautify '/
 
 class Historie {
     +timestamp: DateTime
@@ -34,6 +35,7 @@ enum HootType {
 class Post {
     -hoot: Hoot
     -content: String
+    -onlyFollower: boolean /'TODO: Check if this is cool'/
 }
 
 class Comment {
@@ -65,9 +67,15 @@ class Tag {
     -tag: String /' Only lowercase! '/
 }
 
+class HootMentions {
+    -hoot: Hoot
+    -mention: User
+}
+
 class User {
     -id: Integer /' TODO: Prüfen, ob uid: String  '/
     -userName: String
+    -imagePath: String
     -passwordHash: String
     -lastLogin: DateTime
     -created: DateTime
@@ -98,5 +106,8 @@ Hoot +- HootType
 
 Hoot "1" - "*" HootTags
 HootTags "*" -- "1" Tag
+
+Hoot "1" - "*" HootMentions
+HootMentions "*" - "1" User
 
 @enduml

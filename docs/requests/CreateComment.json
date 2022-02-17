@@ -1,0 +1,36 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/createComment",
+    "authorization": "Session Token",
+    "body": {
+      "post": {
+        "parent": 123,
+        "content": "String"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "comment": {
+        "id": 123,
+        "user": 42,
+        "created": "2010-15-2",
+        "content": "Sag ich nicht #wtf #ftw",
+        "type": "Image",
+        "reactions": {
+          "LIKES": 0,
+          "DISLIKES": 0,
+          "...": 0
+        },
+        "tags": [
+          "wtf",
+          "ftw"
+        ],
+        "comments": [
+        ]
+      }
+    }
+  }
+}

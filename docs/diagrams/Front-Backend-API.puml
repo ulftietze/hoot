@@ -29,14 +29,18 @@ package Requests {
     [GetPostById]
     [GetPostByTags]
     [GetPostByUser]
-    [GetGlobalTimeline]
-    [GetTimelineForUser]
+    [GetTimelineGlobal]
+    [GetTimelinePersonal]
     [GetUserData]
     [SetUserData]
     [Login]
     [Register]
+    [CreatePost]
+    [CreateImage]
+    [CreateComment]
+    [CreatePoll]
 
-    note right of [GetTimelineForUser]
+    note right of [GetTimelinePersonal]
         Only available for current User
         Id will be added via Filter
     end note
@@ -44,12 +48,16 @@ package Requests {
 
 [GetPostById] -[hidden]down-> [GetPostByTags]
 [GetPostByTags] -[hidden]down-> [GetPostByUser]
-[GetPostByUser] -[hidden]down-> [GetGlobalTimeline]
-[GetGlobalTimeline] -[hidden]down-> [GetTimelineForUser]
-[GetTimelineForUser] -[hidden]down-> [GetUserData]
+[GetPostByUser] -[hidden]down-> [GetTimelineGlobal]
+[GetTimelineGlobal] -[hidden]down-> [GetTimelinePersonal]
+[GetTimelinePersonal] -[hidden]down-> [GetUserData]
 [GetUserData] -[hidden]down-> [SetUserData]
 [SetUserData] -[hidden]down-> [Login]
 [Login] -[hidden]down-> [Register]
+[Register] -[hidden]down-> [CreatePost]
+[CreatePost] -[hidden]down-> [CreateImage]
+[CreateImage] -[hidden]down-> [CreateComment]
+[CreateComment] -[hidden]down-> [CreatePoll]
 
 package Backend {
     database "MySql" {
@@ -70,8 +78,20 @@ Frontend -[hidden]r-> Requests
 Requests -[hidden]r-> Backend
 
 
-[f.Timeline Full] -r-> [GetGlobalTimeline]
-[f.Timeline Personal] -r-> [GetTimelineForUser]
+[f.Timeline Full] -r-> [GetTimelineGlobal]
+[f.Timeline Personal] -r-> [GetTimelinePersonal]
+[f.Timeline Full] -r-> [CreatePost]
+[f.Timeline Personal] -r-> [CreatePost]
+[f.My Profile Page] -r-> [CreatePost]
+[f.Timeline Full] -r-> [CreateImage]
+[f.Timeline Personal] -r-> [CreateImage]
+[f.My Profile Page] -r-> [CreateImage]
+[f.Timeline Full] -r-> [CreateComment]
+[f.Timeline Personal] -r-> [CreateComment]
+[f.My Profile Page] -r-> [CreateComment]
+[f.Timeline Full] -r-> [CreatePoll]
+[f.Timeline Personal] -r-> [CreatePoll]
+[f.My Profile Page] -r-> [CreatePoll]
 [f.Timeline Search] -r-> [GetPostByTags]
 [f.Any Profile Page] -r-> [GetPostByUser]
 [f.My Profile Page] -r-> [GetUserData]
@@ -88,11 +108,15 @@ Requests -[hidden]r-> Backend
 [GetPostByUser] -r-> [b.Hoot]
 [GetPostByUser] -r-> [b.User]
 [GetPostByUser] -r-> [b.Reaction]
-[GetTimelineForUser] -r-> [b.Hoot]
-[GetTimelineForUser] -r-> [b.User]
-[GetTimelineForUser] -r-> [b.Reaction]
-[GetGlobalTimeline] -r-> [b.Hoot]
-[GetGlobalTimeline] -r-> [b.User]
-[GetGlobalTimeline] -r-> [b.Reaction]
+[GetTimelinePersonal] -r-> [b.Hoot]
+[GetTimelinePersonal] -r-> [b.User]
+[GetTimelinePersonal] -r-> [b.Reaction]
+[GetTimelineGlobal] -r-> [b.Hoot]
+[GetTimelineGlobal] -r-> [b.User]
+[GetTimelineGlobal] -r-> [b.Reaction]
+[CreatePost] -r-> [b.Hoot]
+[CreateImage] -r-> [b.Hoot]
+[CreateComment] -r-> [b.Hoot]
+[CreatePoll] -r-> [b.Hoot]
 
 @enduml
