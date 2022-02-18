@@ -1,4 +1,4 @@
-package hbv.Servlets.User;
+package hbv.Servlets.Api.V1.User;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -9,8 +9,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-@WebServlet("/user")
-public class UserServlet extends HttpServlet
+@WebServlet("/api/V1/user")
+public class UserApiServlet extends HttpServlet
 {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
     {

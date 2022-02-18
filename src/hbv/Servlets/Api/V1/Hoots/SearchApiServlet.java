@@ -1,4 +1,4 @@
-package hbv.Servlets.Hoots.Timeline;
+package hbv.Servlets.Api.V1.Hoots;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -9,8 +9,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-@WebServlet("/hoots/timeline/user")
-public class TimelineUserServlet extends HttpServlet
+@WebServlet("/api/V1/hoots/search")
+public class SearchApiServlet extends HttpServlet
 {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
     {
@@ -20,7 +20,7 @@ public class TimelineUserServlet extends HttpServlet
         out.println("<!doctype html><html>");
         out.println("<head> <meta charset='utf-8'>");
         out.println("<title>webapp</title> </head>");
-        out.println("<body>GetHootsByUserServlet</body>");
+        out.println("<body>GET::SearchServlet</body>");
         out.println("</html>");
 
         ServletContext context = getServletContext();

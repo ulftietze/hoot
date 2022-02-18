@@ -1,4 +1,4 @@
-package hbv.Servlets.User;
+package hbv.Servlets.Api.V1.Hoots;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -9,8 +9,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-@WebServlet("/user/login")
-public class LoginServlet extends HttpServlet
+@WebServlet("/api/V1/hoots/comment")
+public class CommentApiServlet extends HttpServlet
 {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
     {
@@ -20,7 +20,7 @@ public class LoginServlet extends HttpServlet
         out.println("<!doctype html><html>");
         out.println("<head> <meta charset='utf-8'>");
         out.println("<title>webapp</title> </head>");
-        out.println("<body>LoginServlet</body>");
+        out.println("<body>CreateCommentServlet</body>");
         out.println("</html>");
 
         ServletContext context = getServletContext();

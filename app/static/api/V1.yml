@@ -1,0 +1,419 @@
+openapi: 3.0.1
+info:
+  title: Hoots
+  description: A small social media network
+  version: 0.1-wip
+servers:
+  - url: https://informatik.hs-bremerhaven.de/docker-{username}-java/api/V1/
+    description: The docker environment in the hopper infrastructure
+    variables:
+      username:
+        default: swe3-21-team-d
+        description: Your personal username, the combination out of for- and lastname, eg. "flastname"
+paths:
+  /user:
+    get:
+      description: Retrieve user information based on id
+      summary: Find user by id
+      tags:
+        - user
+      parameters:
+        - in: query
+          name: id
+          description: ID  of user to load
+          required: true
+          schema:
+            type: integer
+      operationId: getUserById
+      responses:
+        '200':
+          description: Returns own user information
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/user'
+            'text/html':
+              schema:
+                type: string
+  /user/me:
+    get:
+      description: Retrieve my user information based on the cookie
+      summary: Find my user data
+      tags:
+        - user
+      security:
+        - cookieAuth: [ ]
+      operationId: getCurrentUser
+      responses:
+        '200':
+          description: Returns user information
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/user'
+            'text/html':
+              schema:
+                type: string
+    post:
+      description: Save my user information based on the cookie
+      summary: Save current session user data
+      tags:
+        - user
+      security:
+        - cookieAuth: [ ]
+      operationId: saveCurrentUser
+      responses:
+        '200':
+          description: Returns user information
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/user'
+            'text/html':
+              schema:
+                type: string
+  /login:
+    post:
+      summary: Logs in and returns the authentication  cookie
+      tags:
+        - authentication
+      requestBody:
+        required: true
+        description: A JSON object containing the login and password.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/login'
+      security: [ ]    # no authentication
+      responses:
+        '200':
+          description: >
+            Successfully authenticated.
+            The session ID is returned in a cookie named `JSESSIONID`. You need to include this cookie in subsequent
+            requests.
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: JSESSIONID=abcde12345; Path=/; HttpOnly
+  /register:
+    post:
+      summary: Register a user, logs it in and returns the authentication cookie
+      tags:
+        - authentication
+      requestBody:
+        required: true
+        description: A JSON object containing the registration information.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/register'
+      security: [ ]    # no authentication
+      responses:
+        '200':
+          description: >
+            Successfully authenticated.
+            The session ID is returned in a cookie named `JSESSIONID`. You need to include this cookie in subsequent 
+            requests.
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: JSESSIONID=abcde12345; Path=/; HttpOnly
+  /hoot/timeline/global:
+    get:
+      description: Load the global timeline. You can configure the last hoot id and the loading quantity.
+      summary: Load global timeline.
+      tags:
+        - hoot
+      parameters:
+        - in: query
+          name: lastPostId
+          description: The post id of the last post of the seen timeline. Set null to load the newest posts.
+          schema:
+            type: integer
+            nullable: true
+            default: null
+        - in: query
+          name: quantity
+          description: Specify the amount of posts to load.
+          schema:
+            type: integer
+            default: 50
+            minimum: 10
+            maximum: 100
+      responses:
+        '200':
+          description: Load the global timeline.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/hoots'
+  /hoot/timeline/mine:
+    get:
+      description: Load the personal timeline. Configurable the last hoot id and the loading quantity.
+      summary: Load global timeline.
+      tags:
+        - hoot
+      security:
+        - cookieAuth: [ ]
+      parameters:
+        - in: query
+          name: lastPostId
+          description: The post id of the last post of the seen timeline. Set null to load the newest hoots.
+          schema:
+            type: integer
+            nullable: true
+            default: null
+        - in: query
+          name: quantity
+          description: Specify the amount of posts to load.
+          schema:
+            type: integer
+            default: 50
+            minimum: 10
+            maximum: 100
+      responses:
+        '200':
+          description: Load the cuirrent users timeline.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/hoots'
+  /hoot/search:
+    get:
+      description: Search for hoots. Configurable the last hoot id and the loading quantity.
+      summary: Load global timeline.
+      tags:
+        - hoot
+      security:
+        - cookieAuth: [ ]
+      parameters:
+        - in: query
+          name: lastPostId
+          description: The post id of the last post of the seen post. Set null to load the newest hoots.
+          schema:
+            type: integer
+            nullable: true
+            default: null
+        - in: query
+          name: quantity
+          description: Specify the amount of posts to load.
+          schema:
+            type: integer
+            default: 50
+            minimum: 10
+            maximum: 100
+        - in: query
+          name: tags
+          description: Specify the tags to search
+          schema:
+            type: string
+            example: abc, def, efg
+        - in: query
+          name: userId
+          description: Specify the userId to search hoots
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Return a list of the host search results.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/hoots'
+  /hoot/post:
+    post:
+      summary: Save and publish a post
+      tags:
+        - hoot
+      security:
+        - cookieAuth: [ ]
+      requestBody:
+        required: true
+        description: The post to save
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/post'
+      responses:
+        '200':
+          description: Successfully created post.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/post'
+
+  /hoot/comment:
+    post:
+      summary: Save and publish a comment
+      tags:
+        - hoot
+      security:
+        - cookieAuth: [ ]
+      requestBody:
+        required: true
+        description: The comment to save
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/comment'
+      responses:
+        '200':
+          description: Successfully created post.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/comment'
+  /hoot/image:
+    post:
+      summary: Save and publish a image hoot
+      tags:
+        - hoot
+      security:
+        - cookieAuth: [ ]
+      requestBody:
+        required: true
+        description: The image hoot to save
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/image'
+      responses:
+        '200':
+          description: Successfully created post.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/image'
+components:
+  securitySchemes:
+    cookieAuth: # arbitrary name for the security scheme; will be used in the "security" key later
+      type: apiKey
+      in: cookie
+      name: JSESSIONID  # cookie name
+  schemas:
+    user:
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+          format: int64
+          nullable: true
+        name:
+          type: string
+        imageUrl:
+          type: string
+        image:
+          type: string
+          format: byte
+        followers:
+          $ref: '#/components/schemas/followers'
+        followings:
+          $ref: '#/components/schemas/followings'
+    follower:
+      required:
+        - user
+      properties:
+        userId:
+          type: integer
+    followers:
+      type: array
+      items:
+        $ref: '#/components/schemas/follower'
+    following:
+      required:
+        - user
+      properties:
+        userId:
+          type: integer
+    followings:
+      type: array
+      items:
+        $ref: '#/components/schemas/following'
+    login:
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    register:
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        image:
+          type: string
+          format: byte
+    hoots:
+      type: array
+      items:
+        $ref: '#/components/schemas/hoot'
+    hoot:
+      type: object
+      required:
+        - id
+        - type
+        - created
+        - modified
+      properties:
+        id:
+          type: integer
+          format: int64
+        type:
+          type: string
+          enum:
+            - post
+            - comment
+            - image
+        created:
+          type: string
+          format: date-time
+        modified:
+          type: string
+          format: date-time
+    image:
+      allOf:
+        - $ref: '#/components/schemas/hoot'
+        - type: object
+          required:
+            - content
+            - imageUrl
+          properties:
+            content:
+              type: string
+            imageUrl:
+              type: string
+            image:
+              type: string
+              format: byte
+    post:
+      allOf:
+        - $ref: '#/components/schemas/hoot'
+        - type: object
+          required:
+            - content
+          properties:
+            content:
+              type: string
+    comment:
+      allOf:
+        - $ref: '#/components/schemas/hoot'
+        - type: object
+          required:
+            - parent
+            - content
+          properties:
+            parent:
+              $ref: '#/components/schemas/hoot'
+            content:
+              type: string

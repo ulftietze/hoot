@@ -1,4 +1,4 @@
-package hbv.Servlets.Hoots;
+package hbv.Servlets.Api.V1.Hoots.Timeline;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -9,10 +9,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-@WebServlet("/hoots/image")
-public class ImageServlet extends HttpServlet
+@WebServlet("/api/V1/hoots/timeline/mine")
+public class TimelineMineApiServlet extends HttpServlet
 {
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
     {
         response.setContentType("text/html");
 
@@ -20,7 +20,7 @@ public class ImageServlet extends HttpServlet
         out.println("<!doctype html><html>");
         out.println("<head> <meta charset='utf-8'>");
         out.println("<title>webapp</title> </head>");
-        out.println("<body>CreateImageServlet</body>");
+        out.println("<body>GetTimelinePersonalServlet</body>");
         out.println("</html>");
 
         ServletContext context = getServletContext();
