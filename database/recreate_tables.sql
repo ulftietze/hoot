@@ -1,7 +1,8 @@
+/* DO NOT CHANGE ORDER OF DROP STATEMENTS */
 DROP TABLE IF EXISTS Historie;
 DROP TABLE IF EXISTS Follower;
 DROP TABLE IF EXISTS Comment;
-DROP TABLE IF EXISTS Pictures;
+DROP TABLE IF EXISTS Image;
 DROP TABLE IF EXISTS HootMentions;
 DROP TABLE IF EXISTS Reaction;
 DROP TABLE IF EXISTS Post;
@@ -125,11 +126,12 @@ CREATE TABLE Post (
 )
 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
-CREATE TABLE Pictures (
+CREATE TABLE Image (
     hoot BIGINT UNSIGNED PRIMARY KEY,
     url VARCHAR(191) NOT NULL,
+    content VARCHAR(191),
     onlyFollower BOOLEAN NOT NULL,
-    CONSTRAINT `Pictures_fk_hoot_hootid`
+    CONSTRAINT `Image_fk_hoot_hootid`
         FOREIGN KEY (hoot) REFERENCES Hoot (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
@@ -191,7 +193,7 @@ INSERT INTO Interaction (interaction)
 VALUES ('LIKE'), ('DISLIKE');
 
 INSERT INTO HootType (hootType)
-VALUES ('Post'), ('Comment'), ('Picture');
+VALUES ('Post'), ('Comment'), ('Image');
 
 INSERT INTO Hoot (user, hootType)
 VALUES ('BeispielUser2', 'Post');

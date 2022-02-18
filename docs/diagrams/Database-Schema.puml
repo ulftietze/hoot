@@ -3,6 +3,7 @@
 /' TODO: Beautify '/
 
 class Historie {
+    -id: Integer
     +timestamp: DateTime
     +currentLoggedIn: Integer
     +postPerSecond: Float /'Durchschnitt seit letztem Timestamp'/
@@ -18,8 +19,9 @@ enum Interaction {
 }
 
 class Reaction {
+    -id: Integer
     -user: User
-    -post: Post
+    -hoot: Hoot
     -interaction: Interaction
     -created: DateTime
     -modified: DateTime
@@ -48,17 +50,20 @@ class Image {
     -hoot: Hoot
     -url: String
     -content: String
+    -onlyFollower: boolean /'TODO: Check if this is cool'/
 }
 
 class Hoot {
+    -id: Integer
     -user: User
-    -type: HootType
+    -hootType: HootType
     -created: DateTime
     -modified: DateTime
     +getContent(): String
 }
 
 class HootTags {
+    -id: Integer
     -hoot: Hoot
     -tag: Tag
 }
@@ -68,12 +73,12 @@ class Tag {
 }
 
 class HootMentions {
+    -id: Integer
     -hoot: Hoot
     -mention: User
 }
 
 class User {
-    -id: Integer /' TODO: Prüfen, ob uid: String  '/
     -userName: String
     -imagePath: String
     -passwordHash: String
@@ -84,6 +89,7 @@ class User {
 }
 
 class Follower {
+    -id: Integer
     -user: User
     -follows: User
     -created: DateTime
