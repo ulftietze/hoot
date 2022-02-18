@@ -85,7 +85,7 @@ class User {
 
 class Follower {
     -user: User
-    -following: User
+    -follows: User
     -created: DateTime
 }
 
