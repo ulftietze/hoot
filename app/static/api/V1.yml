@@ -157,7 +157,7 @@ paths:
   /hoot/timeline/mine:
     get:
       description: Load the personal timeline. Configurable the last hoot id and the loading quantity.
-      summary: Load global timeline.
+      summary: Load my timeline.
       tags:
         - hoot
       security:
@@ -188,7 +188,7 @@ paths:
   /hoot/search:
     get:
       description: Search for hoots. Configurable the last hoot id and the loading quantity.
-      summary: Load global timeline.
+      summary: Search hoots after parameter criteria.
       tags:
         - hoot
       security:
