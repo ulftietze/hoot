@@ -309,6 +309,8 @@ components:
           type: string
         imageUrl:
           type: string
+        imageFilename:
+          type: string
         image:
           type: string
           format: byte
@@ -362,6 +364,8 @@ components:
           type: string
         password:
           type: string
+        imageFilename:
+          type: string
         image:
           type: string
           format: byte
@@ -404,6 +408,8 @@ components:
             content:
               type: string
             imageUrl:
+              type: string
+            imageFilename:
               type: string
             image:
               type: string
