@@ -122,4 +122,88 @@ class Api
             }
         }).then(promiseOnSuccess).catch(promiseOnError);
     }
+
+    /**
+     * @param {int}      lastPostId
+     * @param {int}      quantity
+     * @param {String}   tags
+     * @param {int|null} userId
+     * @param {function} promiseOnSuccess
+     * @param {function} promiseOnError
+     */
+    static getHootSearch(lastPostId, quantity, tags , userId,  promiseOnSuccess, promiseOnError)
+    {
+        let url = '/api/V1/hoot/Search?lastPostId=' + lastPostId + "&quantity=" + quantity;
+
+        if (tags !== "") {
+            url += "&tags=" + tags;
+        }
+
+        if (userId !== null) {
+            url += "&userId" + userId;
+        }
+
+        // TODO: Set Cookie for Auth
+        fetch( url, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json; charset=UTF-8'
+            }
+        }).then(promiseOnSuccess).catch(promiseOnError);
+    }
+
+    /**
+     * @param {PostDTO}  component
+     * @param {function} promiseOnSuccess
+     * @param {function} promiseOnError
+     */
+    static postHootPost(component,  promiseOnSuccess, promiseOnError)
+    {
+        // TODO: Set Cookie for Auth
+        fetch('/api/V1/hoot/post', {
+            method: 'POST',
+            body: component,
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json; charset=UTF-8'
+            }
+        }).then(promiseOnSuccess).catch(promiseOnError);
+    }
+
+    /**
+     * @param {CommentDTO}  component
+     * @param {function} promiseOnSuccess
+     * @param {function} promiseOnError
+     */
+    static postHootComment(component,  promiseOnSuccess, promiseOnError)
+    {
+        // TODO: Set Cookie for Auth
+        fetch('/api/V1/hoot/comment', {
+            method: 'POST',
+            body: component,
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json; charset=UTF-8'
+            }
+        }).then(promiseOnSuccess).catch(promiseOnError);
+    }
+
+    /**
+     * @param {ImageDTO}  component
+     * @param {function} promiseOnSuccess
+     * @param {function} promiseOnError
+     */
+    static postHootImage(component,  promiseOnSuccess, promiseOnError)
+    {
+        // TODO: Set Cookie for Auth
+        fetch('/api/V1/hoot/image', {
+            method: 'POST',
+            body: component,
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json; charset=UTF-8'
+            }
+        }).then(promiseOnSuccess).catch(promiseOnError);
+    }
 }
