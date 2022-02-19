@@ -130,7 +130,7 @@ CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE Image (
     hoot INT UNSIGNED PRIMARY KEY,
-    url VARCHAR(191) NOT NULL,
+    imagePath VARCHAR(191) NOT NULL,
     content VARCHAR(191),
     onlyFollower BOOLEAN NOT NULL,
     CONSTRAINT `Image_fk_hoot_hootid`

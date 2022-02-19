@@ -48,7 +48,7 @@ class Comment {
 
 class Image {
     -hoot: Hoot
-    -url: String
+    -imagePath: String
     -content: String
     -onlyFollower: boolean /'TODO: Check if this is cool'/
 }
