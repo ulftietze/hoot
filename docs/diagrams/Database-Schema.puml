@@ -80,7 +80,7 @@ class HootMentions {
 
 class User {
     *id: Integer
-    -userName: String
+    -username: String
     -imagePath: String
     -passwordHash: String
     -lastLogin: DateTime

@@ -27,13 +27,13 @@ CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE User (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    userName VARCHAR(191) NOT NULL,
+    username VARCHAR(191) NOT NULL,
     imagePath VARCHAR(191),
     passwordHash VARCHAR(191) NOT NULL,
     lastLogin DateTime DEFAULT CURRENT_TIMESTAMP,
     created DateTime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     modified DateTime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT userName_unique UNIQUE (userName)
+    CONSTRAINT userName_unique UNIQUE (username)
 )
 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -185,7 +185,7 @@ VALUES (50, 1.3, 42.1, 24.9, 2, 'Hier, folgt, ein, Emoji, 🐈');
 INSERT INTO Historie (trendingHashtags)
 VALUES ('🐈');
 
-INSERT INTO User (userName, passwordHash)
+INSERT INTO User (username, passwordHash)
 VALUES ('BeispielUser1','1234'), ('BeispielUser2','5678');
 
 INSERT INTO Follower (user, follows)
