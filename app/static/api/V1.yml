@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: Hoots
   description: A small social media network
-  version: 0.1-wip
+  version: 0.2-wip
 servers:
   - url: https://informatik.hs-bremerhaven.de/docker-{username}-java/api/V1/
     description: The docker environment in the hopper infrastructure
@@ -91,7 +91,6 @@ paths:
         - user
       security:
         - cookieAuth: [ ]
-      operationId: getCurrentUser
       responses:
         '200':
           description: Returns user information
@@ -100,6 +99,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/user'
             'text/html':
+              schema:
+                type: string
+        '404':
+          description: User not found
+          content:
+            'application/json':
               schema:
                 type: string
     put:
@@ -243,7 +248,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/post'
-
   /hoot/comment:
     post:
       summary: Save and publish a comment
@@ -301,7 +305,6 @@ components:
         id:
           type: integer
           format: int64
-          nullable: true
         name:
           type: string
         imageUrl:
@@ -310,29 +313,35 @@ components:
           type: string
           format: byte
         followers:
-          $ref: '#/components/schemas/followers'
-        followings:
-          $ref: '#/components/schemas/followings'
+          type: array
+          items:
+            $ref: '#/components/schemas/follower'
+        follows:
+          type: array
+          items:
+            $ref: '#/components/schemas/follow'
     follower:
       required:
-        - user
+        - userId
+        - username
       properties:
         userId:
           type: integer
-    followers:
-      type: array
-      items:
-        $ref: '#/components/schemas/follower'
-    following:
+          format: int64
+        username:
+          type: string
+    follow:
       required:
-        - user
+        - userId
+        - username
       properties:
         userId:
           type: integer
-    followings:
-      type: array
-      items:
-        $ref: '#/components/schemas/following'
+          format: int64
+        username:
+          type: string
+        imageUrl:
+          type: string
     login:
       required:
         - username
@@ -341,6 +350,8 @@ components:
         username:
           type: string
         password:
+          type: string
+        imageUrl:
           type: string
     register:
       required:
@@ -369,6 +380,7 @@ components:
         id:
           type: integer
           format: int64
+          nullable: true
         type:
           type: string
           enum:
