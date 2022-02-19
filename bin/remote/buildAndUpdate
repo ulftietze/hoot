@@ -2,6 +2,8 @@
 name="$USER-java"
 manager="$USER-manager"
 
+export $(echo $(cat .env | sed 's/#.*//g' | sed 's/\r//g' | xargs))
+
 # tomcat available?
 if ! curl -f -s -o /dev/null https://informatik.hs-bremerhaven.de/$manager/ ; then 
    echo "Ihr tomcat ist nicht aktiviert. Aktivieren Sie auf hopper mit"
@@ -14,9 +16,14 @@ fi
 # TODO: When moving classes the old ones are not getting deleted
 rm -rf build
 
-echo compile
+echo "Compile"
 mkdir -p build
 cp -r app/* build
+sed -i "s/MARIA_HOST/$MARIA_HOST/g" build/WEB-INF/web.xml
+sed -i "s/MARIA_USER/$MARIA_USER/g" build/WEB-INF/web.xml
+sed -i "s/MARIA_PWD/$MARIA_PWD/g" build/WEB-INF/web.xml
+sed -i "s/MARIA_DATABASE/$MARIA_DATABASE/g" build/WEB-INF/web.xml
+sed -i "s/REDIS_PWD/$REDIS_PWD/g" build/WEB-INF/web.xml
 export CLASSPATH=.:$(find complibs app/WEB-INF/lib -name '*jar'|tr '\n' ':')
 javafiles=$(find src -name '*java')
 javac -d build/WEB-INF/classes $javafiles
