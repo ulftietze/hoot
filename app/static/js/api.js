@@ -139,7 +139,7 @@ class Api
         url += userId ? "&userId" + userId : "";
 
         // TODO: Set Cookie for Auth
-        fetch('/api/V1/hoot/Search?lastPostId=' + lastPostId + "&quantity=" + quantity, {
+        fetch(url, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
