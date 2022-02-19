@@ -201,7 +201,7 @@ INSERT INTO Hoot (user, hootType)
 VALUES (2, 'Post');
 
 INSERT INTO Post (hoot, content, onlyFollower)
-VALUES (1, 'Dies ist mein erster Hoot - bitte seid nett zu mir :)', 'FALSE');
+VALUES (1, 'Dies ist mein erster Hoot - bitte seid nett zu mir :)', FALSE);
 
 INSERT INTO Reaction (user, hoot, interaction)
 VALUES (2, 1, 'DISLIKE');
