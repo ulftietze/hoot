@@ -330,6 +330,8 @@ components:
           format: int64
         username:
           type: string
+        imageUrl:
+          type: string
     follow:
       required:
         - userId
@@ -350,8 +352,6 @@ components:
         username:
           type: string
         password:
-          type: string
-        imageUrl:
           type: string
     register:
       required:
