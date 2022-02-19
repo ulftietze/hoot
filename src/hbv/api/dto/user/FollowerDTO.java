@@ -4,7 +4,7 @@ public class FollowerDTO
 {
     public int id;
 
-    public String userName;
+    public String username;
 
     public String imageUrl;
 }
