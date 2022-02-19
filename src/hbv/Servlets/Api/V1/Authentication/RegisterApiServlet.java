@@ -1,4 +1,4 @@
-package hbv.Servlets.Api.V1.User;
+package hbv.Servlets.Api.V1.Authentication;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-@WebServlet("/api/V1/user/register")
+@WebServlet("/api/V1/register")
 public class RegisterApiServlet extends HttpServlet
 {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
