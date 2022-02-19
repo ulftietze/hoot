@@ -13,7 +13,7 @@ import java.io.PrintWriter;
 @WebServlet("/api/V1/login")
 public class LoginApiServlet extends AbstractApiServlet
 {
-    protected void post(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
     {
         LoginDTO login = (LoginDTO) this.deserializeJsonRequestBody(request, LoginDTO.class);
 
