@@ -1,4 +1,4 @@
-package hbv.Servlets.Hoots.Timeline;
+package hbv.Servlets.Api.V1.Hoots.Timeline;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -9,8 +9,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-@WebServlet("/hoots/timeline/global")
-public class TimelineGlobalServlet extends HttpServlet
+@WebServlet("/api/V1/hoots/timeline/global")
+public class TimelineGlobalApiServlet extends HttpServlet
 {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
     {
