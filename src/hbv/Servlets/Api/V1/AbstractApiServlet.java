@@ -13,7 +13,7 @@ public abstract class AbstractApiServlet extends HttpServlet
      * @param request   The incoming http servlet request
      * @param targetDTO The Output DTO from which the input body json is serialized
      * @return Object
-     * @throws IOException
+     * @throws IOException Thrown while reading input stream
      */
     protected Object deserializeJsonRequestBody(HttpServletRequest request, Class<?> targetDTO) throws IOException
     {
@@ -28,6 +28,10 @@ public abstract class AbstractApiServlet extends HttpServlet
         return new Gson().fromJson(stringBuilder.toString(), targetDTO);
     }
 
+    /**
+     * @param toSerialize The DTO to Serialize
+     * @return the serialized json string
+     */
     protected String serializeJsonResponseBody(Object toSerialize)
     {
         return new Gson().toJson(toSerialize);

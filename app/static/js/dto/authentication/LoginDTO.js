@@ -1,12 +1,12 @@
 class LoginDTO
 {
     /**
-     * @type String
+     * @type {String}
      */
     username;
 
     /**
-     * @type String
+     * @type {String}
      */
     password;
 }

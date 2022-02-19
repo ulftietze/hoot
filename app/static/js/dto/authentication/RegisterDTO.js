@@ -1,22 +1,22 @@
 class RegisterDTO
 {
     /**
-     * @type String
+     * @type {String}
      */
     username;
 
     /**
-     * @type String
+     * @type {String}
      */
     password;
 
     /**
-     * @type String
+     * @type {String}
      */
     imageFilename;
 
     /**
-     * @type String
+     * @type {String}
      */
     image;
 }
