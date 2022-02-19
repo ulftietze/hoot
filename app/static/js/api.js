@@ -2,8 +2,8 @@ class Api
 {
     /**
      * @param {LoginDTO} component
-     * @param {function}       promiseOnSuccess
-     * @param {function}       promiseOnError
+     * @param {function} promiseOnSuccess
+     * @param {function} promiseOnError
      */
     static login(component, promiseOnSuccess, promiseOnError)
     {
@@ -124,27 +124,22 @@ class Api
     }
 
     /**
-     * @param {int}      lastPostId
-     * @param {int}      quantity
-     * @param {String}   tags
-     * @param {int|null} userId
-     * @param {function} promiseOnSuccess
-     * @param {function} promiseOnError
+     * @param {int}         lastPostId
+     * @param {int}         quantity
+     * @param {String|null} tags
+     * @param {int|null}    userId
+     * @param {function}    promiseOnSuccess
+     * @param {function}    promiseOnError
      */
-    static getHootSearch(lastPostId, quantity, tags , userId,  promiseOnSuccess, promiseOnError)
+    static getHootSearch(lastPostId, quantity, tags, userId, promiseOnSuccess, promiseOnError)
     {
         let url = '/api/V1/hoot/Search?lastPostId=' + lastPostId + "&quantity=" + quantity;
 
-        if (tags !== "") {
-            url += "&tags=" + tags;
-        }
-
-        if (userId !== null) {
-            url += "&userId" + userId;
-        }
+        url += tags ? "&tags=" + tags : "";
+        url += userId ? "&userId" + userId : "";
 
         // TODO: Set Cookie for Auth
-        fetch( url, {
+        fetch('/api/V1/hoot/Search?lastPostId=' + lastPostId + "&quantity=" + quantity, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -158,7 +153,7 @@ class Api
      * @param {function} promiseOnSuccess
      * @param {function} promiseOnError
      */
-    static postHootPost(component,  promiseOnSuccess, promiseOnError)
+    static postHootPost(component, promiseOnSuccess, promiseOnError)
     {
         // TODO: Set Cookie for Auth
         fetch('/api/V1/hoot/post', {
@@ -172,11 +167,11 @@ class Api
     }
 
     /**
-     * @param {CommentDTO}  component
-     * @param {function} promiseOnSuccess
-     * @param {function} promiseOnError
+     * @param {CommentDTO} component
+     * @param {function}   promiseOnSuccess
+     * @param {function}   promiseOnError
      */
-    static postHootComment(component,  promiseOnSuccess, promiseOnError)
+    static postHootComment(component, promiseOnSuccess, promiseOnError)
     {
         // TODO: Set Cookie for Auth
         fetch('/api/V1/hoot/comment', {
@@ -190,11 +185,11 @@ class Api
     }
 
     /**
-     * @param {ImageDTO}  component
+     * @param {ImageDTO} component
      * @param {function} promiseOnSuccess
      * @param {function} promiseOnError
      */
-    static postHootImage(component,  promiseOnSuccess, promiseOnError)
+    static postHootImage(component, promiseOnSuccess, promiseOnError)
     {
         // TODO: Set Cookie for Auth
         fetch('/api/V1/hoot/image', {
