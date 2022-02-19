@@ -3,6 +3,7 @@ package hbv.Servlets.Api.V1.Authentication;
 import hbv.Servlets.Api.V1.AbstractApiServlet;
 import hbv.api.dto.authentication.LoginDTO;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -15,7 +16,11 @@ public class LoginApiServlet extends AbstractApiServlet
 {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
     {
-        LoginDTO login = (LoginDTO) this.deserializeJsonRequestBody(request, LoginDTO.class);
+        LoginDTO       login   = (LoginDTO) this.deserializeJsonRequestBody(request, LoginDTO.class);
+        ServletContext context = this.getServletContext();
+
+        login.username = "test";
+        login.password = "test";
 
         response.setContentType("text/text");
         response.setCharacterEncoding("UTF-8");
