@@ -1,29 +1,26 @@
 package hbv.Servlets.Api.V1.Authentication;
 
-import javax.servlet.ServletContext;
+import hbv.Servlets.Api.V1.AbstractApiServlet;
+import hbv.api.dto.authentication.LoginDTO;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
 @WebServlet("/api/V1/login")
-public class LoginApiServlet extends HttpServlet
+public class LoginApiServlet extends AbstractApiServlet
 {
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
+    protected void post(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
     {
-        response.setContentType("text/html");
+        LoginDTO login = (LoginDTO) this.deserializeJsonRequestBody(request, LoginDTO.class);
+
+        response.setContentType("text/text");
+        response.setCharacterEncoding("UTF-8");
 
         PrintWriter out = response.getWriter();
-        out.println("<!doctype html><html>");
-        out.println("<head> <meta charset='utf-8'>");
-        out.println("<title>webapp</title> </head>");
-        out.println("<body>LoginServlet</body>");
-        out.println("</html>");
-
-        ServletContext context = getServletContext();
-        context.log("simple logging");
+        out.println(this.serializeJsonResponseBody(login));
     }
 }

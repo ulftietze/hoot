@@ -1,29 +1,26 @@
 package hbv.Servlets.Api.V1.Authentication;
 
-import javax.servlet.ServletContext;
+import hbv.Servlets.Api.V1.AbstractApiServlet;
+import hbv.api.dto.authentication.RegisterDTO;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
 @WebServlet("/api/V1/register")
-public class RegisterApiServlet extends HttpServlet
+public class RegisterApiServlet extends AbstractApiServlet
 {
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
     {
-        response.setContentType("text/html");
+        RegisterDTO register = (RegisterDTO) this.deserializeJsonRequestBody(request, RegisterDTO.class);
+
+        response.setContentType("text/text");
+        response.setCharacterEncoding("UTF-8");
 
         PrintWriter out = response.getWriter();
-        out.println("<!doctype html><html>");
-        out.println("<head> <meta charset='utf-8'>");
-        out.println("<title>webapp</title> </head>");
-        out.println("<body>RegisterServlet</body>");
-        out.println("</html>");
-
-        ServletContext context = getServletContext();
-        context.log("simple logging");
+        out.println(this.serializeJsonResponseBody(register));
     }
 }
