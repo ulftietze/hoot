@@ -21,31 +21,33 @@ CREATE TABLE Historie (
     requestsPerSecond FLOAT UNSIGNED,
     loginsPerSecond FLOAT UNSIGNED,
     currentlyRegisteredUsers INT UNSIGNED,
-    trendingHashtags VARCHAR(191)
+    trendingHashtags VARCHAR(191) /*   191 * 4bit < 767 bit   */
 )
 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE User (
-    userName VARCHAR(191) PRIMARY KEY,
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    userName VARCHAR(191) NOT NULL,
     imagePath VARCHAR(191),
     passwordHash VARCHAR(191) NOT NULL,
     lastLogin DateTime DEFAULT CURRENT_TIMESTAMP,
     created DateTime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    modified DateTime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    modified DateTime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT userName_unique UNIQUE (userName)
 )
 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE Follower (
-    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    user VARCHAR(191) NOT NULL,
-    follows VARCHAR(191) NOT NULL,
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user INT UNSIGNED NOT NULL,
+    follows INT UNSIGNED NOT NULL,
     created DateTime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT `Follower_fk_user_userName`
-        FOREIGN KEY (user) REFERENCES User (userName)
+    CONSTRAINT `Follower_fk_user_userid`
+        FOREIGN KEY (user) REFERENCES User (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
     CONSTRAINT `Follower_fk_follows_userid`
-        FOREIGN KEY (follows) REFERENCES User (userName)
+        FOREIGN KEY (follows) REFERENCES User (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 )
@@ -62,13 +64,13 @@ CREATE TABLE HootType (
 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE Hoot (
-    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    user VARCHAR(191) NOT NULL,
-    hootType VARCHAR(191),
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user INT UNSIGNED NOT NULL,
+    hootType VARCHAR(191) NOT NULL,
     created DateTime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     modified DateTime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT `Hoot_fk_user_userName`
-        FOREIGN KEY (user) REFERENCES User (userName)
+    CONSTRAINT `Hoot_fk_user_userid`
+        FOREIGN KEY (user) REFERENCES User (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
     CONSTRAINT `Hoot_fk_hootType_hootTypeid`
@@ -79,14 +81,14 @@ CREATE TABLE Hoot (
 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE Reaction (
-    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    user VARCHAR(191) NOT NULL,
-    hoot BIGINT UNSIGNED NOT NULL,
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user INT UNSIGNED NOT NULL,
+    hoot INT UNSIGNED NOT NULL,
     interaction VARCHAR(191) NOT NULL,
     created DateTime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     modified DateTime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT `Reaction_fk_user_userName`
-        FOREIGN KEY (user) REFERENCES User (userName)
+    CONSTRAINT `Reaction_fk_user_userid`
+        FOREIGN KEY (user) REFERENCES User (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
     CONSTRAINT `Reaction_fk_hoot_hootid`
@@ -101,8 +103,8 @@ CREATE TABLE Reaction (
 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE Comment (
-    hoot BIGINT UNSIGNED PRIMARY KEY,
-    parent BIGINT UNSIGNED NOT NULL,
+    hoot INT UNSIGNED PRIMARY KEY,
+    parent INT UNSIGNED NOT NULL,
     content VARCHAR(191),
     CONSTRAINT `Comment_fk_hoot_hootid`
         FOREIGN KEY (hoot) REFERENCES Hoot (id)
@@ -116,7 +118,7 @@ CREATE TABLE Comment (
 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE Post (
-    hoot BIGINT UNSIGNED PRIMARY KEY,
+    hoot INT UNSIGNED PRIMARY KEY,
     content VARCHAR(191),
     onlyFollower BOOLEAN NOT NULL,
     CONSTRAINT `Post_fk_hoot_hootid`
@@ -127,7 +129,7 @@ CREATE TABLE Post (
 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE Image (
-    hoot BIGINT UNSIGNED PRIMARY KEY,
+    hoot INT UNSIGNED PRIMARY KEY,
     url VARCHAR(191) NOT NULL,
     content VARCHAR(191),
     onlyFollower BOOLEAN NOT NULL,
@@ -139,15 +141,15 @@ CREATE TABLE Image (
 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE HootMentions (
-    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    hoot BIGINT UNSIGNED NOT NULL,
-    mention VARCHAR(191) NOT NULL,
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    hoot INT UNSIGNED NOT NULL,
+    mention INT UNSIGNED NOT NULL,
     CONSTRAINT `HootMentions_fk_hoot_hootid`
         FOREIGN KEY (hoot) REFERENCES Hoot (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    CONSTRAINT `HootMentions_fk_user_userName`
-        FOREIGN KEY (mention) REFERENCES User (userName)
+    CONSTRAINT `HootMentions_fk_user_userid`
+        FOREIGN KEY (mention) REFERENCES User (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 )
@@ -159,8 +161,8 @@ CREATE TABLE Tag (
 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE HootTags (
-    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    hoot BIGINT UNSIGNED NOT NULL,
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    hoot INT UNSIGNED NOT NULL,
     tag VARCHAR(191) NOT NULL,
     CONSTRAINT `HootTags_fk_hoot_hootid`
         FOREIGN KEY (hoot) REFERENCES Hoot (id)
@@ -187,7 +189,7 @@ INSERT INTO User (userName, passwordHash)
 VALUES ('BeispielUser1','1234'), ('BeispielUser2','5678');
 
 INSERT INTO Follower (user, follows)
-VALUES ('BeispielUser1', 'BeispielUser2');
+VALUES (1, 2);
 
 INSERT INTO Interaction (interaction)
 VALUES ('LIKE'), ('DISLIKE');
@@ -196,16 +198,16 @@ INSERT INTO HootType (hootType)
 VALUES ('Post'), ('Comment'), ('Image');
 
 INSERT INTO Hoot (user, hootType)
-VALUES ('BeispielUser2', 'Post');
+VALUES (2, 'Post');
 
 INSERT INTO Post (hoot, content, onlyFollower)
 VALUES (1, 'Dies ist mein erster Hoot - bitte seid nett zu mir :)', 'FALSE');
 
 INSERT INTO Reaction (user, hoot, interaction)
-VALUES ('Beispieluser2', 1, 'DISLIKE');
+VALUES (2, 1, 'DISLIKE');
 
 INSERT INTO HootMentions (hoot, mention)
-VALUES (1, 'Beispieluser2');
+VALUES (1, 2);
 
 INSERT INTO Tag (tag)
 VALUES ('sommerwind');

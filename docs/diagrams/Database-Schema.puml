@@ -19,7 +19,7 @@ enum Interaction {
 }
 
 class Reaction {
-    -id: Integer
+    *id: Integer
     -user: User
     -hoot: Hoot
     -interaction: Interaction
@@ -30,8 +30,8 @@ class Reaction {
 enum HootType {
     Post
     Comment
-    Poll /' TODO: Maybe or maybe not implement '/
     Image
+    Poll /' TODO: Maybe or maybe not implement '/
 }
 
 class Post {
@@ -54,7 +54,7 @@ class Image {
 }
 
 class Hoot {
-    -id: Integer
+    *id: Integer
     -user: User
     -hootType: HootType
     -created: DateTime
@@ -79,6 +79,7 @@ class HootMentions {
 }
 
 class User {
+    *id: Integer
     -userName: String
     -imagePath: String
     -passwordHash: String
@@ -89,7 +90,7 @@ class User {
 }
 
 class Follower {
-    -id: Integer
+    *id: Integer
     -user: User
     -follows: User
     -created: DateTime
