@@ -11,67 +11,6 @@ servers:
         default: swe3-21-team-d
         description: Your personal username, the combination out of for- and lastname, eg. "flastname"
 paths:
-  /user:
-    get:
-      description: Retrieve user information based on id
-      summary: Find user by id
-      tags:
-        - user
-      parameters:
-        - in: query
-          name: id
-          description: ID  of user to load
-          required: true
-          schema:
-            type: integer
-      operationId: getUserById
-      responses:
-        '200':
-          description: Returns own user information
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/user'
-            'text/html':
-              schema:
-                type: string
-  /user/me:
-    get:
-      description: Retrieve my user information based on the cookie
-      summary: Find my user data
-      tags:
-        - user
-      security:
-        - cookieAuth: [ ]
-      operationId: getCurrentUser
-      responses:
-        '200':
-          description: Returns user information
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/user'
-            'text/html':
-              schema:
-                type: string
-    post:
-      description: Save my user information based on the cookie
-      summary: Save current session user data
-      tags:
-        - user
-      security:
-        - cookieAuth: [ ]
-      operationId: saveCurrentUser
-      responses:
-        '200':
-          description: Returns user information
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/user'
-            'text/html':
-              schema:
-                type: string
   /login:
     post:
       summary: Logs in and returns the authentication  cookie
@@ -120,6 +59,67 @@ paths:
               schema:
                 type: string
                 example: JSESSIONID=abcde12345; Path=/; HttpOnly
+  /user:
+    get:
+      description: Retrieve user information based on id
+      summary: Find user by id
+      tags:
+        - user
+      parameters:
+        - in: query
+          name: id
+          description: ID  of user to load
+          required: true
+          schema:
+            type: integer
+      operationId: getUserById
+      responses:
+        '200':
+          description: Returns own user information
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/user'
+            'text/html':
+              schema:
+                type: string
+  /user/me:
+    get:
+      description: Retrieve my user information based on the cookie
+      summary: Find my user data
+      tags:
+        - user
+      security:
+        - cookieAuth: [ ]
+      operationId: getCurrentUser
+      responses:
+        '200':
+          description: Returns user information
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/user'
+            'text/html':
+              schema:
+                type: string
+    put:
+      description: Update my user information based on the cookie
+      summary: Update current session user
+      tags:
+        - user
+      security:
+        - cookieAuth: [ ]
+      operationId: saveCurrentUser
+      responses:
+        '200':
+          description: Returns user information
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/user'
+            'text/html':
+              schema:
+                type: string
   /hoot/timeline/global:
     get:
       description: Load the global timeline. You can configure the last hoot id and the loading quantity.
