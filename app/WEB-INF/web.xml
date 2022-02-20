@@ -29,6 +29,6 @@
     </context-param>
 
     <listener>
-        <listener-class>hbv.Listener.MyContextListener</listener-class>
+        <listener-class>hoot.front.Listener.MyContextListener</listener-class>
     </listener>
 </web-app>

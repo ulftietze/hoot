@@ -56,7 +56,7 @@ Location: `/bin/remote/`
 
 - list active webapps
 
-In src liegt das java-Paket hbv mit Java-Beispieldateien.
+In src liegt das package hoot mit Java-Dateien.
 
 In app befindet sich die Deployment-Struktur mit html-Dateien WEB-INF, web.xml und den notwendigen Bibliotheken für die
 Laufzeit.
