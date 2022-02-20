@@ -1,6 +1,8 @@
 package hoot.front.Servlets.Api.V1.User;
 
 import hoot.front.Servlets.Api.V1.AbstractApiServlet;
+import hoot.front.api.dto.user.UserDTO;
+import hoot.system.Filesystem.ImageFileHandler;
 import hoot.system.Annotation.AuthenticationRequired;
 
 import javax.servlet.ServletContext;
@@ -47,6 +49,11 @@ public class UserApiServlet extends AbstractApiServlet
 
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
     {
+        UserDTO user = (UserDTO) this.deserializeJsonRequestBody(request, UserDTO.class);
+
+        ImageFileHandler imageFileHandler = new ImageFileHandler(this.getServletContext().getContextPath());
+        imageFileHandler.saveImage(user.imageFilename, "user", user.image, this.getServletContext());
+
         response.setContentType("text/html");
 
         PrintWriter out = response.getWriter();
@@ -56,7 +63,5 @@ public class UserApiServlet extends AbstractApiServlet
         out.println("<body>PUT::UserServlet</body>");
         out.println("</html>");
 
-        ServletContext context = getServletContext();
-        context.log("simple logging");
     }
 }
