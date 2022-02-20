@@ -1,0 +1,50 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+== Authentication ==
+
+Client -> ":Server": << POST: login >>
+activate ":Server"
+
+":Server" --> ":Database": findUserWithLoginInformation()
+":Database" --> ":Server": < User|null >
+
+alt#Gold #LightBlue successful case
+    ":Server" --> Client: JSESSIONID (Session Token)
+else #Pink user not authorized
+    ":Server" --> Client: << 401: Unauthorized >>
+    destroy ":Server"
+end
+
+== Timeline Mine Request ==
+
+Client ->> ":Server": << GET: /hoots/timeline/mine >>
+activate ":Server"
+hnote over Client: Show loading symbol
+":Server" -> ":Server": mapTransferDtoToQueryData()
+":Server" -> ":Server": loadUserIdFromSession()
+":Server" -> ":Database": loadTimeline()
+activate ":Database"
+":Database" -> ":DB_HOOTS": QueryData = "SELECT * FROM hoots where ..."
+":Database" -> ":DB_IMAGES": QueryData = "JOIN images"
+":Database" -> ":DB_POSTS": QueryData = "JOIN posts"
+":Database" -> ":DB_COMMENTS": QueryData = "JOIN comments"
+":Database" -> ":DB_REACTIONS": QueryData = "SELECT count(*) FROM reaction where hoot in (...)"
+":Database" -> ":DB_USER": QueryData = "JOIN user"
+":Database" --> ":Server": Result QueryData
+deactivate ":Database"
+":Server" -> ":Server": Map Result QueryData to TransferDTO
+":Server" -->> Client: << 200: TransferDTO >>
+deactivate ":Server"
+
+box db
+    participant ":Database"
+    participant ":DB_HOOTS"
+    participant ":DB_IMAGES"
+    participant ":DB_POSTS"
+    participant ":DB_COMMENTS"
+    participant ":DB_REACTIONS"
+    participant ":DB_USER"
+end box
+
+@enduml

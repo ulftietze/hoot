@@ -1,0 +1,38 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+== Authentication ==
+
+Client -> ":Server": << POST: login >>
+activate ":Server"
+
+":Server" --> ":Database": findUserWithLoginInformation()
+":Database" --> ":Server": < User|null >
+
+alt#Gold #LightBlue successful case
+    ":Server" --> Client: JSESSIONID (Session Token)
+else #Pink user not authorized
+    ":Server" --> Client: << 401: Unauthorized >>
+    destroy ":Server"
+end
+
+== Request Template ==
+
+group request
+    Client ->> ":Server": << METHOD: retrieve or send information >>
+    activate ":Server"
+    hnote over Client: showLoadingSymbol()
+    ":Server" -> ":Server": mapTransferDtoToQueryData()
+    ":Server" -> ":Database": sendQueryData()
+    ":Database" --> ":Server": < Result QueryData >
+    ":Server" -> ":Server": mapResultQueryDataToTransferDTO()
+    ":Server" -->> Client: << 200: TransferDTO >>
+    deactivate ":Server"
+end
+
+box Backend
+    participant ":Server"
+    participant ":Database"
+end box
+
+@enduml
