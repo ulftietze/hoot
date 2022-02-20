@@ -1,9 +1,11 @@
 package hoot.front.Servlets.Api.V1;
 
 import com.google.gson.Gson;
+import hbv.Exceptions.UnauthorizedException;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.io.BufferedReader;
 import java.io.IOException;
 
@@ -35,5 +37,17 @@ public abstract class AbstractApiServlet extends HttpServlet
     protected String serializeJsonResponseBody(Object toSerialize)
     {
         return new Gson().toJson(toSerialize);
+    }
+
+    protected void validateAuthentication(HttpServletRequest request) throws UnauthorizedException
+    {
+        HttpSession session  = request.getSession(true);
+        boolean     loggedIn = false;
+
+        if (session.getAttribute("user-id") != null) {
+            return;
+        }
+
+        throw new UnauthorizedException("User is not allowed to access this resource");
     }
 }

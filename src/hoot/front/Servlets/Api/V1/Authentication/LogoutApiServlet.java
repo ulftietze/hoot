@@ -11,11 +11,11 @@ import java.io.IOException;
 @WebServlet("/api/V1/logout")
 public class LogoutApiServlet extends AbstractApiServlet
 {
-    protected void post(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
     {
         request.getSession().invalidate();
 
-        response.setContentType("text/text");
+        response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
     }
 }

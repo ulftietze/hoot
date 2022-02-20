@@ -1,5 +1,6 @@
 package hoot.front.Servlets.Api.V1.Hoots;
 
+import hbv.Exceptions.UnauthorizedException;
 import hoot.front.Servlets.Api.V1.AbstractApiServlet;
 
 import javax.servlet.ServletContext;
@@ -15,7 +16,17 @@ public class CommentApiServlet extends AbstractApiServlet
 {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
     {
-        response.setContentType("text/html");
+        try {
+            this.validateAuthentication(request);
+        } catch (UnauthorizedException e) {
+            response.setStatus(401);
+            PrintWriter out = response.getWriter();
+            out.println(this.serializeJsonResponseBody("Unauthorized"));
+
+            return;
+        }
+
+        response.setContentType("application/json");
 
         PrintWriter out = response.getWriter();
         out.println("<!doctype html><html>");
