@@ -5,31 +5,46 @@ import hoot.system.Exception.CouldNotDeleteException;
 import hoot.system.Exception.CouldNotSaveException;
 import hoot.system.Exception.EntityNotFoundException;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
-public class UserRepository implements UserRepositoryInterface
+public class UserRepository implements RepositoryInterface<UserDTO>
 {
     public UserDTO getById(int id) throws EntityNotFoundException
     {
-        Connection connection;
-
         try {
-            connection = DriverManager.getConnection("...");
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
+            Context    initCtx    = new InitialContext();
+            Context    envCtx     = (Context) initCtx.lookup("java:/comp/env");
+            DataSource ds         = (DataSource) envCtx.lookup("jdbc/mariadb");
+            Connection connection = ds.getConnection();
+
+            PreparedStatement pss = connection.prepareStatement("select * from User where id = ?");
+            pss.setInt(1, id);
+            ResultSet rs = pss.executeQuery();
+
+            rs.next(); // will throw exception if user not found
+            if (!rs.isLast()) {
+                throw new EntityNotFoundException("User");
+            }
+
+            UserDTO user = new UserDTO();
+
+            user.id       = rs.getInt("id");
+            user.username = rs.getString("username");
+            user.imageUrl = rs.getString("imagePath");
+
+            rs.close();
+            pss.close();
+            connection.close();
+
+            return user;
+        } catch (Exception e) {
+            throw new EntityNotFoundException("User");
         }
-
-        // connection.query("Select * from user;");
-        // result = connection.fetchAll();
-
-        // userDTO = new UserDTO();
-        // mapper.map(result, userDTO);
-        // return userDTO;
-
-        return null;
     }
 
     public void save(UserDTO user) throws CouldNotSaveException
