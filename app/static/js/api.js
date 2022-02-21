@@ -9,12 +9,9 @@ class Api
     {
         // TODO: Set Cookie for Auth
         fetch('api/V1/login', {
-            method: 'POST',
-            body: component,
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json; charset=UTF-8'
-            }
+            method: 'POST', body: component, headers: {
+                'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
+            },
         }).then(promiseOnSuccess).catch(promiseOnError);
     }
 
@@ -27,12 +24,9 @@ class Api
     {
         // TODO: Set Cookie for Auth
         fetch('api/V1/login', {
-            method: 'POST',
-            body: component,
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json; charset=UTF-8'
-            }
+            method: 'POST', body: component, headers: {
+                'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
+            },
         }).then(promiseOnSuccess).catch(promiseOnError);
     }
 
@@ -46,11 +40,9 @@ class Api
         // TODO: Set Cookie for Auth
         // TODO: Check for easier query params
         fetch('/api/V1/user?id=' + userId, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json; charset=UTF-8'
-            }
+            method: 'GET', headers: {
+                'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
+            },
         }).then(promiseOnSuccess).catch(promiseOnError);
     }
 
@@ -62,11 +54,9 @@ class Api
     {
         // TODO: Set Cookie for Auth
         fetch('/api/V1/user/me', {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json; charset=UTF-8'
-            }
+            method: 'GET', headers: {
+                'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
+            },
         }).then(promiseOnSuccess).catch(promiseOnError);
     }
 
@@ -79,12 +69,9 @@ class Api
     {
         // TODO: Set Cookie for Auth
         fetch('/api/V1/user/me', {
-            method: 'PUT',
-            body: component,
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json; charset=UTF-8'
-            }
+            method: 'PUT', body: component, headers: {
+                'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
+            },
         }).then(promiseOnSuccess).catch(promiseOnError);
     }
 
@@ -96,12 +83,10 @@ class Api
      */
     static getHootTimelineGlobal(lastPostId, quantity, promiseOnSuccess, promiseOnError)
     {
-        fetch('/api/V1/hoot/timeline/global?lastPostId=' + lastPostId + "&quantity=" + quantity, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json; charset=UTF-8'
-            }
+        fetch('/api/V1/hoot/timeline/global?lastPostId=' + lastPostId + '&quantity=' + quantity, {
+            method: 'GET', headers: {
+                'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
+            },
         }).then(promiseOnSuccess).catch(promiseOnError);
     }
 
@@ -114,12 +99,10 @@ class Api
     static getHootTimelineMine(lastPostId, quantity, promiseOnSuccess, promiseOnError)
     {
         // TODO: Set Cookie for Auth
-        fetch('/api/V1/hoot/timeline/mine?lastPostId=' + lastPostId + "&quantity=" + quantity, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json; charset=UTF-8'
-            }
+        fetch('/api/V1/hoot/timeline/mine?lastPostId=' + lastPostId + '&quantity=' + quantity, {
+            method: 'GET', headers: {
+                'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
+            },
         }).then(promiseOnSuccess).catch(promiseOnError);
     }
 
@@ -133,18 +116,16 @@ class Api
      */
     static getHootSearch(lastPostId, quantity, tags, userId, promiseOnSuccess, promiseOnError)
     {
-        let url = '/api/V1/hoot/Search?lastPostId=' + lastPostId + "&quantity=" + quantity;
+        let url = '/api/V1/hoot/Search?lastPostId=' + lastPostId + '&quantity=' + quantity;
 
-        url += tags ? "&tags=" + tags : "";
-        url += userId ? "&userId" + userId : "";
+        url += tags ? '&tags=' + tags : '';
+        url += userId ? '&userId' + userId : '';
 
         // TODO: Set Cookie for Auth
         fetch(url, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json; charset=UTF-8'
-            }
+            method: 'GET', headers: {
+                'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
+            },
         }).then(promiseOnSuccess).catch(promiseOnError);
     }
 
@@ -157,12 +138,9 @@ class Api
     {
         // TODO: Set Cookie for Auth
         fetch('/api/V1/hoot/post', {
-            method: 'POST',
-            body: component,
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json; charset=UTF-8'
-            }
+            method: 'POST', body: component, headers: {
+                'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
+            },
         }).then(promiseOnSuccess).catch(promiseOnError);
     }
 
@@ -175,12 +153,9 @@ class Api
     {
         // TODO: Set Cookie for Auth
         fetch('/api/V1/hoot/comment', {
-            method: 'POST',
-            body: component,
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json; charset=UTF-8'
-            }
+            method: 'POST', body: component, headers: {
+                'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
+            },
         }).then(promiseOnSuccess).catch(promiseOnError);
     }
 
@@ -193,12 +168,9 @@ class Api
     {
         // TODO: Set Cookie for Auth
         fetch('/api/V1/hoot/image', {
-            method: 'POST',
-            body: component,
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json; charset=UTF-8'
-            }
+            method: 'POST', body: component, headers: {
+                'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
+            },
         }).then(promiseOnSuccess).catch(promiseOnError);
     }
 }
