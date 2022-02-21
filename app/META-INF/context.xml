@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+    <Resource name="jdbc/mariadb"
+              auth="Container"
+              type="javax.sql.DataSource"
+              initialSize="10"
+              maxWaitMillis="5000"
+              username="__MARIA_USER__"
+              password="__MARIA_PWD__"
+              driverClassName="org.mariadb.jdbc.Driver"
+              url="jdbc:mariadb://__MARIA_HOST__:3306/__MARIA_DATABASE__" />
+</Context>

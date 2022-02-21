@@ -19,10 +19,10 @@ rm -rf build
 echo "Compile"
 mkdir -p build
 cp -r app/* build
-sed -i "s/MARIA_HOST/$MARIA_HOST/g" build/WEB-INF/web.xml
-sed -i "s/MARIA_USER/$MARIA_USER/g" build/WEB-INF/web.xml
-sed -i "s/MARIA_PWD/$MARIA_PWD/g" build/WEB-INF/web.xml
-sed -i "s/MARIA_DATABASE/$MARIA_DATABASE/g" build/WEB-INF/web.xml
+sed -i "s/__MARIA_HOST__/$MARIADB_HOST/g" build/META-INF/context.xml
+sed -i "s/__MARIA_USER__/$MARIADB_USER/g" build/META-INF/context.xml
+sed -i "s/__MARIA_PWD__/$MARIADB_PWD/g" build/META-INF/context.xml
+sed -i "s/__MARIA_DATABASE__/$MARIADB_DATABASE/g" build/META-INF/context.xml
 sed -i "s/REDIS_PWD/$REDIS_PWD/g" build/WEB-INF/web.xml
 export CLASSPATH=.:$(find complibs app/WEB-INF/lib -name '*jar'|tr '\n' ':')
 javafiles=$(find src -name '*java')
