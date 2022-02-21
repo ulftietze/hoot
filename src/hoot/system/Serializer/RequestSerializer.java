@@ -8,7 +8,7 @@ import java.io.IOException;
 
 public class RequestSerializer
 {
-    Gson gson;
+    private final Gson gson;
 
     public RequestSerializer()
     {
