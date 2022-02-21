@@ -1,32 +1,32 @@
 package hoot.model.repositories;
 
 import hoot.front.api.dto.user.UserDTO;
+import hoot.model.search.SearchCriteriaInterface;
+import hoot.model.search.UserSearchCriteria;
+import hoot.system.Exception.ConnectionFailedException;
 import hoot.system.Exception.CouldNotDeleteException;
 import hoot.system.Exception.CouldNotSaveException;
 import hoot.system.Exception.EntityNotFoundException;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
-public class UserRepository implements RepositoryInterface<UserDTO>
+public class UserRepository extends AbstractRepository<UserDTO>
 {
-    public UserDTO getById(int id) throws EntityNotFoundException
+    @Override
+    public UserDTO getById(int id) throws EntityNotFoundException, ConnectionFailedException
     {
         try {
-            Context    initCtx    = new InitialContext();
-            Context    envCtx     = (Context) initCtx.lookup("java:/comp/env");
-            DataSource ds         = (DataSource) envCtx.lookup("jdbc/mariadb");
-            Connection connection = ds.getConnection();
+            Connection connection = this.getConnection();
 
-            PreparedStatement pss = connection.prepareStatement("select * from User where id = ?");
+            PreparedStatement pss = connection.prepareStatement("select id, username, imagePath from User where id = ?");
             pss.setInt(1, id);
             ResultSet rs = pss.executeQuery();
 
-            rs.next(); // will throw exception if user not found
+            rs.next(); // will throw SQLException if user was not found
             if (!rs.isLast()) {
                 throw new EntityNotFoundException("User");
             }
@@ -39,19 +39,29 @@ public class UserRepository implements RepositoryInterface<UserDTO>
 
             rs.close();
             pss.close();
-            connection.close();
+
+            this.returnConnection(connection);
 
             return user;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             throw new EntityNotFoundException("User");
         }
     }
 
+    @Override
+    public ArrayList<UserDTO> getList(SearchCriteriaInterface searchCriteria)
+    {
+        UserSearchCriteria us = (UserSearchCriteria) searchCriteria;
+        return null;
+    }
+
+    @Override
     public void save(UserDTO user) throws CouldNotSaveException
     {
 
     }
 
+    @Override
     public void delete(UserDTO user) throws CouldNotDeleteException
     {
 

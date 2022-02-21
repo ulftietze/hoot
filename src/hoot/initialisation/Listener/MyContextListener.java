@@ -1,4 +1,4 @@
-package hoot.front.Listener;
+package hoot.initialisation.Listener;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
