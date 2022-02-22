@@ -1,6 +1,7 @@
 package hoot.front.Servlets.Api.V1.Hoots;
 
 import hoot.front.Servlets.Api.V1.AbstractApiServlet;
+import hoot.system.Annotation.AuthenticationRequired;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -10,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+@AuthenticationRequired
 @WebServlet("/api/V1/hoots/post")
 public class PostApiServlet extends AbstractApiServlet
 {

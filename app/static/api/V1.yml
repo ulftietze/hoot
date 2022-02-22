@@ -13,7 +13,7 @@ servers:
 paths:
   /login:
     post:
-      summary: Logs in and returns the authentication  cookie
+      summary: Logs in and returns the authentication cookie header
       tags:
         - authentication
       requestBody:
@@ -35,6 +35,16 @@ paths:
               schema:
                 type: string
                 example: JSESSIONID=abcde12345; Path=/; HttpOnly
+  /logout:
+    post:
+      summary: Logout and resets authentication cookie
+      tags:
+        - authentication
+      security:
+        - cookieAuth: [ ]
+      responses:
+        '200':
+          description: Successfully removed authentication.
   /register:
     post:
       summary: Register a user, logs it in and returns the authentication cookie
