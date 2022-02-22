@@ -1,18 +1,24 @@
 package hoot.front.Servlets;
 
-import hoot.front.api.dto.user.UserDTO;
+import hoot.model.entities.User;
 import hoot.model.repositories.UserRepository;
 import hoot.system.Annotation.AuthenticationRequired;
 import hoot.system.Exception.ConnectionFailedException;
 import hoot.system.Exception.EntityNotFoundException;
+import hoot.system.ObjectManager.ObjectManager;
 
-import javax.servlet.ServletContext;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 @AuthenticationRequired(authenticationRequired = false)
 @WebServlet("/test")
@@ -29,13 +35,26 @@ public class TestServlet extends HttpServlet
         out.println("<title>JDBC Test</title> </head>");
         out.println("<body>");
 
-        UserDTO user = null;
-
-        UserRepository ur = new UserRepository();
+        User user = null;
 
         try {
-            user = ur.getById(1);
-        } catch (EntityNotFoundException | ConnectionFailedException e) {
+            DataSource ds = (DataSource) ObjectManager.get(DataSource.class);
+            Connection connection = ds.getConnection();
+
+            PreparedStatement pss = connection.prepareStatement("select id, username, imagePath from User where id = ?");
+            pss.setInt(1, 1);
+            ResultSet rs = pss.executeQuery();
+
+            rs.next(); // will throw SQLException if result set is empty
+            if (!rs.isLast()) {
+                throw new EntityNotFoundException("User");
+            }
+
+            user.id = rs.getObject()
+
+
+
+        } catch (EntityNotFoundException | ConnectionFailedException | SQLException e) {
             e.printStackTrace(out);
         }
 
