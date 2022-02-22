@@ -1,0 +1,16 @@
+#!/bin/bash
+
+export $(echo $(cat .env | sed 's/#.*//g' | sed 's/\r//g' | xargs) | envsubst)
+
+ssh "$REMOTE_USER"@"$REMOTE_HOST" "mkdir -p $REMOTE_PATH"
+
+# shellcheck disable=SC2046
+rsync -var --delete --exclude 'build' --exclude '.git' --exclude '.idea' --exclude 'media' . "$REMOTE_USER"@"$REMOTE_HOST":"$REMOTE_PATH"
+
+ssh "$REMOTE_USER"@"$REMOTE_HOST"  "sudo -u tomcat cp $REMOTE_PATH/etc/tomcat/server.xml /etc/tomcat9/"
+ssh "$REMOTE_USER"@"$REMOTE_HOST"  "sudo -u tomcat /my/runtomcat.sh"
+
+# maybe increase sleep ( tomcat restart takes around 5 sec) if issue occurs
+sleep 7
+
+ssh "$REMOTE_USER"@"$REMOTE_HOST" "cd $REMOTE_PATH && bin/remote/buildAndUpdate"
