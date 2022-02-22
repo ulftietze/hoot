@@ -12,7 +12,4 @@
     <listener>
         <listener-class>hoot.initialisation.Listener.MyContextListener</listener-class>
     </listener>
-    <listener>
-            <listener-class>hoot.initialisation.Listener.DatabaseInitContextListener</listener-class>
-    </listener>
 </web-app>
