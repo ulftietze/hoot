@@ -15,4 +15,5 @@
               testWhileIdle="true"
               validationQuery="SELECT 1;"
               url="jdbc:mariadb://__MARIA_HOST__:3306/__MARIA_DATABASE__" />
+    <Resources allowLinking="true" />
 </Context>

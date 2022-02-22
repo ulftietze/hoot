@@ -125,6 +125,13 @@ paths:
       security:
         - cookieAuth: [ ]
       operationId: saveCurrentUser
+      requestBody:
+        required: true
+        description: A JSON object containing the user.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/user'
       responses:
         '200':
           description: Returns user information
