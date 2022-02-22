@@ -26,7 +26,7 @@ public class UserRepository extends AbstractRepository<UserDTO>
             pss.setInt(1, id);
             ResultSet rs = pss.executeQuery();
 
-            rs.next(); // will throw SQLException if user was not found
+            rs.next(); // will throw SQLException if result set is empty
             if (!rs.isLast()) {
                 throw new EntityNotFoundException("User");
             }
