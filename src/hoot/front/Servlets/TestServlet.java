@@ -1,9 +1,7 @@
 package hoot.front.Servlets;
 
 import hoot.model.entities.User;
-import hoot.model.repositories.UserRepository;
 import hoot.system.Annotation.AuthenticationRequired;
-import hoot.system.Exception.ConnectionFailedException;
 import hoot.system.Exception.EntityNotFoundException;
 import hoot.system.ObjectManager.ObjectManager;
 
@@ -12,13 +10,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
-import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.ZoneId;
 
 @AuthenticationRequired(authenticationRequired = false)
 @WebServlet("/test")
@@ -41,7 +39,7 @@ public class TestServlet extends HttpServlet
             DataSource ds = (DataSource) ObjectManager.get(DataSource.class);
             Connection connection = ds.getConnection();
 
-            PreparedStatement pss = connection.prepareStatement("select id, username, imagePath from User where id = ?");
+            PreparedStatement pss = connection.prepareStatement("select * from User where id = ?");
             pss.setInt(1, 1);
             ResultSet rs = pss.executeQuery();
 
@@ -50,16 +48,22 @@ public class TestServlet extends HttpServlet
                 throw new EntityNotFoundException("User");
             }
 
-            user.id = rs.getObject()
+            user = new User();
 
+            user.id = rs.getInt("id");
+            user.username = rs.getString("username");
+            user.imagePath = rs.getString("imagePath");
+            user.passwordHash = rs.getString("passwordHash");
+            user.lastLogin = rs.getTimestamp("lastLogin").toInstant().atZone(ZoneId.of("Europe/Berlin")).toLocalDateTime();
+            user.created = rs.getTimestamp("created").toInstant().atZone(ZoneId.of("Europe/Berlin")).toLocalDateTime();
+            user.modified = rs.getTimestamp("modified").toInstant().atZone(ZoneId.of("Europe/Berlin")).toLocalDateTime();
 
-
-        } catch (EntityNotFoundException | ConnectionFailedException | SQLException e) {
+        } catch (EntityNotFoundException | SQLException e) {
             e.printStackTrace(out);
         }
 
         if (user != null) {
-            out.println("ID: " + user.id + "<br>" + "UserName: " + user.username + "<br>");
+            out.println("ID: " + user.id + "<br>" + "UserName: " + user.username + "<br>" + "LastLogin: " + user.lastLogin + "<br>");
         } else {
             out.println("DB connection failed or User not found.");
         }
