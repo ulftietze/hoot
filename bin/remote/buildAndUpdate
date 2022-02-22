@@ -17,7 +17,7 @@ fi
 rm -rf build
 
 echo "Compile"
-mkdir -p build
+mkdir -p build media
 cp -r app/* build
 sed -i "s/__MARIA_HOST__/$MARIADB_HOST/g" build/META-INF/context.xml
 sed -i "s/__MARIA_USER__/$MARIADB_USER/g" build/META-INF/context.xml

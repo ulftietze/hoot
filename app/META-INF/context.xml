@@ -15,4 +15,10 @@
               testWhileIdle="true"
               validationQuery="SELECT 1;"
               url="jdbc:mariadb://__MARIA_HOST__:3306/__MARIA_DATABASE__" />
+    <Resources allowLinking="false">
+        <PostResources readOnly="false"
+                       className="org.apache.catalina.webresources.DirResourceSet"
+                       base="media"
+                       webAppMount="/media"/>
+    </Resources>
 </Context>
