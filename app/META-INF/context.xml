@@ -5,8 +5,14 @@
               type="javax.sql.DataSource"
               initialSize="10"
               maxWaitMillis="5000"
+              minIdle="10"
+              maxIdle="-1"
+              maxTotal="25"
               username="__MARIA_USER__"
               password="__MARIA_PWD__"
               driverClassName="org.mariadb.jdbc.Driver"
+              testOnBorrow="true"
+              testWhileIdle="true"
+              validationQuery="SELECT 1;"
               url="jdbc:mariadb://__MARIA_HOST__:3306/__MARIA_DATABASE__" />
 </Context>

@@ -10,9 +10,6 @@
     </context-param>
 
     <listener>
-        <listener-class>hoot.initialisation.Listener.MyContextListener</listener-class>
-    </listener>
-    <listener>
-            <listener-class>hoot.initialisation.Listener.DatabaseInitContextListener</listener-class>
+        <listener-class>hoot.initialisation.Listener.ObjectInstantiationContextListener</listener-class>
     </listener>
 </web-app>

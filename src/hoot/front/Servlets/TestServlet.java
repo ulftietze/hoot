@@ -2,18 +2,19 @@ package hoot.front.Servlets;
 
 import hoot.front.api.dto.user.UserDTO;
 import hoot.model.repositories.UserRepository;
+import hoot.system.Annotation.AuthenticationRequired;
 import hoot.system.Exception.ConnectionFailedException;
 import hoot.system.Exception.EntityNotFoundException;
 
-import javax.naming.NamingException;
+import javax.servlet.ServletContext;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
 
+@AuthenticationRequired(authenticationRequired = false)
 @WebServlet("/test")
 public class TestServlet extends HttpServlet
 {

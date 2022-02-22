@@ -21,7 +21,6 @@ public class UserRepository extends AbstractRepository<UserDTO>
     {
         try {
             Connection connection = this.getConnection();
-
             PreparedStatement pss = connection.prepareStatement("select id, username, imagePath from User where id = ?");
             pss.setInt(1, id);
             ResultSet rs = pss.executeQuery();
@@ -40,10 +39,11 @@ public class UserRepository extends AbstractRepository<UserDTO>
             rs.close();
             pss.close();
 
-            this.returnConnection(connection);
+            connection.close();
 
             return user;
         } catch (SQLException e) {
+            this.getLogger().log("Das hat nicht geklappt");
             throw new EntityNotFoundException("User");
         }
     }
