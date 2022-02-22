@@ -14,4 +14,4 @@ ssh "$REMOTE_USER"@"$REMOTE_HOST"  "sudo -u tomcat /my/runtomcat.sh"
 sleep 7
 
 ssh "$REMOTE_USER"@"$REMOTE_HOST" "cd $REMOTE_PATH && bin/remote/buildAndUpdate"
-ssh "$REMOTE_USER"@"$REMOTE_HOST" "sudo -u tomcat ln -s /home/docker-utietze/projects/hoots/media /var/lib/tomcat9/webapps/docker-utietze-java/media"
+ssh "$REMOTE_USER"@"$REMOTE_HOST" "sudo -u tomcat ln -s $REMOTE_PATH/media /var/lib/tomcat9/webapps/$REMOTE_USER-java/media"
