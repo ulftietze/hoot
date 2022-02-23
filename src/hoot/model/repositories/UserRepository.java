@@ -2,7 +2,6 @@ package hoot.model.repositories;
 
 import hoot.model.entities.User;
 import hoot.model.search.SearchCriteriaInterface;
-import hoot.model.search.UserSearchCriteria;
 import hoot.system.Exception.CouldNotDeleteException;
 import hoot.system.Exception.CouldNotSaveException;
 import hoot.system.Exception.EntityNotFoundException;
@@ -69,15 +68,49 @@ public class UserRepository extends AbstractRepository<User>
             return user;
         } catch (EntityNotFoundException | SQLException e) {
             this.log(e.getMessage());
-            throw new EntityNotFoundException("User");
+            throw new EntityNotFoundException("User with ID: " + id);
         }
     }
 
     @Override
     public ArrayList<User> getList(SearchCriteriaInterface searchCriteria)
     {
-        UserSearchCriteria us = (UserSearchCriteria) searchCriteria;
-        return null;
+        ArrayList<User> users = new ArrayList<>();
+
+        try {
+            Connection connection       = this.getConnection();
+            PreparedStatement statement = searchCriteria.getSearchQuery(connection);
+            ResultSet resultSet         = statement.executeQuery();
+
+            while (resultSet.next()) {
+                LocalDateTime lastLogin = resultSet
+                        .getTimestamp("lastLogin")
+                        .toInstant()
+                        .atZone(ZoneId.of("Europe/Berlin"))
+                        .toLocalDateTime();
+
+                LocalDateTime created = resultSet
+                        .getTimestamp("created")
+                        .toInstant()
+                        .atZone(ZoneId.of("Europe/Berlin"))
+                        .toLocalDateTime();
+
+                User user = new User();
+                user.username     = resultSet.getString("username");
+                user.imagePath    = resultSet.getString("imagePath");
+                user.passwordHash = resultSet.getString("passwordHash");
+
+                users.add(user);
+            }
+
+            resultSet.close();
+            statement.close();
+            connection.close();
+        } catch (SQLException e) {
+            // TODO: Maybe logging and stuff, maybe not, this could
+        }
+
+        return users;
     }
 
     /**
@@ -126,13 +159,18 @@ public class UserRepository extends AbstractRepository<User>
     }
 
     /**
-     * Save changes to a already existing User in the DB
+     * Save changes to an already existing User in the DB
      * @param user a User object that was previously returned from the getById() method. DO NOT CREATE ONE ON YOUR OWN.
      * @throws CouldNotSaveException if any SQL errors occurred.
      */
     @Override
     public void save(User user) throws CouldNotSaveException
     {
+        if (user.id == null) {
+            this.create(user.username, user.imagePath, user.passwordHash);
+            return;
+        }
+
         try {
             Connection        connection   = this.getConnection();
             String            sqlStatement = "update User set username = ?, imagePath = ?, passwordHash = ? where id = ?";

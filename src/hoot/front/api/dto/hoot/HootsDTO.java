@@ -4,5 +4,5 @@ import java.util.ArrayList;
 
 public class HootsDTO
 {
-    public ArrayList<HootDTO> hoots;
+    public ArrayList<HootDTO> hoots = new ArrayList<>();
 }

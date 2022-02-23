@@ -1,16 +1,8 @@
 package hoot.front.api.dto.hoot;
 
-import java.time.LocalDateTime;
-
-public class CommentDTO
+public class CommentDTO extends HootDTO
 {
-    public Integer id;
-
-    public HootType type;
-
-    public LocalDateTime created;
-
-    public LocalDateTime modified;
+    public HootType type = HootType.comment;
 
     public HootDTO parent;
 

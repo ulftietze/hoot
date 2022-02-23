@@ -8,6 +8,11 @@ public class Post extends Hoot
 
     public boolean onlyFollower;
 
+    public Post()
+    {
+        
+    }
+
     public Post(int id, User user, HootType hootType, LocalDateTime created)
     {
         super(id, user, hootType, created);

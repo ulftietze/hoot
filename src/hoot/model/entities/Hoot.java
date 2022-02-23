@@ -5,16 +5,19 @@ import java.time.LocalDateTime;
 public class Hoot
 {
     // id should never be changed
-    public final int id;
+    public int id;
 
     // changing the user of a hoot does not make sense
-    public final User user;
+    public User user;
 
     // hootType will always be the same (comment cannot magically become a image)
-    public final HootType hootType;
+    public HootType hootType;
 
     // set by the DB
-    public final LocalDateTime created;
+    public LocalDateTime created;
+
+    public Hoot()
+    {}
 
     public Hoot(int id, User user, HootType hootType, LocalDateTime created)
     {

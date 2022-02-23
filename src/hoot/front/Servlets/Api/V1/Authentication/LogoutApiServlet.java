@@ -15,7 +15,6 @@ public class LogoutApiServlet extends AbstractApiServlet
     {
         request.getSession().invalidate();
 
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
+        this.sendResponse(response, HttpServletResponse.SC_RESET_CONTENT, this.serializeJsonResponseBody("logged out"));
     }
 }

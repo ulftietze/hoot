@@ -40,7 +40,7 @@ public class GetUserIdIfValidLogin
 
             return result.getInt("id");
         } catch (SQLException e) {
-            // Ignore, in this case the credentials were wrong.
+            // Ignore, in this case the credentials are simply wrong.
             return null;
         } catch (GeneralSecurityException e) {
             this.logger.log("Unable to Login User. " + e.getMessage());

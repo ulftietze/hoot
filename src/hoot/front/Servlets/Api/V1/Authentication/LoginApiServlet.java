@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.io.PrintWriter;
 
 @WebServlet("/api/V1/login")
 public class LoginApiServlet extends AbstractApiServlet
@@ -23,10 +22,11 @@ public class LoginApiServlet extends AbstractApiServlet
         LoginDTO    login    = (LoginDTO) this.deserializeJsonRequestBody(request, LoginDTO.class);
         HttpSession session  = request.getSession(true);
         boolean     loggedIn = false;
-        session.setAttribute("userId", null);
 
         GetUserIdIfValidLogin getUserIdIfValid = (GetUserIdIfValidLogin) ObjectManager.get(GetUserIdIfValidLogin.class);
         Integer               userId           = getUserIdIfValid.execute(login);
+
+        session.setAttribute(LoginApiServlet.SESSION_USER_IDENTIFIER, null);
 
         // TODO: If already logged in this is irrelevant
         if (userId != null) {
@@ -35,10 +35,7 @@ public class LoginApiServlet extends AbstractApiServlet
             // TODO: Update User.LastLoggedIn
         }
 
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-
-        PrintWriter out = response.getWriter();
-        out.println(this.serializeJsonResponseBody(loggedIn ? "success" : "failure"));
+        String responseBody = this.serializeJsonResponseBody(loggedIn ? "success" : "failure");
+        this.sendResponse(response, HttpServletResponse.SC_OK, responseBody);
     }
 }

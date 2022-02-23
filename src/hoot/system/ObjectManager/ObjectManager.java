@@ -7,7 +7,9 @@ public class ObjectManager
 {
     private static ObjectManager instance;
 
-    private Map<Class<?>, Object> objectMap;
+    private final Map<Class<?>, Object> objectMap;
+
+    private Map<Class<?>, FactoryInterface<?>> objectFactoryMap;
 
     private ObjectManager()
     {
@@ -20,10 +22,29 @@ public class ObjectManager
         return om.objectMap.get(className);
     }
 
+    public static Object get(Class<?> className, boolean newInstance)
+    {
+        ObjectManager om = ObjectManager.getInstance();
+
+        if (newInstance) {
+            FactoryInterface<?> factory = om.objectFactoryMap.get(className);
+            return factory.create();
+        }
+
+        return ObjectManager.get(className);
+    }
+
     public static void set(Class<?> className, Object object)
     {
         ObjectManager om = ObjectManager.getInstance();
         om.objectMap.put(className, object);
+    }
+
+    public static void set(Class<?> className, Object object, FactoryInterface<?> factory)
+    {
+        ObjectManager om = ObjectManager.getInstance();
+        om.objectMap.put(className, object);
+        om.objectFactoryMap.put(className, factory);
     }
 
     private static ObjectManager getInstance()
