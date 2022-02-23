@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-@WebServlet("/api/V1/hoots/timeline/global")
+@WebServlet("/api/V1/hoot/timeline/global")
 public class TimelineGlobalApiServlet extends AbstractApiServlet
 {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException

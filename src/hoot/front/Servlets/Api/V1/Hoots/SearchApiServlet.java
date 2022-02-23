@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 @AuthenticationRequired
-@WebServlet("/api/V1/hoots/search")
+@WebServlet("/api/V1/hoot/search")
 public class SearchApiServlet extends AbstractApiServlet
 {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException

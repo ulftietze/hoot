@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 @AuthenticationRequired
-@WebServlet("/api/V1/hoots/post")
+@WebServlet("/api/V1/hoot/post")
 public class PostApiServlet extends AbstractApiServlet
 {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
