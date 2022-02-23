@@ -3,6 +3,7 @@ package hoot.front.Servlets;
 import hoot.model.entities.User;
 import hoot.model.repositories.UserRepository;
 import hoot.system.Annotation.AuthenticationRequired;
+import hoot.system.Exception.EntityNotFoundException;
 import hoot.system.ObjectManager.ObjectManager;
 
 import javax.servlet.annotation.WebServlet;
@@ -28,7 +29,15 @@ public class TestServlet extends HttpServlet
         out.println("<body>");
 
         UserRepository ur   = (UserRepository) ObjectManager.get(UserRepository.class);
-        User           user = ur.getById(1);
+
+        User user = null;
+
+        try {
+            user = ur.getById(1);
+        } catch (EntityNotFoundException e) {
+            // Exception is already logged at this point
+            // This is just to inform the frontend, that something went wrong
+        }
 
         if (user != null) {
             out.println(

@@ -1,7 +1,6 @@
 package hoot.model.repositories;
 
 import hoot.model.search.SearchCriteriaInterface;
-import hoot.system.Exception.ConnectionFailedException;
 import hoot.system.Exception.CouldNotDeleteException;
 import hoot.system.Exception.CouldNotSaveException;
 import hoot.system.Exception.EntityNotFoundException;
@@ -27,9 +26,9 @@ public abstract class AbstractRepository<Type>
         logger.log(message);
     }
 
-    public abstract Type getById(int id) throws EntityNotFoundException, ConnectionFailedException;
+    public abstract Type getById(int id) throws EntityNotFoundException;
 
-    public abstract ArrayList<Type> getList(SearchCriteriaInterface searchCriteria);
+    public abstract ArrayList<Type> getList(SearchCriteriaInterface searchCriteria) throws EntityNotFoundException;
 
     public abstract Type create() throws CouldNotSaveException;
 

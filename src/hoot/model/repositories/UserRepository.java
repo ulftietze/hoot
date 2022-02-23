@@ -25,7 +25,7 @@ public class UserRepository extends AbstractRepository<User>
      */
     // TODO: Check if synchronisation is required!
     @Override
-    public User getById(int id)
+    public User getById(int id) throws EntityNotFoundException
     {
         try {
             Connection connection = this.getConnection();
@@ -69,7 +69,7 @@ public class UserRepository extends AbstractRepository<User>
             return user;
         } catch (EntityNotFoundException | SQLException e) {
             this.log(e.getMessage());
-            return null;
+            throw new EntityNotFoundException("User");
         }
     }
 

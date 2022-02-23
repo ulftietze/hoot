@@ -17,7 +17,7 @@ CREATE TABLE Historie (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     timestamp DateTime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     currentLoggedIn INT UNSIGNED,
-    postPerSecond FLOAT UNSIGNED,
+    postsPerSecond FLOAT UNSIGNED,
     requestsPerSecond FLOAT UNSIGNED,
     loginsPerSecond FLOAT UNSIGNED,
     currentlyRegisteredUsers INT UNSIGNED,
