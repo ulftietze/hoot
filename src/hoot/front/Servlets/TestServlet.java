@@ -28,7 +28,7 @@ public class TestServlet extends HttpServlet
         out.println("<title>JDBC Test</title> </head>");
         out.println("<body>");
 
-        UserRepository ur   = (UserRepository) ObjectManager.get(UserRepository.class);
+        UserRepository ur = (UserRepository) ObjectManager.get(UserRepository.class);
 
         User user = null;
 
@@ -49,8 +49,10 @@ public class TestServlet extends HttpServlet
                     "created: " + user.created + "<br>"
             );
         } else {
-            out.println("DB connection failed or User not found.");
+            out.println("DB connection failed or User not found.<br>");
         }
+
+        out.println("<br>");
 
         out.println("</body>");
         out.println("</html>");

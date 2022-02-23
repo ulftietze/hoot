@@ -30,8 +30,8 @@ public class UserRepository extends AbstractRepository<User>
         try {
             Connection connection = this.getConnection();
 
-            String sqlStatement = "select id, username, imagePath, passwordHash, lastLogin, created from User where id = ?";
-            PreparedStatement pss = connection.prepareStatement(sqlStatement);
+            String            sqlStatement = "select id, username, imagePath, passwordHash, lastLogin, created from User where id = ?";
+            PreparedStatement pss          = connection.prepareStatement(sqlStatement);
             pss.setInt(1, id);
             ResultSet rs = pss.executeQuery();
 
@@ -80,27 +80,105 @@ public class UserRepository extends AbstractRepository<User>
         return null;
     }
 
-    @Override
-    public User create() throws CouldNotSaveException
+    /**
+     * Create a new User and save it directly to the DB.
+     * @param username the new User's name. Must be unique.
+     * @param imagePath Path to the profile picture.
+     * @param passwordHash SHA2 hashed Password.
+     * @return An Object representing the just inserted User. You may change the object and save it with save(User).
+     * @throws CouldNotSaveException if any errors (SQL or otherwise) occurred.
+     */
+    public User create(String username, String imagePath, String passwordHash) throws CouldNotSaveException
     {
-        // Generate random but unique userName and save it
-        // insert generated username in table and check for SQL Errors (username already exists?)
-        // search table for username (only one result, username is unique!)
-        // call getUserById with the id that was returned by the DB
-        // set username, password, etc.
-        // return user;
-        return null;
+        try {
+            Connection        connection   = this.getConnection();
+            String            sqlStatement = "insert into User (username, imagePath, passwordHash) values (?, ?, ?)";
+            PreparedStatement pss          = connection.prepareStatement(sqlStatement, PreparedStatement.RETURN_GENERATED_KEYS);
+
+            pss.setString(1, username);
+            pss.setString(2, imagePath);
+            pss.setString(3, passwordHash);
+            int rowCount = pss.executeUpdate();
+
+            ResultSet rs = pss.getGeneratedKeys();
+
+            if (rowCount == 0) {
+                throw new CouldNotSaveException("new User with username " + username);
+            }
+
+            rs.next();
+
+            int userid = rs.getInt(1);
+
+            rs.close();
+            pss.close();
+            connection.close();
+
+            return this.getById(userid);
+        } catch (SQLException e) {
+            this.log(e.getMessage());
+            throw new CouldNotSaveException("new User with username " + username);
+        } catch (EntityNotFoundException e) {
+            this.log(e.getMessage());
+            this.log("Just inserted a User but could not find it afterwards! This should never happen.");
+            throw new CouldNotSaveException("new User with username " + username + " (disappeared after insert)");
+        }
     }
 
+    /**
+     * Save changes to a already existing User in the DB
+     * @param user a User object that was previously returned from the getById() method. DO NOT CREATE ONE ON YOUR OWN.
+     * @throws CouldNotSaveException if any SQL errors occurred.
+     */
     @Override
     public void save(User user) throws CouldNotSaveException
     {
+        try {
+            Connection        connection   = this.getConnection();
+            String            sqlStatement = "update User set username = ?, imagePath = ?, passwordHash = ? where id = ?";
+            PreparedStatement pss          = connection.prepareStatement(sqlStatement);
+            pss.setString(1, user.username);
+            pss.setString(2, user.imagePath);
+            pss.setString(3, user.passwordHash);
+            pss.setInt(4, user.id);
+            int rowCount = pss.executeUpdate();
 
+            if (rowCount == 0) {
+                throw new CouldNotSaveException("User with username " + user.username);
+            }
+
+            pss.close();
+            connection.close();
+        } catch (SQLException e) {
+            this.log(e.getMessage());
+        }
     }
 
+    /**
+     * Delete an existing User from the DB.
+     * @param user A User object that was previously returned from the getById() method. DO NOT CREATE ONE ON YOUR OWN.
+     * @throws CouldNotDeleteException if any SQL errors occurred.
+     */
     @Override
     public void delete(User user) throws CouldNotDeleteException
     {
+        try {
+            Connection connection = this.getConnection();
 
+            String            sqlStatement = "delete from User where id = ?";
+            PreparedStatement pss          = connection.prepareStatement(sqlStatement);
+            pss.setInt(1, user.id);
+            int rowCount = pss.executeUpdate();
+
+            if (rowCount == 0) {
+                throw new CouldNotDeleteException("User with username " + user.username);
+            }
+
+            pss.close();
+            connection.close();
+        } catch (SQLException e) {
+            this.log(e.getMessage());
+            throw new CouldNotDeleteException("User with username " + user.username);
+        }
     }
 }

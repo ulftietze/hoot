@@ -30,8 +30,6 @@ public abstract class AbstractRepository<Type>
 
     public abstract ArrayList<Type> getList(SearchCriteriaInterface searchCriteria) throws EntityNotFoundException;
 
-    public abstract Type create() throws CouldNotSaveException;
-
     public abstract void save(Type type) throws CouldNotSaveException;
 
     public abstract void delete(Type type) throws CouldNotDeleteException;
