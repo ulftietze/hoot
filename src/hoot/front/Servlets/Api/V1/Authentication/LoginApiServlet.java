@@ -3,6 +3,7 @@ package hoot.front.Servlets.Api.V1.Authentication;
 import hoot.front.Servlets.Api.V1.AbstractApiServlet;
 import hoot.front.api.dto.authentication.LoginDTO;
 import hoot.model.query.api.GetUserIdIfValidLogin;
+import hoot.system.ObjectManager.ObjectManager;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -24,14 +25,14 @@ public class LoginApiServlet extends AbstractApiServlet
         boolean     loggedIn = false;
         session.setAttribute("userId", null);
 
-        GetUserIdIfValidLogin getUserIdIfValidLogin = new GetUserIdIfValidLogin();
-        Integer               userId                = getUserIdIfValidLogin.execute(login);
+        GetUserIdIfValidLogin getUserIdIfValid = (GetUserIdIfValidLogin) ObjectManager.get(GetUserIdIfValidLogin.class);
+        Integer               userId           = getUserIdIfValid.execute(login);
 
-        // TODO: Correct Username/Password Check
         // TODO: If already logged in this is irrelevant
         if (userId != null) {
             loggedIn = true;
             session.setAttribute(LoginApiServlet.SESSION_USER_IDENTIFIER, userId);
+            // TODO: Update User.LastLoggedIn
         }
 
         response.setContentType("application/json");
