@@ -1,5 +1,6 @@
 package hoot.initialisation.Listener;
 
+import hoot.model.query.GetStringHashed;
 import hoot.model.query.api.GetUserIdIfValidLogin;
 import hoot.model.repositories.UserRepository;
 import hoot.system.Logger.ContextLogger;
@@ -29,6 +30,7 @@ public class ObjectInstantiationContextListener implements ServletContextListene
         ObjectManager.set(LoggerInterface.class, new ContextLogger(ctx));
         ObjectManager.set(UserRepository.class, new UserRepository());
         ObjectManager.set(GetUserIdIfValidLogin.class, new GetUserIdIfValidLogin());
+        ObjectManager.set(GetStringHashed.class, new GetStringHashed());
     }
 
     public void contextDestroyed(ServletContextEvent servletContextEvent)

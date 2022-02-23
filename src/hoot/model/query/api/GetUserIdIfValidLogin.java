@@ -22,7 +22,7 @@ public class GetUserIdIfValidLogin
     public GetUserIdIfValidLogin()
     {
         this.dataSource      = (DataSource) ObjectManager.get(DataSource.class);
-        this.getStringHashed = new GetStringHashed();
+        this.getStringHashed = (GetStringHashed) ObjectManager.get(GetStringHashed.class);
         this.logger          = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
     }
 
