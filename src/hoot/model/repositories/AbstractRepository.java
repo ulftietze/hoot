@@ -15,22 +15,25 @@ import java.util.ArrayList;
 
 public abstract class AbstractRepository<Type>
 {
-    public abstract Type getById(int id) throws EntityNotFoundException, ConnectionFailedException;
-
-    public abstract ArrayList<Type> getList(SearchCriteriaInterface searchCriteria);
-
-    public abstract void save(Type type) throws CouldNotSaveException;
-
-    public abstract void delete(Type type) throws CouldNotDeleteException;
-
-    protected Connection getConnection() throws SQLException
+    protected synchronized Connection getConnection() throws SQLException
     {
         DataSource ds = (DataSource) ObjectManager.get(DataSource.class);
         return ds.getConnection();
     }
 
-    protected LoggerInterface getLogger()
+    protected synchronized void log(String message)
     {
-        return (LoggerInterface) ObjectManager.get(LoggerInterface.class);
+        LoggerInterface logger = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
+        logger.log(message);
     }
+
+    public abstract Type getById(int id) throws EntityNotFoundException, ConnectionFailedException;
+
+    public abstract ArrayList<Type> getList(SearchCriteriaInterface searchCriteria);
+
+    public abstract Type create() throws CouldNotSaveException;
+
+    public abstract void save(Type type) throws CouldNotSaveException;
+
+    public abstract void delete(Type type) throws CouldNotDeleteException;
 }

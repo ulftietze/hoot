@@ -1,8 +1,9 @@
 package hoot.front.Servlets;
 
 import hoot.model.entities.User;
-import hoot.model.mapper.DatabaseMapper;
+import hoot.model.repositories.UserRepository;
 import hoot.system.Annotation.AuthenticationRequired;
+import hoot.system.ObjectManager.ObjectManager;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -26,7 +27,8 @@ public class TestServlet extends HttpServlet
         out.println("<title>JDBC Test</title> </head>");
         out.println("<body>");
 
-        User user = DatabaseMapper.getUserById(3);
+        UserRepository ur   = (UserRepository) ObjectManager.get(UserRepository.class);
+        User           user = ur.getById(1);
 
         if (user != null) {
             out.println(
