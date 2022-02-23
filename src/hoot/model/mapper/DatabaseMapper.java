@@ -102,4 +102,15 @@ public class DatabaseMapper
             return null;
         }
     }
+
+    public static User createUser()
+    {
+        // Generate random but unique userName and save it
+        // insert generated username in table and check for SQL Errors (username already exists?)
+        // search table for username (only one result, username is unique!)
+        // call getUserById with the id that was returned by the DB
+        // set username, password, etc.
+        // return user;
+        return null;
+    }
 }
