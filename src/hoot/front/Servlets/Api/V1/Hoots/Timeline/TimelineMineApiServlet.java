@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 @AuthenticationRequired
-@WebServlet("/api/V1/hoots/timeline/mine")
+@WebServlet("/api/V1/hoot/timeline/mine")
 public class TimelineMineApiServlet extends AbstractApiServlet
 {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException

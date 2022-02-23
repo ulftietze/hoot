@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 @AuthenticationRequired
-@WebServlet("/api/V1/hoots/comment")
+@WebServlet("/api/V1/hoot/comment")
 public class CommentApiServlet extends AbstractApiServlet
 {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException

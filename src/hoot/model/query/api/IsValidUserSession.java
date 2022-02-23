@@ -6,6 +6,6 @@ public class IsValidUserSession
 {
     public boolean execute(HttpSession session)
     {
-        return session != null && session.getAttribute("user-id") != null;
+        return session != null && session.getAttribute("userId") != null;
     }
 }
