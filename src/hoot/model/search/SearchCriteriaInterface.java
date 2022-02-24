@@ -6,5 +6,5 @@ import java.sql.SQLException;
 
 public interface SearchCriteriaInterface
 {
-    public PreparedStatement getSearchQuery(Connection connection) throws SQLException;
+    public PreparedStatement getQueryStatement(Connection connection) throws SQLException;
 }

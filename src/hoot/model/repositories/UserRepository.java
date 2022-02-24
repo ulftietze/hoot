@@ -79,7 +79,7 @@ public class UserRepository extends AbstractRepository<User>
 
         try {
             Connection connection       = this.getConnection();
-            PreparedStatement statement = searchCriteria.getSearchQuery(connection);
+            PreparedStatement statement = searchCriteria.getQueryStatement(connection);
             ResultSet resultSet         = statement.executeQuery();
 
             while (resultSet.next()) {

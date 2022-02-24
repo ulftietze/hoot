@@ -19,7 +19,7 @@ public class HootSearchCriteria implements SearchCriteriaInterface
     public Integer lastPostId = null;
 
     @Override
-    public PreparedStatement getSearchQuery(Connection connection) throws SQLException
+    public PreparedStatement getQueryStatement(Connection connection) throws SQLException
     {
         ArrayList<String> WHERE      = new ArrayList<>();
         ArrayList<String> JOINS      = new ArrayList<>();

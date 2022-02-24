@@ -15,7 +15,7 @@ public class UserSearchCriteria implements SearchCriteriaInterface
     public Integer defaultPageSize = 50;
 
     @Override
-    public PreparedStatement getSearchQuery(Connection connection) throws SQLException
+    public PreparedStatement getQueryStatement(Connection connection) throws SQLException
     {
         ArrayList<String> WHERE      = new ArrayList<>();
         ArrayList<String> PARAMETERS = new ArrayList<>();
