@@ -1,6 +1,7 @@
 package hoot.system.Serializer;
 
 import com.google.gson.Gson;
+import hoot.system.ObjectManager.ObjectManager;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
@@ -12,7 +13,7 @@ public class RequestSerializer
 
     public RequestSerializer()
     {
-        this.gson = new Gson();
+        this.gson = (Gson) ObjectManager.get(Gson.class);
     }
 
     /**

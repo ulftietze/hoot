@@ -2,8 +2,6 @@ package hoot.front.api.dto.hoot;
 
 public class ImageDTO
 {
-    public HootType type = HootType.image;
-
     public String content;
 
     public String imageUrl;

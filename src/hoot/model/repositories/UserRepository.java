@@ -13,17 +13,17 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class UserRepository extends AbstractRepository<User>
 {
     /**
      * Try to return a User object representing the database entry with the given id.
+     * TODO: Check if synchronisation is required!
      *
      * @param id User.id (Primary Key)
      * @return User object if the user was found and no SQL errors occurred, null otherwise
      */
-    // TODO: Check if synchronisation is required!
-    @Override
     public User getById(int id) throws EntityNotFoundException
     {
         try {
@@ -72,6 +72,69 @@ public class UserRepository extends AbstractRepository<User>
         }
     }
 
+    /**
+     * Try to return a User object representing the database entry by given username.
+     * TODO: Check if synchronisation is required!
+     *
+     * @param username User.id (Primary Key)
+     * @return User object if the user was found and no SQL errors occurred, null otherwise
+     */
+    public User getByUsername(String username) throws EntityNotFoundException
+    {
+        try {
+            Connection connection = this.getConnection();
+
+            String            sqlStatement = "select * from User where username = ?";
+            PreparedStatement pss          = connection.prepareStatement(sqlStatement);
+            pss.setString(1, username);
+            ResultSet rs = pss.executeQuery();
+
+            // TODO: this code is similar to getById() and getList(), lets check if we can prevent duplicated code
+            rs.next();          // will throw SQLException if result set is empty
+            if (!rs.isLast()) { // throw Exception if result set contains more than one result
+                throw new EntityNotFoundException("User with username " + username);
+            }
+
+            // TODO: Do we need this check?
+            if (!Objects.equals(username, rs.getString("username"))) {
+                throw new EntityNotFoundException("User with username " + username + " (id " + rs.getInt("id") + " was returned)");
+            }
+
+            LocalDateTime lastLogin = rs
+                    .getTimestamp("lastLogin")
+                    .toInstant()
+                    .atZone(ZoneId.of("Europe/Berlin"))
+                    .toLocalDateTime();
+
+            LocalDateTime created = rs
+                    .getTimestamp("created")
+                    .toInstant()
+                    .atZone(ZoneId.of("Europe/Berlin"))
+                    .toLocalDateTime();
+
+            User user = new User(rs.getInt("id"), lastLogin, created);
+
+            user.username     = rs.getString("username");
+            user.imagePath    = rs.getString("imagePath");
+            user.passwordHash = rs.getString("passwordHash");
+
+            rs.close();
+            pss.close();
+            connection.close();
+
+            return user;
+        } catch (EntityNotFoundException | SQLException e) {
+            this.log(e.getMessage());
+            throw new EntityNotFoundException("User with username: " + username);
+        }
+    }
+
+    /**
+     * TODO: Check if synchronisation is required!
+     *
+     * @param searchCriteria
+     * @return
+     */
     @Override
     public ArrayList<User> getList(SearchCriteriaInterface searchCriteria)
     {
@@ -115,6 +178,7 @@ public class UserRepository extends AbstractRepository<User>
 
     /**
      * Create a new User and save it directly to the DB.
+     *
      * @param username the new User's name. Must be unique.
      * @param imagePath Path to the profile picture.
      * @param passwordHash SHA2 hashed Password.

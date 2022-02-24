@@ -2,21 +2,21 @@ package hoot.model.mapper;
 
 import hoot.front.api.dto.authentication.RegisterDTO;
 import hoot.model.entities.User;
-import hoot.model.query.GetStringHashed;
 import hoot.system.Filesystem.MediaFileHandler;
 import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.Security.Encryptor;
 
 import java.security.GeneralSecurityException;
 
 public class RegisterDtoToUserMapper
 {
-    private final GetStringHashed getStringHashed;
+    private final Encryptor encryptor;
 
     private final MediaFileHandler mediaFileHandler;
 
     public RegisterDtoToUserMapper()
     {
-        this.getStringHashed  = (GetStringHashed) ObjectManager.get(GetStringHashed.class);
+        this.encryptor        = (Encryptor) ObjectManager.get(Encryptor.class);
         this.mediaFileHandler = (MediaFileHandler) ObjectManager.get(MediaFileHandler.class);
     }
 
@@ -26,7 +26,7 @@ public class RegisterDtoToUserMapper
         this.saveImageIfProvided(register);
 
         user.username     = register.username;
-        user.passwordHash = getStringHashed.execute(register.password);
+        user.passwordHash = this.encryptor.hash(register.password);
         user.imagePath    = register.imageFilename;
 
         return user;

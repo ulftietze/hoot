@@ -14,19 +14,28 @@ import java.util.ArrayList;
 
 public abstract class AbstractRepository<Type>
 {
+    /**
+     * TODO: Do we need synchronized here?
+     *
+     * @return
+     * @throws SQLException
+     */
     protected synchronized Connection getConnection() throws SQLException
     {
         DataSource ds = (DataSource) ObjectManager.get(DataSource.class);
         return ds.getConnection();
     }
 
+    /**
+     * TODO: Do we need synchronized here?
+     *
+     * @param message
+     */
     protected synchronized void log(String message)
     {
         LoggerInterface logger = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
         logger.log(message);
     }
-
-    public abstract Type getById(int id) throws EntityNotFoundException;
 
     public abstract ArrayList<Type> getList(SearchCriteriaInterface searchCriteria) throws EntityNotFoundException;
 

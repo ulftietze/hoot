@@ -53,8 +53,8 @@ public class AuthorizationFilter implements Filter
     {
         String servletName = httpRequest.getHttpServletMapping().getServletName();
         String httpMethod  = httpRequest.getMethod();
+        boolean isRequired = this.isAuthenticationRequired.execute(servletName, httpMethod);
 
-        return this.isAuthenticationRequired.execute(servletName, httpMethod) && !this.isValidUserSession.execute(
-                httpRequest.getSession());
+        return isRequired && !this.isValidUserSession.execute(httpRequest.getSession());
     }
 }

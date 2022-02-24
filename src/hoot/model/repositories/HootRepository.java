@@ -14,7 +14,6 @@ import java.util.ArrayList;
 
 public class HootRepository extends AbstractRepository<Hoot>
 {
-    @Override
     public Hoot getById(int id)
     {
         return null;
