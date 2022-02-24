@@ -1,0 +1,52 @@
+@startuml
+'https://plantuml.com/component-diagram
+
+actor Client
+
+[Browser]
+[Server]
+database "Mysql"
+
+() Login
+() Registration
+() User
+() Timeline
+() Post
+() Image
+() Comment
+
+
+[Browser] --[hidden]down-> Login
+[Browser] --[hidden]down-> Registration
+[Browser] --[hidden]down-> User
+[Browser] --[hidden]down-> Timeline
+[Browser] --[hidden]down-> Post
+[Browser] --[hidden]down-> Image
+[Browser] --[hidden]down-> Comment
+
+Login --[hidden]down-> [Server]
+Registration --[hidden]down-> [Server]
+User --[hidden]down-> [Server]
+Timeline --[hidden]down-> [Server]
+Post --[hidden]down-> [Server]
+Image --[hidden]down-> [Server]
+Comment --[hidden]down-> [Server]
+
+Client --> [Browser]
+[Browser] -( Login
+[Browser] -( Registration
+[Browser] -( User
+[Browser] -( Timeline
+[Browser] -( Post
+[Browser] -( Image
+[Browser] -( Comment
+Login -> [Server]
+Registration -> [Server]
+User -> [Server]
+Timeline -> [Server]
+Post -> [Server]
+Image -> [Server]
+Comment -> [Server]
+
+
+@enduml
