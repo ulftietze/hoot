@@ -1,27 +1,52 @@
 @startuml
 'https://plantuml.com/class-diagram
+' TODO: Work in progress
 
-abstract class AbstractList
-abstract AbstractCollection
-interface List
-interface Collection
 
-List <|-- AbstractList
-Collection <|-- AbstractCollection
+class UserRepository<User> {
+     +getById(int id): Type
+     +getList(SearchCriteria searchCriteria): ArrayList<Type>
+     +save(Type toSave): void
+     +delete(int id): void
+     #getConnection(): Connection
+}
+class HootRepository<Hoot>{
+   +getById(int id): Type
+   +getList(SearchCriteria searchCriteria): ArrayList<Type>
+   +save(Type toSave): void
+   +delete(int id): void
+   #getConnection(): Connection
+}
+class ReactionRepository<Reaction>{
+    +getById(int id): Type
+    +getList(SearchCriteria searchCriteria): ArrayList<Type>
+    +save(Type toSave): void
+    +delete(int id): void
+    #getConnection(): Connection
+ }
 
-Collection <|- List
-AbstractCollection <|- AbstractList
-AbstractList <|-- ArrayList
 
-class ArrayList {
-Object[] elementData
-size()
+Interface HttpServlet {
+    +doGet(Request req, Response res): void
+    +doPost(Request req, Response res): void
+    +doPut(Request req, Response res): void
+    +doDelete(Request req, Response res): void
 }
 
-enum TimeUnit {
-DAYS
-HOURS
-MINUTES
-}
+class UserServlet extends HttpServlet
+class HootServlet extends HttpServlet
+class LoginServlet extends HttpServlet
+class RegistrationServlet extends HttpServlet
+
+
+UserServlet --> UserRepository: use
+HootServlet --> HootRepository: use
+HootServlet --> ReactionRepository: use
+LoginServlet --> UserRepository: use
+
+
+UserServlet ---> UserDtoToUserMapper: use
+RegistrationServlet ---> RegistrationDtoToUserMapper: use
+
 
 @enduml

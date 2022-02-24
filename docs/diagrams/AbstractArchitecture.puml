@@ -3,28 +3,13 @@
 
 
 
-class UserRepository<User> {
+abstract class AbstractRepository<User> {
      +getById(int id): Type
      +getList(SearchCriteria searchCriteria): ArrayList<Type>
      +save(Type toSave): void
      +delete(int id): void
      #getConnection(): Connection
 }
-class HootRepository<Hoot>{
-   +getById(int id): Type
-   +getList(SearchCriteria searchCriteria): ArrayList<Type>
-   +save(Type toSave): void
-   +delete(int id): void
-   #getConnection(): Connection
-}
-class ReactionRepository<Reaction>{
-    +getById(int id): Type
-    +getList(SearchCriteria searchCriteria): ArrayList<Type>
-    +save(Type toSave): void
-    +delete(int id): void
-    #getConnection(): Connection
- }
-
 
 Interface HttpServlet {
     +doGet(Request req, Response res): void
@@ -33,20 +18,34 @@ Interface HttpServlet {
     +doDelete(Request req, Response res): void
 }
 
-class UserServlet extends HttpServlet
-class HootServlet extends HttpServlet
-class LoginServlet extends HttpServlet
-class RegistrationServlet extends HttpServlet
+interface MapperInterface<TypeFrom, TypeTo> {
+    +map(TypeFrom): TypeTo
+}
 
 
-UserServlet --> UserRepository: use
-HootServlet --> HootRepository: use
-HootServlet --> ReactionRepository: use
-LoginServlet --> UserRepository: use
+abstract class DTO {
+    -id: int
+    -property: String
+}
 
+abstract class EntityModel {
+    -id: int
+    -property1: String
+    -property2: String
+}
 
-UserServlet ---> UserDtoToUserMapper: use
-RegistrationServlet ---> RegistrationDtoToUserMapper: use
+package Database <<Database>> {
+
+}
+
+HttpServlet ..> AbstractRepository: use
+HttpServlet ..> MapperInterface: use
+HttpServlet -> DTO: use
+
+(AbstractRepository, HttpServlet) -- EntityModel
+
+AbstractRepository --> Database
+Database --> AbstractRepository
 
 
 @enduml
