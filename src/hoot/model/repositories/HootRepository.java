@@ -69,7 +69,7 @@ public class HootRepository extends AbstractRepository<Hoot>
                         imageHoot.onlyFollower = resultSet.getBoolean("i.onlyFollower");
                         imageHoot.user         = userRepository.getById(resultSet.getInt("h.user"));
                         imageHoot.mentions     = mentionsRepository.getByHootId(imageHoot.id);
-                        imageHoot.tags         = tagRepository.getByHootId(imageHoot.id);
+                        imageHoot.hootTags = tagRepository.getByHootId(imageHoot.id);
 
                         for (Interaction interaction: Interaction.values()) {
                             imageHoot.reactionCount.put(interaction, resultSet.getInt(interaction.toString()));
@@ -85,7 +85,7 @@ public class HootRepository extends AbstractRepository<Hoot>
                         postHoot.id           = resultSet.getInt("h.id");
                         postHoot.user         = userRepository.getById(resultSet.getInt("h.user"));
                         postHoot.mentions     = mentionsRepository.getByHootId(postHoot.id);
-                        postHoot.tags         = tagRepository.getByHootId(postHoot.id);
+                        postHoot.hootTags = tagRepository.getByHootId(postHoot.id);
 
                         for (Interaction interaction: Interaction.values()) {
                             postHoot.reactionCount.put(interaction, resultSet.getInt(interaction.toString()));
@@ -101,7 +101,7 @@ public class HootRepository extends AbstractRepository<Hoot>
                         commentHoot.user     = userRepository.getById(resultSet.getInt("h.user"));
                         commentHoot.parent   = this.getById(resultSet.getInt("c.parent"));
                         commentHoot.mentions = mentionsRepository.getByHootId(commentHoot.id);
-                        commentHoot.tags     = tagRepository.getByHootId(commentHoot.id);
+                        commentHoot.hootTags = tagRepository.getByHootId(commentHoot.id);
 
                         for (Interaction interaction: Interaction.values()) {
                             commentHoot.reactionCount.put(interaction, resultSet.getInt(interaction.toString()));

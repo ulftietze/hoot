@@ -6,6 +6,7 @@ public class Comment extends Hoot
 
     public String content;
 
+
     public Comment()
     {
         this.hootType = HootType.Comment;

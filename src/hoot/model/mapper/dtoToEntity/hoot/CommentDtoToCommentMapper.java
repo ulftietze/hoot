@@ -6,6 +6,8 @@ import hoot.model.entities.Hoot;
 import hoot.system.Exception.CouldNotMapException;
 import hoot.system.ObjectManager.ObjectManager;
 
+import java.util.StringTokenizer;
+
 public class CommentDtoToCommentMapper
 {
     public Hoot map(CommentDTO commentDTO) throws CouldNotMapException
@@ -16,6 +18,14 @@ public class CommentDtoToCommentMapper
         comment.parent = hootMapper.map(commentDTO.parent);
 
         comment.content = commentDTO.content;
-        return new Comment();
+
+        StringTokenizer tokenizer = new StringTokenizer(commentDTO.content);
+        while (tokenizer.hasMoreTokens()) {
+            String token = tokenizer.nextToken();
+            if (token.startsWith("#")) {
+                comment.addTag(token);
+            }
+        }
+        return comment;
     }
 }
