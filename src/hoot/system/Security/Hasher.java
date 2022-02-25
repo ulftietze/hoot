@@ -3,7 +3,7 @@ package hoot.system.Security;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 
-public class Encryptor
+public class Hasher
 {
     /**
      * TODO: Maybe use some salt here!

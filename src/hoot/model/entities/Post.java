@@ -15,6 +15,6 @@ public class Post extends Hoot
 
     public Post(int id, User user, HootType hootType, LocalDateTime created)
     {
-        super(id, user, hootType, created);
+        //super(id, user, hootType, created);
     }
 }

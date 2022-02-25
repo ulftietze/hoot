@@ -6,7 +6,7 @@ import hoot.model.repositories.UserRepository;
 import hoot.system.Exception.EntityNotFoundException;
 import hoot.system.Logger.LoggerInterface;
 import hoot.system.ObjectManager.ObjectManager;
-import hoot.system.Security.Encryptor;
+import hoot.system.Security.Hasher;
 
 import javax.sql.DataSource;
 import java.security.GeneralSecurityException;
@@ -18,16 +18,16 @@ public class GetUserIdIfValidLogin
 
     private final DataSource dataSource;
 
-    private final Encryptor encryptor;
+    private final Hasher hasher;
 
     LoggerInterface logger;
 
     public GetUserIdIfValidLogin()
     {
         this.userRepository = (UserRepository) ObjectManager.get(UserRepository.class);
-        this.dataSource     = (DataSource) ObjectManager.get(DataSource.class);
-        this.encryptor      = (Encryptor) ObjectManager.get(Encryptor.class);
-        this.logger         = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
+        this.dataSource = (DataSource) ObjectManager.get(DataSource.class);
+        this.hasher     = (Hasher) ObjectManager.get(Hasher.class);
+        this.logger     = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
     }
 
     /**
@@ -41,7 +41,7 @@ public class GetUserIdIfValidLogin
         try {
             User user = this.userRepository.getByUsername(login.username);
 
-            if (!Objects.equals(user.passwordHash, this.encryptor.hash(login.password))) {
+            if (!Objects.equals(user.passwordHash, this.hasher.hash(login.password))) {
                 return null;
             }
 

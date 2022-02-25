@@ -4,10 +4,9 @@
 
 
 abstract class AbstractRepository<User> {
-     +getById(int id): Type
      +getList(SearchCriteria searchCriteria): ArrayList<Type>
      +save(Type toSave): void
-     +delete(int id): void
+     +delete(Type toDelete): void
      #getConnection(): Connection
 }
 
