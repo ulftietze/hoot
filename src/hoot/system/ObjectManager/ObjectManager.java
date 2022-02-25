@@ -156,12 +156,12 @@ public class ObjectManager
         return !Modifier.isAbstract(toCheck.getModifiers());
     }
 
-    private FactoryInterface<?> getFactoryIfExists(Class<?> classKey, Class<?> actualClass)
+    private FactoryInterface<?> getFactoryIfExists(Class<?> className, Class<?> actualClass)
     {
         FactoryInterface<?> factory = this.objectFactoryMap.get(actualClass);
 
         if (factory == null) {
-            factory = this.objectFactoryMap.get(classKey);
+            factory = this.objectFactoryMap.get(className);
         }
 
         return factory;

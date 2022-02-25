@@ -1,5 +1,6 @@
 package hoot.model.repositories;
 
+import hoot.model.search.DefaultSearchCriteria;
 import hoot.model.search.SearchCriteriaInterface;
 import hoot.system.Exception.CouldNotDeleteException;
 import hoot.system.Exception.CouldNotSaveException;
@@ -17,6 +18,11 @@ import java.util.ArrayList;
 
 public abstract class AbstractRepository<Type>
 {
+    public ArrayList<Type> getList() throws EntityNotFoundException
+    {
+        return this.getList((DefaultSearchCriteria) ObjectManager.get(DefaultSearchCriteria.class));
+    }
+
     public abstract ArrayList<Type> getList(SearchCriteriaInterface searchCriteria) throws EntityNotFoundException;
 
     public abstract void save(Type type) throws CouldNotSaveException;

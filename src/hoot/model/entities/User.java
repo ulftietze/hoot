@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public class User
 {
-    public Integer id;
+    public Integer id, followerCount, followsCount;
 
     public String username, imagePath, passwordHash;
 

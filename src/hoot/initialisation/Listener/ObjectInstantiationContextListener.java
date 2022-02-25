@@ -25,7 +25,6 @@ public class ObjectInstantiationContextListener implements ServletContextListene
     public void contextInitialized(ServletContextEvent servletContextEvent)
     {
         ServletContext context = servletContextEvent.getServletContext();
-        context.log("Hello");
 
         // System
         ObjectManager.set(LoggerInterface.class, ContextLogger.class);
