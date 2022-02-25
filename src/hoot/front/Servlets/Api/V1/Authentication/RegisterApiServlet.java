@@ -31,11 +31,8 @@ public class RegisterApiServlet extends AbstractApiServlet
 
             this.sendResponse(response, HttpServletResponse.SC_CREATED, this.serializeJsonResponseBody("Registered"));
         } catch (GeneralSecurityException | CouldNotSaveException e) {
-            this.sendResponse(
-                    response,
-                    HttpServletResponse.SC_CONFLICT,
-                    this.serializeJsonResponseBody(e.getMessage())
-            );
+            int httpStatus = HttpServletResponse.SC_CONFLICT;
+            this.sendResponse(response, httpStatus, this.serializeJsonResponseBody(e.getMessage()));
         }
     }
 }
