@@ -1,6 +1,8 @@
 package hoot.model.entities;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class Hoot
 {
@@ -11,4 +13,10 @@ public abstract class Hoot
     public HootType hootType;
 
     public LocalDateTime created;
+
+    public Mentions mentions;
+
+    public HootTags tags;
+
+    public Map<Interaction, Integer> reactionCount = new HashMap<>();
 }

@@ -1,6 +1,7 @@
 package hoot.model.entities;
 
-public class Interaction
+public enum Interaction
 {
-    public String interaction;
+    LIKE,
+    DISLIKE
 }

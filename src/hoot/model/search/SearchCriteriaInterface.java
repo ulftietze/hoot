@@ -1,10 +1,10 @@
 package hoot.model.search;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
+import hoot.system.Database.QueryBuilder;
+
 import java.sql.SQLException;
 
 public interface SearchCriteriaInterface
 {
-    public PreparedStatement getQueryStatement(Connection connection) throws SQLException;
+    public QueryBuilder getQueryBuilder() throws SQLException;
 }

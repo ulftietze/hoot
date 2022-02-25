@@ -41,9 +41,9 @@ public class InteractionRepository extends AbstractRepository<Interaction>
             rs.next();  // will throw SQLException if DB contains no interaction
 
             do {
-                Interaction type = new Interaction();
-                type.interaction = rs.getString("interaction");
-                interactionList.add(type);
+                //Interaction type = new Interaction();
+                //type.interaction = rs.getString("interaction");
+                //interactionList.add(type);
             } while (rs.next());
 
             return interactionList;
@@ -67,18 +67,18 @@ public class InteractionRepository extends AbstractRepository<Interaction>
 
             String            sqlStatement = "insert into Interaction (interaction) VALUES (?)";
             PreparedStatement pss          = connection.prepareStatement(sqlStatement);
-            pss.setString(1, interaction.interaction);
+            //pss.setString(1, interaction.interaction);
             int rowCount = pss.executeUpdate();
 
             if (rowCount == 0) {
-                throw new CouldNotSaveException("Interaction of type " + interaction.interaction);
+                //throw new CouldNotSaveException("Interaction of type " + interaction.interaction);
             }
 
             pss.close();
             connection.close();
         } catch (SQLException e) {
             this.log(e.getMessage());
-            throw new CouldNotSaveException("Interaction of type " + interaction.interaction);
+            //throw new CouldNotSaveException("Interaction of type " + interaction.interaction);
         }
     }
 
@@ -95,18 +95,18 @@ public class InteractionRepository extends AbstractRepository<Interaction>
 
             String            sqlStatement = "delete from Interaction where interaction = ?";
             PreparedStatement pss          = connection.prepareStatement(sqlStatement);
-            pss.setString(1, interaction.interaction);
+            //pss.setString(1, interaction.interaction);
             int rowCount = pss.executeUpdate();
 
             if (rowCount == 0) {
-                throw new CouldNotDeleteException("Interaction of type " + interaction.interaction);
+                //throw new CouldNotDeleteException("Interaction of type " + interaction.interaction);
             }
 
             pss.close();
             connection.close();
         } catch (SQLException e) {
             this.log(e.getMessage());
-            throw new CouldNotDeleteException("Interaction of type " + interaction.interaction);
+            //throw new CouldNotDeleteException("Interaction of type " + interaction.interaction);
         }
     }
 }

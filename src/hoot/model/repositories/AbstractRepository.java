@@ -17,6 +17,12 @@ import java.util.ArrayList;
 
 public abstract class AbstractRepository<Type>
 {
+    public abstract ArrayList<Type> getList(SearchCriteriaInterface searchCriteria) throws EntityNotFoundException;
+
+    public abstract void save(Type type) throws CouldNotSaveException;
+
+    public abstract void delete(Type type) throws CouldNotDeleteException;
+
     /**
      * TODO: Do we need synchronized here?
      *
@@ -40,16 +46,8 @@ public abstract class AbstractRepository<Type>
         logger.log(message);
     }
 
-    public abstract ArrayList<Type> getList(SearchCriteriaInterface searchCriteria) throws EntityNotFoundException;
-
-    public abstract void save(Type type) throws CouldNotSaveException;
-
-    public abstract void delete(Type type) throws CouldNotDeleteException;
-
     protected LocalDateTime getLocalDateTimeFromSQLTimestamp(Timestamp timestamp)
     {
-        return timestamp.toInstant()
-            .atZone(ZoneId.of("Europe/Berlin"))
-            .toLocalDateTime();
+        return timestamp.toInstant().atZone(ZoneId.of("Europe/Berlin")).toLocalDateTime();
     }
 }

@@ -133,6 +133,7 @@ public class ObjectManager
     private Object create(Class<?> actualClass)
     {
         ObjectManager       om      = ObjectManager.getInstance();
+        // TODO: Factory for actualClass only fallback - lookup first for requested class
         FactoryInterface<?> factory = om.objectFactoryMap.get(actualClass);
 
         if (factory != null) {

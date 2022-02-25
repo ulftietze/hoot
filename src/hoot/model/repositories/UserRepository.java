@@ -2,9 +2,11 @@ package hoot.model.repositories;
 
 import hoot.model.entities.User;
 import hoot.model.search.SearchCriteriaInterface;
+import hoot.system.Database.QueryBuilder;
 import hoot.system.Exception.CouldNotDeleteException;
 import hoot.system.Exception.CouldNotSaveException;
 import hoot.system.Exception.EntityNotFoundException;
+import hoot.system.ObjectManager.ObjectManager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -25,9 +27,19 @@ public class UserRepository extends AbstractRepository<User>
     public User getById(int id) throws EntityNotFoundException
     {
         try {
-            Connection        connection   = this.getConnection();
-            String            sqlStatement = "select id, username, imagePath, passwordHash, lastLogin, created from User where id = ?";
-            PreparedStatement pss          = connection.prepareStatement(sqlStatement);
+            // TODO: Build with query builder
+            Connection connection = this.getConnection();
+            String
+                    sqlStatement
+                    = "select id, username, imagePath, passwordHash, lastLogin, created from User where id = ?";
+
+            QueryBuilder qb = (QueryBuilder) ObjectManager.get(ObjectManager.class);
+            qb.SELECT.add("*");
+            qb.FROM = "User u";
+            qb.WHERE.add("id = ?");
+            qb.PARAMETERS.add(Integer.toString(id));
+
+            PreparedStatement pss = connection.prepareStatement(sqlStatement);
             pss.setInt(1, id);
             ResultSet rs = pss.executeQuery();
 
@@ -65,6 +77,7 @@ public class UserRepository extends AbstractRepository<User>
         try {
             Connection connection = this.getConnection();
 
+            // TODO: Build with query builder
             String            sqlStatement = "select * from User where username = ?";
             PreparedStatement pss          = connection.prepareStatement(sqlStatement);
             pss.setString(1, username);
@@ -107,8 +120,12 @@ public class UserRepository extends AbstractRepository<User>
         ArrayList<User> users = new ArrayList<>();
 
         try {
+            QueryBuilder queryBuilder = searchCriteria.getQueryBuilder();
+            queryBuilder.SELECT.add("*");
+            queryBuilder.FROM = "User";
+
             Connection        connection = this.getConnection();
-            PreparedStatement statement  = searchCriteria.getQueryStatement(connection);
+            PreparedStatement statement  = queryBuilder.build(connection);
             ResultSet         resultSet  = statement.executeQuery();
 
             while (resultSet.next()) {
@@ -190,9 +207,11 @@ public class UserRepository extends AbstractRepository<User>
         }
 
         try {
-            Connection        connection   = this.getConnection();
-            String            sqlStatement = "update User set username = ?, imagePath = ?, passwordHash = ? where id = ?";
-            PreparedStatement pss          = connection.prepareStatement(sqlStatement);
+            Connection        connection = this.getConnection();
+            String
+                              sqlStatement
+                                         = "update User set username = ?, imagePath = ?, passwordHash = ? where id = ?";
+            PreparedStatement pss        = connection.prepareStatement(sqlStatement);
             pss.setString(1, user.username);
             pss.setString(2, user.imagePath);
             pss.setString(3, user.passwordHash);

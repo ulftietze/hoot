@@ -1,14 +1,15 @@
 package hoot.model.search;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
+import hoot.system.Database.QueryBuilder;
+import hoot.system.ObjectManager.ObjectManager;
+
 import java.sql.SQLException;
 
 public class AllHootsSearchCriteria implements SearchCriteriaInterface
 {
     @Override
-    public PreparedStatement getQueryStatement(Connection connection) throws SQLException
+    public QueryBuilder getQueryBuilder() throws SQLException
     {
-        return connection.prepareStatement("SELECT * FROM Hoot");
+        return (QueryBuilder) ObjectManager.get(QueryBuilder.class, true);
     }
 }
