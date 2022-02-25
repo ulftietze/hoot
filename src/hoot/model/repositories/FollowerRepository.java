@@ -19,6 +19,7 @@ public class FollowerRepository extends AbstractRepository<Follower>
     @Override
     public ArrayList<Follower> getList(SearchCriteriaInterface searchCriteria) throws EntityNotFoundException
     {
+        // limit to 50 with FollowerToUser SearchCriteria
         return new ArrayList<>();
     }
 

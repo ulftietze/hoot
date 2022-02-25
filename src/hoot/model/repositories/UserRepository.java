@@ -10,8 +10,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -27,8 +25,7 @@ public class UserRepository extends AbstractRepository<User>
     public User getById(int id) throws EntityNotFoundException
     {
         try {
-            Connection connection = this.getConnection();
-
+            Connection        connection   = this.getConnection();
             String            sqlStatement = "select id, username, imagePath, passwordHash, lastLogin, created from User where id = ?";
             PreparedStatement pss          = connection.prepareStatement(sqlStatement);
             pss.setInt(1, id);
@@ -43,23 +40,7 @@ public class UserRepository extends AbstractRepository<User>
                 throw new EntityNotFoundException("User with id " + id + " (id " + rs.getInt("id") + " was returned)");
             }
 
-            LocalDateTime lastLogin = rs
-                    .getTimestamp("lastLogin")
-                    .toInstant()
-                    .atZone(ZoneId.of("Europe/Berlin"))
-                    .toLocalDateTime();
-
-            LocalDateTime created = rs
-                    .getTimestamp("created")
-                    .toInstant()
-                    .atZone(ZoneId.of("Europe/Berlin"))
-                    .toLocalDateTime();
-
-            User user = new User(id, lastLogin, created);
-
-            user.username     = rs.getString("username");
-            user.imagePath    = rs.getString("imagePath");
-            user.passwordHash = rs.getString("passwordHash");
+            User user = this.mapResultSetToUser(rs);
 
             rs.close();
             pss.close();
@@ -97,26 +78,11 @@ public class UserRepository extends AbstractRepository<User>
 
             // TODO: Do we need this check?
             if (!Objects.equals(username, rs.getString("username"))) {
-                throw new EntityNotFoundException("User with username " + username + " (id " + rs.getInt("id") + " was returned)");
+                throw new EntityNotFoundException(
+                        "User with username " + username + " (id " + rs.getInt("id") + " was returned)");
             }
 
-            LocalDateTime lastLogin = rs
-                    .getTimestamp("lastLogin")
-                    .toInstant()
-                    .atZone(ZoneId.of("Europe/Berlin"))
-                    .toLocalDateTime();
-
-            LocalDateTime created = rs
-                    .getTimestamp("created")
-                    .toInstant()
-                    .atZone(ZoneId.of("Europe/Berlin"))
-                    .toLocalDateTime();
-
-            User user = new User(rs.getInt("id"), lastLogin, created);
-
-            user.username     = rs.getString("username");
-            user.imagePath    = rs.getString("imagePath");
-            user.passwordHash = rs.getString("passwordHash");
+            User user = this.mapResultSetToUser(rs);
 
             rs.close();
             pss.close();
@@ -141,28 +107,12 @@ public class UserRepository extends AbstractRepository<User>
         ArrayList<User> users = new ArrayList<>();
 
         try {
-            Connection connection       = this.getConnection();
-            PreparedStatement statement = searchCriteria.getQueryStatement(connection);
-            ResultSet resultSet         = statement.executeQuery();
+            Connection        connection = this.getConnection();
+            PreparedStatement statement  = searchCriteria.getQueryStatement(connection);
+            ResultSet         resultSet  = statement.executeQuery();
 
             while (resultSet.next()) {
-                LocalDateTime lastLogin = resultSet
-                        .getTimestamp("lastLogin")
-                        .toInstant()
-                        .atZone(ZoneId.of("Europe/Berlin"))
-                        .toLocalDateTime();
-
-                LocalDateTime created = resultSet
-                        .getTimestamp("created")
-                        .toInstant()
-                        .atZone(ZoneId.of("Europe/Berlin"))
-                        .toLocalDateTime();
-
-                User user = new User();
-                user.username     = resultSet.getString("username");
-                user.imagePath    = resultSet.getString("imagePath");
-                user.passwordHash = resultSet.getString("passwordHash");
-
+                User user = this.mapResultSetToUser(resultSet);
                 users.add(user);
             }
 
@@ -179,8 +129,8 @@ public class UserRepository extends AbstractRepository<User>
     /**
      * Create a new User and save it directly to the DB.
      *
-     * @param username the new User's name. Must be unique.
-     * @param imagePath Path to the profile picture.
+     * @param username     the new User's name. Must be unique.
+     * @param imagePath    Path to the profile picture.
      * @param passwordHash SHA2 hashed Password.
      * @return An Object representing the just inserted User. You may change the object and save it with save(User).
      * @throws CouldNotSaveException if any errors (SQL or otherwise) occurred.
@@ -190,7 +140,10 @@ public class UserRepository extends AbstractRepository<User>
         try {
             Connection        connection   = this.getConnection();
             String            sqlStatement = "insert into User (username, imagePath, passwordHash) values (?, ?, ?)";
-            PreparedStatement pss          = connection.prepareStatement(sqlStatement, PreparedStatement.RETURN_GENERATED_KEYS);
+            PreparedStatement pss          = connection.prepareStatement(
+                    sqlStatement,
+                    PreparedStatement.RETURN_GENERATED_KEYS
+            );
 
             pss.setString(1, username);
             pss.setString(2, imagePath);
@@ -224,6 +177,7 @@ public class UserRepository extends AbstractRepository<User>
 
     /**
      * Save changes to an already existing User in the DB
+     *
      * @param user a User object that was previously returned from the getById() method. DO NOT CREATE ONE ON YOUR OWN.
      * @throws CouldNotSaveException if any SQL errors occurred.
      */
@@ -258,6 +212,7 @@ public class UserRepository extends AbstractRepository<User>
 
     /**
      * Delete an existing User from the DB.
+     *
      * @param user A User object that was previously returned from the getById() method. DO NOT CREATE ONE ON YOUR OWN.
      * @throws CouldNotDeleteException if any SQL errors occurred.
      */
@@ -282,5 +237,19 @@ public class UserRepository extends AbstractRepository<User>
             this.log(e.getMessage());
             throw new CouldNotDeleteException("User with username " + user.username);
         }
+    }
+
+    private User mapResultSetToUser(ResultSet rs) throws SQLException
+    {
+        User user = new User();
+
+        user.id           = rs.getInt("id");
+        user.username     = rs.getString("username");
+        user.imagePath    = rs.getString("imagePath");
+        user.passwordHash = rs.getString("passwordHash");
+        user.created      = this.getLocalDateTimeFromSQLTimestamp(rs.getTimestamp("created"));
+        user.lastLogin    = this.getLocalDateTimeFromSQLTimestamp(rs.getTimestamp("lastLogin"));
+
+        return user;
     }
 }

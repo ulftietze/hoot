@@ -10,6 +10,9 @@ import hoot.system.ObjectManager.ObjectManager;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 
 public abstract class AbstractRepository<Type>
@@ -42,4 +45,11 @@ public abstract class AbstractRepository<Type>
     public abstract void save(Type type) throws CouldNotSaveException;
 
     public abstract void delete(Type type) throws CouldNotDeleteException;
+
+    protected LocalDateTime getLocalDateTimeFromSQLTimestamp(Timestamp timestamp)
+    {
+        return timestamp.toInstant()
+            .atZone(ZoneId.of("Europe/Berlin"))
+            .toLocalDateTime();
+    }
 }

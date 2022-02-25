@@ -2,7 +2,7 @@ package hoot.model.entities;
 
 import java.time.LocalDateTime;
 
-public class Hoot
+public abstract class Hoot
 {
     public int id;
 

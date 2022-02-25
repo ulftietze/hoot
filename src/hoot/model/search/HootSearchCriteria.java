@@ -1,5 +1,6 @@
 package hoot.model.search;
 
+import hoot.model.entities.HootType;
 import hoot.system.Logger.LoggerInterface;
 import hoot.system.ObjectManager.ObjectManager;
 
@@ -17,6 +18,8 @@ public class HootSearchCriteria implements SearchCriteriaInterface
     public Integer defaultPageSize = 50;
 
     public Integer lastPostId = null;
+
+    public boolean withComments = false;
 
     @Override
     public PreparedStatement getQueryStatement(Connection connection) throws SQLException
@@ -45,6 +48,11 @@ public class HootSearchCriteria implements SearchCriteriaInterface
             // ID's are incremental, so this is easier than a timestamp comparison
             WHERE.add("h.id < ?");
             PARAMETERS.add(lastPostId.toString());
+        }
+
+        if (!withComments) {
+            WHERE.add("h.type != ?");
+            PARAMETERS.add(HootType.Comment.toString());
         }
 
         StringBuilder QUERY = new StringBuilder(SELECT);
