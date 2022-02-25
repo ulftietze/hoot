@@ -10,11 +10,6 @@ public class Post extends Hoot
 
     public Post()
     {
-        
-    }
-
-    public Post(int id, User user, HootType hootType, LocalDateTime created)
-    {
-        //super(id, user, hootType, created);
+        this.hootType = HootType.Post;
     }
 }

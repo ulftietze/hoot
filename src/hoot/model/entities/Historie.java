@@ -5,19 +5,13 @@ import java.util.ArrayList;
 
 public class Historie
 {
-    public final long id;
+    public long id;
 
-    public final LocalDateTime timestamp;
+    public LocalDateTime timestamp;
 
     public int currentLoggedIn, currentlyRegisteredUsers;
 
     public float postsPerSecond, requestsPerSecond, loginsPerSecond;
 
     public ArrayList<Tag> trendingHashtags;
-
-    public Historie(long id, LocalDateTime timestamp)
-    {
-        this.id        = id;
-        this.timestamp = timestamp;
-    }
 }

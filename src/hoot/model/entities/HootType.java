@@ -1,6 +1,8 @@
 package hoot.model.entities;
 
-public class HootType
+public enum HootType
 {
-    public String hootType;
+    Comment,
+    Image,
+    Post
 }
