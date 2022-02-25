@@ -8,15 +8,12 @@ import hoot.system.Logger.LoggerInterface;
 import hoot.system.ObjectManager.ObjectManager;
 import hoot.system.Security.Hasher;
 
-import javax.sql.DataSource;
 import java.security.GeneralSecurityException;
 import java.util.Objects;
 
 public class GetUserIdIfValidLogin
 {
     private final UserRepository userRepository;
-
-    private final DataSource dataSource;
 
     private final Hasher hasher;
 
@@ -25,9 +22,8 @@ public class GetUserIdIfValidLogin
     public GetUserIdIfValidLogin()
     {
         this.userRepository = (UserRepository) ObjectManager.get(UserRepository.class);
-        this.dataSource = (DataSource) ObjectManager.get(DataSource.class);
-        this.hasher     = (Hasher) ObjectManager.get(Hasher.class);
-        this.logger     = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
+        this.hasher         = (Hasher) ObjectManager.get(Hasher.class);
+        this.logger         = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
     }
 
     /**

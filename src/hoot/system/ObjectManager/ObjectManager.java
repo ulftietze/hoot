@@ -33,7 +33,7 @@ public class ObjectManager
         Class<?>      actualClass = om.getActualClassToCreate(className);
 
         if (om.objectMap.get(className) == null) {
-            om.objectMap.put(className, om.create(actualClass));
+            om.objectMap.put(className, om.create(className, actualClass));
         }
 
         return om.objectMap.get(className);
@@ -52,8 +52,8 @@ public class ObjectManager
         ObjectManager om          = ObjectManager.getInstance();
         Class<?>      actualClass = om.getActualClassToCreate(className);
 
-        if (newInstance && om.objectMap.get(className) == null) {
-            return om.create(className);
+        if (newInstance) {
+            return om.create(className, actualClass);
         }
 
         return ObjectManager.get(className);
@@ -130,11 +130,9 @@ public class ObjectManager
         return actualClass != null ? actualClass : className;
     }
 
-    private Object create(Class<?> actualClass)
+    private Object create(Class<?> className, Class<?> actualClass)
     {
-        ObjectManager       om      = ObjectManager.getInstance();
-        // TODO: Factory for actualClass only fallback - lookup first for requested class
-        FactoryInterface<?> factory = om.objectFactoryMap.get(actualClass);
+        FactoryInterface<?> factory = this.getFactoryIfExists(className, actualClass);
 
         if (factory != null) {
             return factory.create();
@@ -148,7 +146,7 @@ public class ObjectManager
             Constructor<?> constructor = actualClass.getConstructor();
             return constructor.newInstance();
         } catch (ReflectiveOperationException ignore) {
-            this.getLogger().log("[ERROR] Could not instantiate class: " + actualClass.getName());
+            this.getLogger().log("[ERROR] Could not instantiate class: " + className.getName());
             return null;
         }
     }
@@ -156,6 +154,17 @@ public class ObjectManager
     private boolean canCreateInstance(Class<?> toCheck)
     {
         return !Modifier.isAbstract(toCheck.getModifiers());
+    }
+
+    private FactoryInterface<?> getFactoryIfExists(Class<?> classKey, Class<?> actualClass)
+    {
+        FactoryInterface<?> factory = this.objectFactoryMap.get(actualClass);
+
+        if (factory == null) {
+            factory = this.objectFactoryMap.get(classKey);
+        }
+
+        return factory;
     }
 
     private LoggerInterface getLogger()
