@@ -1,0 +1,20 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+Client -> Servlet: sendJson(DtoAsJson)
+Servlet -> Servlet: getDtoFromRequestJson()
+Servlet -> Mapper: mapDtoToEntity
+Mapper -> Servlet: (Entity)
+Servlet -> Repository: createOrSaveEntity(Entity)
+Repository -> Repository: mapEntityToSQLStatement
+Repository -> Database: executeStatement
+Database -> Repository: (ResultSet)
+Repository -> Repository: mapResultSetToEntity
+Repository -> Servlet: (Entity)
+Servlet -> Mapper: mapEntityToDto()
+Mapper -> Servlet: (Dto))
+Servlet -> Servlet: getJsonFromDto(Dto)
+Servlet -> Client: (DtoAsJson)
+
+
+@enduml

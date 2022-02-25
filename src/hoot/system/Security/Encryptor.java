@@ -1,18 +1,18 @@
-package hoot.model.query;
+package hoot.system.Security;
 
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 
-public class GetStringHashed
+public class Encryptor
 {
     /**
-     * TODO: Use some salt here!
+     * TODO: Maybe use some salt here!
      *
      * @param toHash The String which is about to be hashed
      * @return The created hash string.
      * @throws GeneralSecurityException Could be thrown if f.e. the Algorithm does not exist
      */
-    public String execute(String toHash) throws GeneralSecurityException
+    public String hash(String toHash) throws GeneralSecurityException
     {
         StringBuilder hexString = new StringBuilder();
         MessageDigest digest    = MessageDigest.getInstance("SHA-256");

@@ -8,19 +8,25 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-public class UserSearchCriteria implements SearchCriteriaInterface
+public class HootSearchCriteria implements SearchCriteriaInterface
 {
     public Integer userId = null;
 
+    public String tags = null;
+
     public Integer defaultPageSize = 50;
+
+    public Integer lastPostId = null;
 
     @Override
     public PreparedStatement getQueryStatement(Connection connection) throws SQLException
     {
         ArrayList<String> WHERE      = new ArrayList<>();
+        ArrayList<String> JOINS      = new ArrayList<>();
         ArrayList<String> PARAMETERS = new ArrayList<>();
 
-        String SELECT = "SELECT * FROM User u ";
+        String SELECT = "SELECT * FROM Hoot h ";
+        String JOIN   = "";
         String LIMIT  = "LIMIT " + defaultPageSize;
 
         if (userId != null) {
@@ -28,7 +34,24 @@ public class UserSearchCriteria implements SearchCriteriaInterface
             PARAMETERS.add(userId.toString());
         }
 
+        if (tags != null && !tags.equals("")) {
+            JOINS.add("LEFT JOIN HootTags ht ON h.id = ht.id");
+            JOINS.add("LEFT JOIN Tag t ON ht.tag = t.tag");
+            WHERE.add("t.tag IN (?) ");
+            PARAMETERS.add(tags);
+        }
+
+        if (lastPostId != null) {
+            // ID's are incremental, so this is easier than a timestamp comparison
+            WHERE.add("h.id < ?");
+            PARAMETERS.add(lastPostId.toString());
+        }
+
         StringBuilder QUERY = new StringBuilder(SELECT);
+
+        for (String join : JOINS) {
+            QUERY.append(" ").append(join);
+        }
 
         if (WHERE.size() >= 1) {
             QUERY.append(" WHERE ").append(WHERE.get(0));

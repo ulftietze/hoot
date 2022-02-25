@@ -2,16 +2,20 @@ package hoot.front.Servlets.Api.V1.User;
 
 import hoot.front.Servlets.Api.V1.AbstractApiServlet;
 import hoot.front.api.dto.user.UserDTO;
-import hoot.system.Filesystem.ImageFileHandler;
+import hoot.model.entities.User;
+import hoot.model.mapper.UserDtoToUserMapper;
+import hoot.model.mapper.UserToUserDtoMapper;
+import hoot.model.repositories.UserRepository;
 import hoot.system.Annotation.AuthenticationRequired;
+import hoot.system.Exception.CouldNotSaveException;
+import hoot.system.Exception.EntityNotFoundException;
+import hoot.system.ObjectManager.ObjectManager;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
 
 @AuthenticationRequired
 @WebServlet({"/api/V1/user", "/api/V1/user/me"})
@@ -19,49 +23,61 @@ public class UserApiServlet extends AbstractApiServlet
 {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
     {
-        response.setContentType("text/html");
+        String requestedId = request.getParameter("id");
 
-        PrintWriter out = response.getWriter();
-        out.println("<!doctype html><html>");
-        out.println("<head> <meta charset='utf-8'>");
-        out.println("<title>webapp</title> </head>");
-        out.println("<body>GET::UserServlet</body>");
-        out.println("</html>");
+        if (requestedId == null || requestedId.equals("")) {
+            int httpStatus = HttpServletResponse.SC_BAD_REQUEST;
+            this.sendResponse(response, httpStatus, this.serializeJsonResponseBody("No ID given."));
+            return;
+        }
 
-        ServletContext context = getServletContext();
-        context.log("simple logging");
+        UserRepository      repository = (UserRepository) ObjectManager.get(UserRepository.class);
+        UserToUserDtoMapper mapper     = (UserToUserDtoMapper) ObjectManager.get(UserToUserDtoMapper.class);
+
+        try {
+            User    entity = repository.getById(Integer.parseInt(requestedId));
+            UserDTO dto    = mapper.map(entity);
+
+            this.sendResponse(response, HttpServletResponse.SC_OK, this.serializeJsonResponseBody(dto));
+        } catch (EntityNotFoundException e) {
+            int httpStatus = HttpServletResponse.SC_NOT_FOUND;
+            this.sendResponse(response, httpStatus, this.serializeJsonResponseBody(e.getMessage()));
+        }
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
     {
-        response.setContentType("text/html");
+        UserDTO dto = (UserDTO) this.deserializeJsonRequestBody(request, UserDTO.class);
 
-        PrintWriter out = response.getWriter();
-        out.println("<!doctype html><html>");
-        out.println("<head> <meta charset='utf-8'>");
-        out.println("<title>webapp</title> </head>");
-        out.println("<body>POST::UserServlet</body>");
-        out.println("</html>");
+        UserRepository      repository = (UserRepository) ObjectManager.get(UserRepository.class);
+        UserDtoToUserMapper mapper     = (UserDtoToUserMapper) ObjectManager.get(UserDtoToUserMapper.class);
 
-        ServletContext context = getServletContext();
-        context.log("simple logging");
+        try {
+            User entity = mapper.map(dto);
+            repository.save(entity);
+
+            this.sendResponse(response, HttpServletResponse.SC_OK, this.serializeJsonResponseBody("saved"));
+        } catch (CouldNotSaveException e) {
+            int httpStatus = HttpServletResponse.SC_NOT_ACCEPTABLE;
+            this.sendResponse(response, httpStatus, this.serializeJsonResponseBody(e.getMessage()));
+        }
     }
 
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
     {
-        UserDTO user = (UserDTO) this.deserializeJsonRequestBody(request, UserDTO.class);
+        UserDTO dto = (UserDTO) this.deserializeJsonRequestBody(request, UserDTO.class);
 
-        ImageFileHandler imageFileHandler = new ImageFileHandler(this.getServletContext().getContextPath());
-        imageFileHandler.saveImage(user.imageFilename, "user", user.image, this.getServletContext());
+        UserRepository      repository = (UserRepository) ObjectManager.get(UserRepository.class);
+        UserDtoToUserMapper mapper     = (UserDtoToUserMapper) ObjectManager.get(UserDtoToUserMapper.class);
 
-        response.setContentType("text/html");
+        try {
+            User entity = mapper.map(dto);
+            repository.save(entity);
 
-        PrintWriter out = response.getWriter();
-        out.println("<!doctype html><html>");
-        out.println("<head> <meta charset='utf-8'>");
-        out.println("<title>webapp</title> </head>");
-        out.println("<body>PUT::UserServlet</body>");
-        out.println("</html>");
-
+            this.sendResponse(response, HttpServletResponse.SC_OK, this.serializeJsonResponseBody("updated"));
+        } catch (CouldNotSaveException e) {
+            int httpStatus = HttpServletResponse.SC_NOT_ACCEPTABLE;
+            this.sendResponse(response, httpStatus, this.serializeJsonResponseBody(e.getMessage()));
+        }
     }
 }

@@ -2,6 +2,7 @@ package hoot.front.Filter;
 
 import hoot.model.query.api.IsAuthenticationRequired;
 import hoot.model.query.api.IsValidUserSession;
+import hoot.system.ObjectManager.ObjectManager;
 import hoot.system.Serializer.RequestSerializer;
 
 import javax.servlet.*;
@@ -21,9 +22,9 @@ public class AuthorizationFilter implements Filter
 
     public void init(FilterConfig config)
     {
-        this.requestSerializer        = new RequestSerializer();
-        this.isValidUserSession       = new IsValidUserSession();
-        this.isAuthenticationRequired = new IsAuthenticationRequired();
+        this.requestSerializer        = (RequestSerializer) ObjectManager.get(RequestSerializer.class);
+        this.isValidUserSession       = (IsValidUserSession) ObjectManager.get(IsValidUserSession.class);
+        this.isAuthenticationRequired = (IsAuthenticationRequired) ObjectManager.get(IsAuthenticationRequired.class);
     }
 
     /**
@@ -48,14 +49,12 @@ public class AuthorizationFilter implements Filter
         chain.doFilter(request, response);
     }
 
-    public void destroy() {}
-
     private boolean isUnauthorized(HttpServletRequest httpRequest) throws ServletException
     {
         String servletName = httpRequest.getHttpServletMapping().getServletName();
         String httpMethod  = httpRequest.getMethod();
+        boolean isRequired = this.isAuthenticationRequired.execute(servletName, httpMethod);
 
-        return this.isAuthenticationRequired.execute(servletName, httpMethod) && !this.isValidUserSession.execute(
-                httpRequest.getSession());
+        return isRequired && !this.isValidUserSession.execute(httpRequest.getSession());
     }
 }

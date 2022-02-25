@@ -15,17 +15,8 @@ import java.util.ArrayList;
 public class HootTypeRepository extends AbstractRepository<HootType>
 {
     /**
-     * HootTypes do not have an ID, thus always return null.
-     * @return null
-     */
-    @Override
-    public HootType getById(int id)
-    {
-        return null;
-    }
-
-    /**
      * Get a list of all HootTypes in the database.
+     *
      * @param searchCriteria is silently ignored
      * @return A list of all HootTypes. This list contains at least one Type, otherwise an Exception is thrown.
      * @throws EntityNotFoundException If no HootType is found or the connection failed

@@ -1,16 +1,12 @@
 package hoot.initialisation.Listener;
 
-import hoot.model.query.GetStringHashed;
-import hoot.model.query.api.GetUserIdIfValidLogin;
-import hoot.model.repositories.UserRepository;
-import hoot.system.Logger.ContextLogger;
+import hoot.initialisation.Factory.ContextLoggerFactory;
+import hoot.initialisation.Factory.DataSourceFactory;
+import hoot.initialisation.Factory.MediaFileHandlerFactory;
+import hoot.system.Filesystem.MediaFileHandler;
 import hoot.system.Logger.LoggerInterface;
 import hoot.system.ObjectManager.ObjectManager;
-import hoot.system.Serializer.RequestSerializer;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -21,32 +17,18 @@ public class ObjectInstantiationContextListener implements ServletContextListene
 {
     Timer timer;
 
+    /**
+     * TODO: Breaking We need to check if the classes have dependencies to each other.
+     * TODO: Maybe lazy load objects?
+     */
     public void contextInitialized(ServletContextEvent servletContextEvent)
     {
-        ServletContext ctx = servletContextEvent.getServletContext();
+        ServletContext context = servletContextEvent.getServletContext();
 
-        ObjectManager.set(DataSource.class, this.getDataSource(ctx));
-        ObjectManager.set(RequestSerializer.class, new RequestSerializer());
-        ObjectManager.set(LoggerInterface.class, new ContextLogger(ctx));
-        ObjectManager.set(UserRepository.class, new UserRepository());
-        ObjectManager.set(GetUserIdIfValidLogin.class, new GetUserIdIfValidLogin());
-        ObjectManager.set(GetStringHashed.class, new GetStringHashed());
-    }
-
-    public void contextDestroyed(ServletContextEvent servletContextEvent)
-    {
-    }
-
-    private DataSource getDataSource(ServletContext ctx)
-    {
-        try {
-            Context initCtx = new InitialContext();
-            Context envCtx  = (Context) initCtx.lookup("java:/comp/env");
-            return (DataSource) envCtx.lookup("jdbc/mariadb");
-        } catch (NamingException e) {
-            ctx.log(e.getMessage());
-        }
-
-        return null;
+        // System
+        ObjectManager.setFactory(LoggerInterface.class, new ContextLoggerFactory(context));
+        //ObjectManager.set(LoggerInterface.class, NullLogger.class);
+        ObjectManager.setFactory(DataSource.class, new DataSourceFactory());
+        ObjectManager.setFactory(MediaFileHandler.class, new MediaFileHandlerFactory(context));
     }
 }

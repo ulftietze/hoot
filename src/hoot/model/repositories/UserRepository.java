@@ -2,7 +2,6 @@ package hoot.model.repositories;
 
 import hoot.model.entities.User;
 import hoot.model.search.SearchCriteriaInterface;
-import hoot.model.search.UserSearchCriteria;
 import hoot.system.Exception.CouldNotDeleteException;
 import hoot.system.Exception.CouldNotSaveException;
 import hoot.system.Exception.EntityNotFoundException;
@@ -14,17 +13,17 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class UserRepository extends AbstractRepository<User>
 {
     /**
      * Try to return a User object representing the database entry with the given id.
+     * TODO: Check if synchronisation is required!
      *
      * @param id User.id (Primary Key)
      * @return User object if the user was found and no SQL errors occurred, null otherwise
      */
-    // TODO: Check if synchronisation is required!
-    @Override
     public User getById(int id) throws EntityNotFoundException
     {
         try {
@@ -69,19 +68,117 @@ public class UserRepository extends AbstractRepository<User>
             return user;
         } catch (EntityNotFoundException | SQLException e) {
             this.log(e.getMessage());
-            throw new EntityNotFoundException("User");
+            throw new EntityNotFoundException("User with ID: " + id);
         }
     }
 
+    /**
+     * Try to return a User object representing the database entry by given username.
+     * TODO: Check if synchronisation is required!
+     *
+     * @param username User.id (Primary Key)
+     * @return User object if the user was found and no SQL errors occurred, null otherwise
+     */
+    public User getByUsername(String username) throws EntityNotFoundException
+    {
+        try {
+            Connection connection = this.getConnection();
+
+            String            sqlStatement = "select * from User where username = ?";
+            PreparedStatement pss          = connection.prepareStatement(sqlStatement);
+            pss.setString(1, username);
+            ResultSet rs = pss.executeQuery();
+
+            // TODO: this code is similar to getById() and getList(), lets check if we can prevent duplicated code
+            rs.next();          // will throw SQLException if result set is empty
+            if (!rs.isLast()) { // throw Exception if result set contains more than one result
+                throw new EntityNotFoundException("User with username " + username);
+            }
+
+            // TODO: Do we need this check?
+            if (!Objects.equals(username, rs.getString("username"))) {
+                throw new EntityNotFoundException("User with username " + username + " (id " + rs.getInt("id") + " was returned)");
+            }
+
+            LocalDateTime lastLogin = rs
+                    .getTimestamp("lastLogin")
+                    .toInstant()
+                    .atZone(ZoneId.of("Europe/Berlin"))
+                    .toLocalDateTime();
+
+            LocalDateTime created = rs
+                    .getTimestamp("created")
+                    .toInstant()
+                    .atZone(ZoneId.of("Europe/Berlin"))
+                    .toLocalDateTime();
+
+            User user = new User(rs.getInt("id"), lastLogin, created);
+
+            user.username     = rs.getString("username");
+            user.imagePath    = rs.getString("imagePath");
+            user.passwordHash = rs.getString("passwordHash");
+
+            rs.close();
+            pss.close();
+            connection.close();
+
+            return user;
+        } catch (EntityNotFoundException | SQLException e) {
+            this.log(e.getMessage());
+            throw new EntityNotFoundException("User with username: " + username);
+        }
+    }
+
+    /**
+     * TODO: Check if synchronisation is required!
+     *
+     * @param searchCriteria
+     * @return
+     */
     @Override
     public ArrayList<User> getList(SearchCriteriaInterface searchCriteria)
     {
-        UserSearchCriteria us = (UserSearchCriteria) searchCriteria;
-        return null;
+        ArrayList<User> users = new ArrayList<>();
+
+        try {
+            Connection connection       = this.getConnection();
+            PreparedStatement statement = searchCriteria.getQueryStatement(connection);
+            ResultSet resultSet         = statement.executeQuery();
+
+            while (resultSet.next()) {
+                LocalDateTime lastLogin = resultSet
+                        .getTimestamp("lastLogin")
+                        .toInstant()
+                        .atZone(ZoneId.of("Europe/Berlin"))
+                        .toLocalDateTime();
+
+                LocalDateTime created = resultSet
+                        .getTimestamp("created")
+                        .toInstant()
+                        .atZone(ZoneId.of("Europe/Berlin"))
+                        .toLocalDateTime();
+
+                User user = new User();
+                user.username     = resultSet.getString("username");
+                user.imagePath    = resultSet.getString("imagePath");
+                user.passwordHash = resultSet.getString("passwordHash");
+
+                users.add(user);
+            }
+
+            resultSet.close();
+            statement.close();
+            connection.close();
+        } catch (SQLException e) {
+            // TODO: Maybe logging and stuff, maybe not, this could
+        }
+
+        return users;
     }
 
     /**
      * Create a new User and save it directly to the DB.
+     *
      * @param username the new User's name. Must be unique.
      * @param imagePath Path to the profile picture.
      * @param passwordHash SHA2 hashed Password.
@@ -126,13 +223,18 @@ public class UserRepository extends AbstractRepository<User>
     }
 
     /**
-     * Save changes to a already existing User in the DB
+     * Save changes to an already existing User in the DB
      * @param user a User object that was previously returned from the getById() method. DO NOT CREATE ONE ON YOUR OWN.
      * @throws CouldNotSaveException if any SQL errors occurred.
      */
     @Override
     public void save(User user) throws CouldNotSaveException
     {
+        if (user.id == null) {
+            this.create(user.username, user.imagePath, user.passwordHash);
+            return;
+        }
+
         try {
             Connection        connection   = this.getConnection();
             String            sqlStatement = "update User set username = ?, imagePath = ?, passwordHash = ? where id = ?";

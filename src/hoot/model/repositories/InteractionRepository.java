@@ -14,7 +14,6 @@ import java.util.ArrayList;
 
 public class InteractionRepository extends AbstractRepository<Interaction>
 {
-    @Override
     public Interaction getById(int id)
     {
         return null;
