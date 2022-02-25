@@ -1,4 +1,4 @@
-package hoot.model.mapper;
+package hoot.model.mapper.entityToDto;
 
 import hoot.front.api.dto.user.UserDTO;
 import hoot.model.entities.User;

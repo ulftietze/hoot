@@ -10,5 +10,4 @@ public class HootDTO
 
     public LocalDateTime created;
 
-    public LocalDateTime modified;
 }

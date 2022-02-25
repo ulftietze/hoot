@@ -1,7 +1,8 @@
 package hoot.front.api.dto.hoot;
 
-public class ImageDTO
+public class ImageDTO extends HootDTO
 {
+
     public String content;
 
     public String imageUrl;

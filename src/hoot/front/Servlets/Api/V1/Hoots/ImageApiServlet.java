@@ -3,7 +3,7 @@ package hoot.front.Servlets.Api.V1.Hoots;
 import hoot.front.Servlets.Api.V1.AbstractApiServlet;
 import hoot.front.api.dto.hoot.ImageDTO;
 import hoot.model.entities.Image;
-import hoot.model.mapper.hoot.ImageDtoToImageMapper;
+import hoot.model.mapper.dtoToEntity.hoot.ImageDtoToImageMapper;
 import hoot.model.repositories.HootRepository;
 import hoot.system.Annotation.AuthenticationRequired;
 import hoot.system.Exception.CouldNotSaveException;

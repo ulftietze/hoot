@@ -3,7 +3,7 @@ package hoot.front.Servlets.Api.V1.Authentication;
 import hoot.front.Servlets.Api.V1.AbstractApiServlet;
 import hoot.front.api.dto.authentication.RegisterDTO;
 import hoot.model.entities.User;
-import hoot.model.mapper.RegisterDtoToUserMapper;
+import hoot.model.mapper.dtoToEntity.RegisterDtoToUserMapper;
 import hoot.model.repositories.UserRepository;
 import hoot.system.Exception.CouldNotSaveException;
 import hoot.system.ObjectManager.ObjectManager;

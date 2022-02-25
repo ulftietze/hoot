@@ -3,7 +3,7 @@ package hoot.front.Servlets.Api.V1.Hoots;
 import hoot.front.Servlets.Api.V1.AbstractApiServlet;
 import hoot.front.api.dto.hoot.CommentDTO;
 import hoot.model.entities.Comment;
-import hoot.model.mapper.hoot.CommentDtoToCommentMapper;
+import hoot.model.mapper.dtoToEntity.hoot.CommentDtoToCommentMapper;
 import hoot.model.repositories.HootRepository;
 import hoot.system.Annotation.AuthenticationRequired;
 import hoot.system.Exception.CouldNotSaveException;
