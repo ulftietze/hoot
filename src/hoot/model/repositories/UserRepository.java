@@ -137,7 +137,7 @@ public class UserRepository extends AbstractRepository<User>
             statement.close();
             connection.close();
         } catch (SQLException e) {
-            // TODO: Maybe logging and stuff, maybe not, this could
+            this.log("UserRepository.getList(): " + e.getMessage());
         }
 
         return users;
@@ -195,7 +195,7 @@ public class UserRepository extends AbstractRepository<User>
     /**
      * Save changes to an already existing User in the DB
      *
-     * @param user a User object that was previously returned from the getById() method. DO NOT CREATE ONE ON YOUR OWN.
+     * @param user an User entity
      * @throws CouldNotSaveException if any SQL errors occurred.
      */
     @Override
@@ -232,7 +232,7 @@ public class UserRepository extends AbstractRepository<User>
     /**
      * Delete an existing User from the DB.
      *
-     * @param user A User object that was previously returned from the getById() method. DO NOT CREATE ONE ON YOUR OWN.
+     * @param user an User entity
      * @throws CouldNotDeleteException if any SQL errors occurred.
      */
     @Override
@@ -268,6 +268,11 @@ public class UserRepository extends AbstractRepository<User>
         user.passwordHash = rs.getString("passwordHash");
         user.created      = this.getLocalDateTimeFromSQLTimestamp(rs.getTimestamp("created"));
         user.lastLogin    = this.getLocalDateTimeFromSQLTimestamp(rs.getTimestamp("lastLogin"));
+
+        try {
+            FollowerRepository fr = (FollowerRepository) ObjectManager.get(FollowerRepository.class);
+            user.followerCount = fr.getFollowerCountForUser(user.id);
+        } catch (EntityNotFoundException ignore) {}
 
         return user;
     }

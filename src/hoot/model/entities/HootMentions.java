@@ -2,9 +2,9 @@ package hoot.model.entities;
 
 import java.util.ArrayList;
 
-public class Mentions
+public class HootMentions
 {
     public Hoot hoot;
 
-    public ArrayList<User> mentions;
+    public ArrayList<Mention> mentions;
 }

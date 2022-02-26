@@ -1,6 +1,10 @@
 package hoot.model.entities;
 
+import java.time.LocalDateTime;
+
 public class Follower
 {
-    // TODO: Follower wie in Datenbank
+    public Integer userID, followsID;
+
+    public LocalDateTime created;
 }

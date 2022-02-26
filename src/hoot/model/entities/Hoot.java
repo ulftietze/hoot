@@ -6,7 +6,7 @@ import java.util.Map;
 
 public abstract class Hoot
 {
-    public int id;
+    public Integer id;
 
     public User user;
 
@@ -14,20 +14,18 @@ public abstract class Hoot
 
     public LocalDateTime created;
 
-    public Mentions mentions;
+    public HootMentions mentions;
 
-    public HootTags hootTags;
+    public HootTags tags;
 
     public Map<Interaction, Integer> reactionCount = new HashMap<>();
 
-    public void addTag(String tag)
+    public Hoot()
     {
-        if (this.hootTags == null) {
-            this.hootTags = new HootTags();
-        }
+        this.mentions = new HootMentions();
+        this.mentions.hoot = this;
 
-        Tag t = new Tag();
-        t.tag = tag;
-        this.hootTags.tags.add(t);
+        this.tags = new HootTags();
+        this.tags.hoot = this;
     }
 }

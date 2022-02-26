@@ -1,7 +1,9 @@
 package hoot.model.repositories;
 
 import hoot.model.entities.*;
+import hoot.model.search.MentionSearchCriteria;
 import hoot.model.search.SearchCriteriaInterface;
+import hoot.model.search.TagSearchCriteria;
 import hoot.system.Database.QueryBuilder;
 import hoot.system.Exception.CouldNotDeleteException;
 import hoot.system.Exception.CouldNotSaveException;
@@ -31,9 +33,10 @@ public class HootRepository extends AbstractRepository<Hoot>
             queryBuilder.SELECT.add("*");
             queryBuilder.FROM = "Hoot h";
 
-            for (Interaction interaction: Interaction.values()) {
+            for (Interaction interaction : Interaction.values()) {
                 String reaction = interaction.toString();
-                String q = "count(CASE WHEN ia.interaction = '" + reaction + "' THEN 1 END) AS '" + reaction + "'";
+                String q = "count(CASE WHEN ia.interaction = '" + reaction + "' THEN 1 END) AS '" + reaction
+                           + "'";
                 queryBuilder.SELECT.add(q);
             }
 
@@ -50,10 +53,8 @@ public class HootRepository extends AbstractRepository<Hoot>
             PreparedStatement statement  = queryBuilder.build(connection);
             ResultSet         resultSet  = statement.executeQuery();
 
-            ArrayList<Hoot>       allHoots           = new ArrayList<>();
-            UserRepository        userRepository     = (UserRepository) ObjectManager.get(UserRepository.class);
-            HootTagRepository     tagRepository      = (HootTagRepository) ObjectManager.get(HootTagRepository.class);
-            HootMentionRepository mentionsRepository = this.getHootMentionRepository();
+            ArrayList<Hoot> allHoots       = new ArrayList<>();
+            UserRepository  userRepository = (UserRepository) ObjectManager.get(UserRepository.class);
 
             while (resultSet.next()) {
                 String dbHootType = resultSet.getString("h.hootType");
@@ -62,16 +63,16 @@ public class HootRepository extends AbstractRepository<Hoot>
                     // yes, this is bad, but it just works (TM)
                     case Image:
                         Image imageHoot = new Image();
-                        imageHoot.id           = resultSet.getInt("h.id");
-                        imageHoot.created      = this.getLocalDateTimeFromSQLTimestamp(resultSet.getTimestamp("h.created"));
-                        imageHoot.imagePath    = resultSet.getString("i.imagePath");
-                        imageHoot.content      = resultSet.getString("i.content");
+                        imageHoot.id = resultSet.getInt("h.id");
+                        imageHoot.created = this.getLocalDateTimeFromSQLTimestamp(resultSet.getTimestamp("h.created"));
+                        imageHoot.imagePath = resultSet.getString("i.imagePath");
+                        imageHoot.content = resultSet.getString("i.content");
                         imageHoot.onlyFollower = resultSet.getBoolean("i.onlyFollower");
-                        imageHoot.user         = userRepository.getById(resultSet.getInt("h.user"));
-                        imageHoot.mentions     = mentionsRepository.getByHootId(imageHoot.id);
-                        imageHoot.hootTags = tagRepository.getByHootId(imageHoot.id);
+                        imageHoot.user = userRepository.getById(resultSet.getInt("h.user"));
+                        imageHoot.mentions = this.getMentions(imageHoot);
+                        imageHoot.tags = this.getTags(imageHoot);
 
-                        for (Interaction interaction: Interaction.values()) {
+                        for (Interaction interaction : Interaction.values()) {
                             imageHoot.reactionCount.put(interaction, resultSet.getInt(interaction.toString()));
                         }
 
@@ -79,31 +80,31 @@ public class HootRepository extends AbstractRepository<Hoot>
                         break;
                     case Post:
                         Post postHoot = new Post();
-                        postHoot.created      = this.getLocalDateTimeFromSQLTimestamp(resultSet.getTimestamp("h.created"));
-                        postHoot.content      = resultSet.getString("i.content");
+                        postHoot.created = this.getLocalDateTimeFromSQLTimestamp(resultSet.getTimestamp("h.created"));
+                        postHoot.content = resultSet.getString("i.content");
                         postHoot.onlyFollower = resultSet.getBoolean("i.onlyFollower");
-                        postHoot.id           = resultSet.getInt("h.id");
-                        postHoot.user         = userRepository.getById(resultSet.getInt("h.user"));
-                        postHoot.mentions     = mentionsRepository.getByHootId(postHoot.id);
-                        postHoot.hootTags = tagRepository.getByHootId(postHoot.id);
+                        postHoot.id = resultSet.getInt("h.id");
+                        postHoot.user = userRepository.getById(resultSet.getInt("h.user"));
+                        postHoot.mentions = this.getMentions(postHoot);
+                        postHoot.tags = this.getTags(postHoot);
 
-                        for (Interaction interaction: Interaction.values()) {
+                        for (Interaction interaction : Interaction.values()) {
                             postHoot.reactionCount.put(interaction, resultSet.getInt(interaction.toString()));
                         }
 
                         allHoots.add(postHoot);
                         break;
                     case Comment:
-                        Comment commentHoot  = new Comment();
-                        commentHoot.created  = this.getLocalDateTimeFromSQLTimestamp(resultSet.getTimestamp("h.created"));
-                        commentHoot.content  = resultSet.getString("i.content");
-                        commentHoot.id       = resultSet.getInt("h.id");
-                        commentHoot.user     = userRepository.getById(resultSet.getInt("h.user"));
-                        commentHoot.parent   = this.getById(resultSet.getInt("c.parent"));
-                        commentHoot.mentions = mentionsRepository.getByHootId(commentHoot.id);
-                        commentHoot.hootTags = tagRepository.getByHootId(commentHoot.id);
+                        Comment commentHoot = new Comment();
+                        commentHoot.created = this.getLocalDateTimeFromSQLTimestamp(resultSet.getTimestamp("h.created"));
+                        commentHoot.content = resultSet.getString("i.content");
+                        commentHoot.id = resultSet.getInt("h.id");
+                        commentHoot.user = userRepository.getById(resultSet.getInt("h.user"));
+                        commentHoot.parent = this.getById(resultSet.getInt("c.parent"));
+                        commentHoot.mentions = this.getMentions(commentHoot);
+                        commentHoot.tags = this.getTags(commentHoot);
 
-                        for (Interaction interaction: Interaction.values()) {
+                        for (Interaction interaction : Interaction.values()) {
                             commentHoot.reactionCount.put(interaction, resultSet.getInt(interaction.toString()));
                         }
 
@@ -153,8 +154,29 @@ public class HootRepository extends AbstractRepository<Hoot>
         // delete parent hoot ID (CASCADE delete in DB)
     }
 
-    private HootMentionRepository getHootMentionRepository()
+    public HootMentions getMentions(Hoot hoot) throws EntityNotFoundException
     {
-        return (HootMentionRepository) ObjectManager.get(HootMentionRepository.class);
+        HootMentions hootMentions = new HootMentions();
+        hootMentions.hoot = hoot;
+
+        MentionSearchCriteria searchCriteria = new MentionSearchCriteria(hoot);
+
+        MentionRepository repository = (MentionRepository) ObjectManager.get(MentionRepository.class);
+        hootMentions.mentions = repository.getList(searchCriteria);
+
+        return hootMentions;
+    }
+
+    public HootTags getTags(Hoot hoot) throws EntityNotFoundException
+    {
+        HootTags hootTags = new HootTags();
+        hootTags.hoot = hoot;
+
+        TagSearchCriteria searchCriteria = new TagSearchCriteria(hoot);
+
+        TagRepository repository = (TagRepository) ObjectManager.get(TagRepository.class);
+        hootTags.tags = repository.getList(searchCriteria);
+
+        return hootTags;
     }
 }
