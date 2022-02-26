@@ -10,6 +10,6 @@ public class DefaultSearchCriteria implements SearchCriteriaInterface
     @Override
     public QueryBuilder getQueryBuilder() throws SQLException
     {
-        return (QueryBuilder) ObjectManager.get(QueryBuilder.class, true);
+        return (QueryBuilder) ObjectManager.create(QueryBuilder.class);
     }
 }

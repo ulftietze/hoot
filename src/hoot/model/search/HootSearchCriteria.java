@@ -21,7 +21,7 @@ public class HootSearchCriteria implements SearchCriteriaInterface
     @Override
     public QueryBuilder getQueryBuilder() throws SQLException
     {
-        QueryBuilder qb = (QueryBuilder) ObjectManager.get(QueryBuilder.class, true);
+        QueryBuilder qb = (QueryBuilder) ObjectManager.create(QueryBuilder.class);
 
         qb.LIMIT = defaultPageSize;
 

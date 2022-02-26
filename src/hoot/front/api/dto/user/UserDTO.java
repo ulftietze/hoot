@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class UserDTO
 {
-    public int id;
+    public Integer id;
 
     public String username;
 

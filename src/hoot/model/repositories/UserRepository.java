@@ -33,7 +33,7 @@ public class UserRepository extends AbstractRepository<User>
                     sqlStatement
                     = "select id, username, imagePath, passwordHash, lastLogin, created from User where id = ?";
 
-            QueryBuilder qb = (QueryBuilder) ObjectManager.get(QueryBuilder.class, true);
+            QueryBuilder qb = (QueryBuilder) ObjectManager.create(QueryBuilder.class);
             qb.SELECT.add("*");
             qb.FROM = "User u";
             qb.WHERE.add("id = ?");

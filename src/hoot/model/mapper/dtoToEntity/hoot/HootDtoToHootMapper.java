@@ -9,26 +9,40 @@ public class HootDtoToHootMapper
 {
     public Hoot map(HootDTO hootDTO) throws CouldNotMapException
     {
-        Hoot                hoot;
-        PostDtoToPostMapper postMapper = (PostDtoToPostMapper) ObjectManager.get(PostDtoToPostMapper.class);
-        ImageDtoToImageMapper imageMapper = (ImageDtoToImageMapper) ObjectManager.get(ImageDtoToImageMapper.class);
-        CommentDtoToCommentMapper commentMapper = (CommentDtoToCommentMapper) ObjectManager.get(CommentDtoToCommentMapper.class);
+        Hoot hoot;
 
         switch (HootType.valueOf(String.valueOf(hootDTO.type))) {
             case post:
-                hoot = postMapper.map((PostDTO) hootDTO);
+                hoot = this.getPostDtoToPostMapper().map((PostDTO) hootDTO);
                 break;
             case image:
-                hoot = imageMapper.map((ImageDTO) hootDTO);
+                hoot = this.getImageDtoToImageMapper().map((ImageDTO) hootDTO);
                 break;
             case comment:
-                hoot = commentMapper.map((CommentDTO) hootDTO);
+                hoot = this.getCommentDtoToCommentMapper().map((CommentDTO) hootDTO);
                 break;
             default:
-                throw new CouldNotMapException("Invalid Type "+ hootDTO.type.toString());
+                throw new CouldNotMapException("Could not map: " + hootDTO.type.toString());
         }
-        hoot.id = hootDTO.id;
+
+        hoot.id      = hootDTO.id;
         hoot.created = hootDTO.created;
+
         return hoot;
+    }
+
+    private PostDtoToPostMapper getPostDtoToPostMapper()
+    {
+        return (PostDtoToPostMapper) ObjectManager.get(PostDtoToPostMapper.class);
+    }
+
+    private ImageDtoToImageMapper getImageDtoToImageMapper()
+    {
+        return (ImageDtoToImageMapper) ObjectManager.get(ImageDtoToImageMapper.class);
+    }
+
+    private CommentDtoToCommentMapper getCommentDtoToCommentMapper()
+    {
+        return (CommentDtoToCommentMapper) ObjectManager.get(CommentDtoToCommentMapper.class);
     }
 }

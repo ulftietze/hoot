@@ -6,6 +6,7 @@ import hoot.model.entities.Comment;
 import hoot.model.mapper.dtoToEntity.hoot.CommentDtoToCommentMapper;
 import hoot.model.repositories.HootRepository;
 import hoot.system.Annotation.AuthenticationRequired;
+import hoot.system.Exception.CouldNotMapException;
 import hoot.system.Exception.CouldNotSaveException;
 import hoot.system.ObjectManager.ObjectManager;
 
@@ -30,7 +31,7 @@ public class CommentApiServlet extends AbstractApiServlet
             repository.save(comment);
 
             this.sendResponse(response, HttpServletResponse.SC_OK, this.serializeJsonResponseBody("created"));
-        } catch (CouldNotSaveException e) {
+        } catch (CouldNotSaveException | CouldNotMapException e) {
             int httpStatus = HttpServletResponse.SC_NOT_ACCEPTABLE;
             this.sendResponse(response, httpStatus, this.serializeJsonResponseBody(e.getMessage()));
         }

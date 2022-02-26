@@ -40,6 +40,20 @@ public class ObjectManager
     }
 
     /**
+     * Create an instance of an object for the given class name.
+     *
+     * @param className   of the Object to create.
+     * @return an instance of the given className. This may be a child class.
+     */
+    public static Object create(Class<?> className)
+    {
+        ObjectManager om          = ObjectManager.getInstance();
+        Class<?>      actualClass = om.getActualClassToCreate(className);
+
+        return om.create(className, actualClass);
+    }
+
+    /**
      * Get an instance of an object for the given class name.
      * When the class does not exist, try to create this. This is kind of a lazy loading the class.
      *

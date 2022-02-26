@@ -1,8 +1,10 @@
 package hoot.front.api.dto.hoot;
 
+import hoot.front.api.dto.user.UserDTO;
+
 import java.time.LocalDateTime;
 
-public class HootDTO
+public abstract class HootDTO
 {
     public Integer id;
 
@@ -10,4 +12,5 @@ public class HootDTO
 
     public LocalDateTime created;
 
+    public UserDTO user;
 }

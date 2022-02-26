@@ -13,7 +13,7 @@ public class UserSearchCriteria implements SearchCriteriaInterface
     @Override
     public QueryBuilder getQueryBuilder() throws SQLException
     {
-        QueryBuilder qb = (QueryBuilder) ObjectManager.get(QueryBuilder.class, true);
+        QueryBuilder qb = (QueryBuilder) ObjectManager.create(QueryBuilder.class);
 
         if (this.userIds.size() > 0) {
             qb.WHERE.add("userId IN (?)");

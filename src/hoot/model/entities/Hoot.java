@@ -20,10 +20,12 @@ public abstract class Hoot
 
     public Map<Interaction, Integer> reactionCount = new HashMap<>();
 
-    public void addTag(String tag){
-        if(this.hootTags == null){
+    public void addTag(String tag)
+    {
+        if (this.hootTags == null) {
             this.hootTags = new HootTags();
         }
+
         Tag t = new Tag();
         t.tag = tag;
         this.hootTags.tags.add(t);
