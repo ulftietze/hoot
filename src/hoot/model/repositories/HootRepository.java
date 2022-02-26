@@ -81,8 +81,8 @@ public class HootRepository extends AbstractRepository<Hoot>
                     case Post:
                         Post postHoot = new Post();
                         postHoot.created = this.getLocalDateTimeFromSQLTimestamp(resultSet.getTimestamp("h.created"));
-                        postHoot.content = resultSet.getString("i.content");
-                        postHoot.onlyFollower = resultSet.getBoolean("i.onlyFollower");
+                        postHoot.content = resultSet.getString("p.content");
+                        postHoot.onlyFollower = resultSet.getBoolean("p.onlyFollower");
                         postHoot.id = resultSet.getInt("h.id");
                         postHoot.user = userRepository.getById(resultSet.getInt("h.user"));
                         postHoot.mentions = this.getMentions(postHoot);
@@ -97,7 +97,7 @@ public class HootRepository extends AbstractRepository<Hoot>
                     case Comment:
                         Comment commentHoot = new Comment();
                         commentHoot.created = this.getLocalDateTimeFromSQLTimestamp(resultSet.getTimestamp("h.created"));
-                        commentHoot.content = resultSet.getString("i.content");
+                        commentHoot.content = resultSet.getString("c.content");
                         commentHoot.id = resultSet.getInt("h.id");
                         commentHoot.user = userRepository.getById(resultSet.getInt("h.user"));
                         commentHoot.parent = this.getById(resultSet.getInt("c.parent"));
