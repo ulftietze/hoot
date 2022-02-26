@@ -53,12 +53,41 @@ public class HootTagRepository extends AbstractRepository<HootTags>
             connection.close();
         } catch (SQLException e) {
             this.log(e.getMessage());
+            throw new CouldNotSaveException("HootTag for Hoot " + hootTags.hoot.id);
         }
     }
 
     @Override
     public void delete(HootTags hootTags) throws CouldNotDeleteException
     {
+        if (hootTags.hoot == null) {
+            throw new CouldNotDeleteException("HootTags for null Hoot");
+        }
 
+        try {
+            Connection connection = this.getConnection();
+
+            TagRepository tagRepository = (TagRepository) ObjectManager.get(TagRepository.class);
+
+            for (Tag tag : hootTags.tags) {
+                try {
+                    tagRepository.delete(tag);
+
+                    String statement = "delete from HootTags where hoot = ? and tag = ?";
+                    PreparedStatement pss = connection.prepareStatement(statement);
+
+                    pss.setInt(1, hootTags.hoot.id);
+                    pss.setString(2, tag.tag);
+
+                    pss.executeUpdate();
+                    pss.close();
+                } catch (CouldNotDeleteException | SQLException ignore) {}
+            }
+
+            connection.close();
+        } catch (SQLException e) {
+            this.log(e.getMessage());
+            throw new CouldNotDeleteException("HootTag for Hoot " + hootTags.hoot.id);
+        }
     }
 }

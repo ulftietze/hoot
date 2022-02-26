@@ -156,10 +156,11 @@ public class HootRepository extends AbstractRepository<Hoot>
 
     public HootMentions getMentions(Hoot hoot) throws EntityNotFoundException
     {
-        HootMentions hootMentions = new HootMentions();
+        HootMentions hootMentions = (HootMentions) ObjectManager.create(HootMentions.class);
         hootMentions.hoot = hoot;
 
-        MentionSearchCriteria searchCriteria = new MentionSearchCriteria(hoot);
+        MentionSearchCriteria searchCriteria = (MentionSearchCriteria) ObjectManager.create(MentionSearchCriteria.class);
+        searchCriteria.hoot = hoot;
 
         MentionRepository repository = (MentionRepository) ObjectManager.get(MentionRepository.class);
         hootMentions.mentions = repository.getList(searchCriteria);
@@ -169,10 +170,11 @@ public class HootRepository extends AbstractRepository<Hoot>
 
     public HootTags getTags(Hoot hoot) throws EntityNotFoundException
     {
-        HootTags hootTags = new HootTags();
+        HootTags hootTags = (HootTags) ObjectManager.create(HootTags.class);
         hootTags.hoot = hoot;
 
-        TagSearchCriteria searchCriteria = new TagSearchCriteria(hoot);
+        TagSearchCriteria searchCriteria = (TagSearchCriteria) ObjectManager.create(TagSearchCriteria.class);
+        searchCriteria.hoot = hoot;
 
         TagRepository repository = (TagRepository) ObjectManager.get(TagRepository.class);
         hootTags.tags = repository.getList(searchCriteria);

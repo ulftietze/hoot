@@ -8,17 +8,14 @@ import java.sql.SQLException;
 
 public class TagSearchCriteria implements SearchCriteriaInterface
 {
-    private Hoot hoot;
-
-    public TagSearchCriteria(Hoot hoot)
-    {
-        this.hoot = hoot;
-    }
+    public Hoot hoot;
 
     @Override
     public QueryBuilder getQueryBuilder() throws SQLException
     {
-        QueryBuilder queryBuilder = (QueryBuilder) ObjectManager.get(QueryBuilder.class, true);
+        if (hoot == null) return null;
+
+        QueryBuilder queryBuilder = (QueryBuilder) ObjectManager.create(QueryBuilder.class);
 
         queryBuilder.SELECT.add("tag");
 

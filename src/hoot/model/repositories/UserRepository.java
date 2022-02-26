@@ -207,11 +207,9 @@ public class UserRepository extends AbstractRepository<User>
         }
 
         try {
-            Connection        connection = this.getConnection();
-            String
-                              sqlStatement
-                                         = "update User set username = ?, imagePath = ?, passwordHash = ? where id = ?";
-            PreparedStatement pss        = connection.prepareStatement(sqlStatement);
+            Connection        connection   = this.getConnection();
+            String            sqlStatement = "update User set username = ?, imagePath = ?, passwordHash = ? where id = ?";
+            PreparedStatement pss          = connection.prepareStatement(sqlStatement);
             pss.setString(1, user.username);
             pss.setString(2, user.imagePath);
             pss.setString(3, user.passwordHash);
