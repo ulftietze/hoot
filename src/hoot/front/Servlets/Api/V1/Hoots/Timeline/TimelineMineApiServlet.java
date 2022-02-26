@@ -1,15 +1,19 @@
 package hoot.front.Servlets.Api.V1.Hoots.Timeline;
 
 import hoot.front.Servlets.Api.V1.AbstractApiServlet;
+import hoot.model.entities.Hoot;
+import hoot.model.repositories.HootRepository;
+import hoot.model.search.TimelineSearchCriteria;
 import hoot.system.Annotation.AuthenticationRequired;
+import hoot.system.Exception.EntityNotFoundException;
+import hoot.system.ObjectManager.ObjectManager;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.util.ArrayList;
 
 @AuthenticationRequired
 @WebServlet("/api/V1/hoot/timeline/mine")
@@ -17,16 +21,37 @@ public class TimelineMineApiServlet extends AbstractApiServlet
 {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
     {
-        response.setContentType("text/html");
+        HootRepository         repository     = (HootRepository) ObjectManager.get(HootRepository.class);
+        TimelineSearchCriteria searchCriteria = this.createSearchCriteriaFromRequest(request);
 
-        PrintWriter out = response.getWriter();
-        out.println("<!doctype html><html>");
-        out.println("<head> <meta charset='utf-8'>");
-        out.println("<title>webapp</title> </head>");
-        out.println("<body>GetTimelinePersonalServlet</body>");
-        out.println("</html>");
+        try {
+            ArrayList<Hoot> hoots = repository.getList(searchCriteria);
+            this.sendResponse(response, HttpServletResponse.SC_OK, this.serialize(hoots));
+        } catch (EntityNotFoundException e) {
+            int httpStatus = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+            this.sendResponse(response, httpStatus, this.serialize(e.getMessage()));
+        }
+    }
 
-        ServletContext context = getServletContext();
-        context.log("simple logging");
+    private TimelineSearchCriteria createSearchCriteriaFromRequest(HttpServletRequest request)
+    {
+        String lastPost = request.getParameter("lastPostId");
+        String quantity = request.getParameter("quantity");
+        String tags     = request.getParameter("tags");
+        String userId   = request.getParameter("userId");
+
+        TimelineSearchCriteria searchCriteria = this.createSearchCriteriaClass();
+
+        searchCriteria.lastPostId      = lastPost != null && !lastPost.equals("") ? Integer.valueOf(lastPost) : null;
+        searchCriteria.defaultPageSize = quantity != null && !quantity.equals("") ? Integer.valueOf(quantity) : null;
+        searchCriteria.tags            = tags != null && !tags.equals("") ? tags : null;
+        searchCriteria.userId          = userId != null && !userId.equals("") ? Integer.valueOf(userId) : null;
+
+        return searchCriteria;
+    }
+
+    private TimelineSearchCriteria createSearchCriteriaClass()
+    {
+        return (TimelineSearchCriteria) ObjectManager.create(TimelineSearchCriteria.class);
     }
 }

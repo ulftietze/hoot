@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class HootTags
 {
-    public Hoot hoot;
+    public transient Hoot hoot;
 
     public ArrayList<Tag> tags;
 }

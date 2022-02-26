@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class HootMentions
 {
-    public Hoot hoot;
+    public transient Hoot hoot;
 
     public ArrayList<Mention> mentions;
 }
