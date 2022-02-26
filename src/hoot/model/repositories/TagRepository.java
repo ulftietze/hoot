@@ -23,6 +23,9 @@ public class TagRepository extends AbstractRepository<Tag>
             ArrayList<Tag> tags         = new ArrayList<>();
             QueryBuilder   queryBuilder = searchCriteria.getQueryBuilder();
 
+            queryBuilder.SELECT.add("tag");
+            queryBuilder.FROM = "HootTags";
+
             Connection        connection = this.getConnection();
             PreparedStatement statement  = queryBuilder.build(connection);
             ResultSet         resultSet  = statement.executeQuery();

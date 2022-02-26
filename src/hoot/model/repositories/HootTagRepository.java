@@ -15,11 +15,12 @@ import java.util.ArrayList;
 
 public class HootTagRepository extends AbstractRepository<HootTags>
 {
-
+    /**
+     * This method never makes sense. Use TagRepository.getList() instead.
+     */
     @Override
     public ArrayList<HootTags> getList(SearchCriteriaInterface searchCriteria) throws EntityNotFoundException
     {
-        // this method never makes sense. Use TagRepository.getList() instead.
         return null;
     }
 

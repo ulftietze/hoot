@@ -48,21 +48,24 @@ public class FollowerRepository extends AbstractRepository<Follower>
     @Override
     public ArrayList<Follower> getList(SearchCriteriaInterface searchCriteria) throws EntityNotFoundException
     {
-        // TODO: limit to 50 with FollowerToUser SearchCriteria
         ArrayList<Follower> followerList = new ArrayList<>();
 
         try {
             QueryBuilder queryBuilder = searchCriteria.getQueryBuilder();
+
+            queryBuilder.SELECT.add("user");
             queryBuilder.FROM = "Follower";
 
             Connection        connection = this.getConnection();
             PreparedStatement statement  = queryBuilder.build(connection);
             ResultSet         resultSet  = statement.executeQuery();
 
+            UserRepository userRepository = (UserRepository) ObjectManager.get(UserRepository.class);
+
             while (resultSet.next()) {
                 Follower follower = new Follower();
-                follower.userID    = resultSet.getInt("user");
-                follower.followsID = resultSet.getInt("follows");
+                follower.user    = userRepository.getById(resultSet.getInt("user"));
+                follower.follows = userRepository.getById(resultSet.getInt("follows"));
                 followerList.add(follower);
             }
 
@@ -79,7 +82,7 @@ public class FollowerRepository extends AbstractRepository<Follower>
     @Override
     public void save(Follower entity) throws CouldNotSaveException
     {
-        if (entity.userID == null || entity.followsID == null) {
+        if (entity.user == null || entity.follows == null) {
             throw new CouldNotSaveException("Follower (ID null)");
         }
 
@@ -88,8 +91,8 @@ public class FollowerRepository extends AbstractRepository<Follower>
             String            sqlStatement = "insert into Follower (user, follows) values (?, ?)";
             PreparedStatement pss          = connection.prepareStatement(sqlStatement);
 
-            pss.setInt(1, entity.userID);
-            pss.setInt(2, entity.followsID);
+            pss.setInt(1, entity.user.id);
+            pss.setInt(2, entity.follows.id);
 
             int rowCount = pss.executeUpdate();
 
@@ -98,18 +101,18 @@ public class FollowerRepository extends AbstractRepository<Follower>
 
             if (rowCount == 0) {
                 throw new CouldNotSaveException(
-                        "New Follower " + entity.userID + " trying to follow " + entity.followsID);
+                        "New Follower " + entity.user.id + " trying to follow " + entity.follows.id);
             }
         } catch (SQLException e) {
             this.log(e.getMessage());
-            throw new CouldNotSaveException("New Follower " + entity.userID + " trying to follow " + entity.followsID);
+            throw new CouldNotSaveException("New Follower " + entity.user.id + " trying to follow " + entity.follows.id);
         }
     }
 
     @Override
     public void delete(Follower entity) throws CouldNotDeleteException
     {
-        if (entity.userID == null || entity.followsID == null) {
+        if (entity.user.id == null || entity.follows.id == null) {
             throw new CouldNotDeleteException("Follower (ID null)");
         }
 
@@ -118,8 +121,8 @@ public class FollowerRepository extends AbstractRepository<Follower>
             String            sqlStatement = "delete from Follower where user = ? and follows = ?";
             PreparedStatement pss          = connection.prepareStatement(sqlStatement);
 
-            pss.setInt(1, entity.userID);
-            pss.setInt(2, entity.followsID);
+            pss.setInt(1, entity.user.id);
+            pss.setInt(2, entity.follows.id);
 
             int rowCount = pss.executeUpdate();
 
@@ -128,11 +131,11 @@ public class FollowerRepository extends AbstractRepository<Follower>
 
             if (rowCount == 0) {
                 throw new CouldNotDeleteException(
-                        "Delete Follower " + entity.userID + " following " + entity.followsID);
+                        "Delete Follower " + entity.user.id + " following " + entity.follows.id);
             }
         } catch (SQLException e) {
             this.log(e.getMessage());
-            throw new CouldNotDeleteException("Delete Follower " + entity.userID + " following " + entity.followsID);
+            throw new CouldNotDeleteException("Delete Follower " + entity.user.id + " following " + entity.follows.id);
         }
     }
 }

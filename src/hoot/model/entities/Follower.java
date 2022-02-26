@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public class Follower
 {
-    public Integer userID, followsID;
+    public User user, follows;
 
     public LocalDateTime created;
 }

@@ -17,10 +17,6 @@ public class MentionSearchCriteria implements SearchCriteriaInterface
 
         QueryBuilder queryBuilder = (QueryBuilder) ObjectManager.create(QueryBuilder.class);
 
-        queryBuilder.SELECT.add("mention");
-
-        queryBuilder.FROM = "HootMentions";
-
         queryBuilder.WHERE.add("hoot = ?");
         queryBuilder.PARAMETERS.add(this.hoot.id.toString());
 

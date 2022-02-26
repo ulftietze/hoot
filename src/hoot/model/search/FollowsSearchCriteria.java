@@ -1,24 +1,28 @@
 package hoot.model.search;
 
-import hoot.model.entities.Hoot;
 import hoot.system.Database.QueryBuilder;
 import hoot.system.ObjectManager.ObjectManager;
 
 import java.sql.SQLException;
 
-public class TagSearchCriteria implements SearchCriteriaInterface
+/**
+ * LIST OF ALL USERS THAT ARE FOLLOWED BY THE SPECIFIED USERID
+ */
+public class FollowsSearchCriteria implements SearchCriteriaInterface
 {
-    public Hoot hoot;
+    Integer userID;
 
     @Override
     public QueryBuilder getQueryBuilder() throws SQLException
     {
-        if (hoot == null) return null;
+        if (userID == null) {
+            return null;
+        }
 
         QueryBuilder queryBuilder = (QueryBuilder) ObjectManager.create(QueryBuilder.class);
 
-        queryBuilder.WHERE.add("hoot = ?");
-        queryBuilder.PARAMETERS.add(this.hoot.id.toString());
+        queryBuilder.WHERE.add("user = ?");
+        queryBuilder.PARAMETERS.add(this.userID.toString());
 
         return queryBuilder;
     }

@@ -23,6 +23,9 @@ public class MentionRepository extends AbstractRepository<Mention>
             ArrayList<Mention> mentioned    = new ArrayList<>();
             QueryBuilder       queryBuilder = searchCriteria.getQueryBuilder();
 
+            queryBuilder.SELECT.add("mention");
+            queryBuilder.FROM = "HootMentions";
+
             Connection        connection = this.getConnection();
             PreparedStatement statement  = queryBuilder.build(connection);
             ResultSet         resultSet  = statement.executeQuery();
