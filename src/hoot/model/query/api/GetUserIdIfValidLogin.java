@@ -1,7 +1,7 @@
 package hoot.model.query.api;
 
-import hoot.front.api.dto.authentication.LoginDTO;
 import hoot.model.entities.User;
+import hoot.model.entities.authentication.Login;
 import hoot.model.repositories.UserRepository;
 import hoot.system.Exception.EntityNotFoundException;
 import hoot.system.Logger.LoggerInterface;
@@ -27,12 +27,12 @@ public class GetUserIdIfValidLogin
     }
 
     /**
-     * // TODO: Return the User Entity
+     * // TODO: Documentation
      *
      * @param login The LoginDTO which is used to transport data via the API
      * @return The UserId if the login data matches the database data
      */
-    public User execute(LoginDTO login)
+    public User execute(Login login)
     {
         try {
             User user = this.userRepository.getByUsername(login.username);

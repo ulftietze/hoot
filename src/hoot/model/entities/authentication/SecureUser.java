@@ -1,7 +1,9 @@
-package hoot.front.api.dto.authentication;
+package hoot.model.entities.authentication;
 
-public class RegisterDTO
+public class SecureUser
 {
+    public Integer id;
+
     public String username;
 
     public String password;

@@ -1,10 +1,9 @@
 package hoot.front.Servlets.Api.V1.User;
 
 import hoot.front.Servlets.Api.V1.AbstractApiServlet;
-import hoot.front.api.dto.user.UserDTO;
 import hoot.model.entities.User;
-import hoot.model.mapper.dtoToEntity.UserDtoToUserMapper;
-import hoot.model.mapper.entityToDto.UserToUserDtoMapper;
+import hoot.model.entities.authentication.SecureUser;
+import hoot.model.mapper.SecureUserToUserMapper;
 import hoot.model.repositories.UserRepository;
 import hoot.system.Annotation.AuthenticationRequired;
 import hoot.system.Exception.CouldNotSaveException;
@@ -16,6 +15,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 
 @AuthenticationRequired
 @WebServlet({"/api/V1/user", "/api/V1/user/me"})
@@ -27,57 +27,55 @@ public class UserApiServlet extends AbstractApiServlet
 
         if (requestedId == null || requestedId.equals("")) {
             int httpStatus = HttpServletResponse.SC_BAD_REQUEST;
-            this.sendResponse(response, httpStatus, this.serializeJsonResponseBody("No ID given."));
+            this.sendResponse(response, httpStatus, this.serialize("No ID given."));
             return;
         }
 
-        UserRepository      repository = (UserRepository) ObjectManager.get(UserRepository.class);
-        UserToUserDtoMapper mapper     = (UserToUserDtoMapper) ObjectManager.get(UserToUserDtoMapper.class);
+        UserRepository repository = (UserRepository) ObjectManager.get(UserRepository.class);
 
         try {
-            User    entity = repository.getById(Integer.parseInt(requestedId));
-            UserDTO dto    = mapper.map(entity);
+            User entity = repository.getById(Integer.parseInt(requestedId));
 
-            this.sendResponse(response, HttpServletResponse.SC_OK, this.serializeJsonResponseBody(dto));
+            this.sendResponse(response, HttpServletResponse.SC_OK, this.serialize(entity));
         } catch (EntityNotFoundException e) {
             int httpStatus = HttpServletResponse.SC_NOT_FOUND;
-            this.sendResponse(response, httpStatus, this.serializeJsonResponseBody(e.getMessage()));
+            this.sendResponse(response, httpStatus, this.serialize(e.getMessage()));
         }
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
     {
-        UserDTO dto = (UserDTO) this.deserializeJsonRequestBody(request, UserDTO.class);
+        UserRepository         repository = (UserRepository) ObjectManager.get(UserRepository.class);
+        SecureUserToUserMapper mapper     = (SecureUserToUserMapper) ObjectManager.get(SecureUserToUserMapper.class);
 
-        UserRepository      repository = (UserRepository) ObjectManager.get(UserRepository.class);
-        UserDtoToUserMapper mapper     = (UserDtoToUserMapper) ObjectManager.get(UserDtoToUserMapper.class);
+        SecureUser secureUser = (SecureUser) this.deserializeJsonRequestBody(request, SecureUser.class);
 
         try {
-            User entity = mapper.map(dto);
+            User entity = mapper.map(secureUser);
             repository.save(entity);
 
-            this.sendResponse(response, HttpServletResponse.SC_OK, this.serializeJsonResponseBody("saved"));
-        } catch (CouldNotSaveException e) {
+            this.sendResponse(response, HttpServletResponse.SC_OK, this.serialize("saved"));
+        } catch (CouldNotSaveException | EntityNotFoundException | GeneralSecurityException e) {
             int httpStatus = HttpServletResponse.SC_NOT_ACCEPTABLE;
-            this.sendResponse(response, httpStatus, this.serializeJsonResponseBody(e.getMessage()));
+            this.sendResponse(response, httpStatus, this.serialize(e.getMessage()));
         }
     }
 
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
     {
-        UserDTO dto = (UserDTO) this.deserializeJsonRequestBody(request, UserDTO.class);
+        UserRepository         repository = (UserRepository) ObjectManager.get(UserRepository.class);
+        SecureUserToUserMapper mapper     = (SecureUserToUserMapper) ObjectManager.get(SecureUserToUserMapper.class);
 
-        UserRepository      repository = (UserRepository) ObjectManager.get(UserRepository.class);
-        UserDtoToUserMapper mapper     = (UserDtoToUserMapper) ObjectManager.get(UserDtoToUserMapper.class);
+        SecureUser secureUser = (SecureUser) this.deserializeJsonRequestBody(request, SecureUser.class);
 
         try {
-            User entity = mapper.map(dto);
+            User entity = mapper.map(secureUser);
             repository.save(entity);
 
-            this.sendResponse(response, HttpServletResponse.SC_OK, this.serializeJsonResponseBody("updated"));
-        } catch (CouldNotSaveException e) {
+            this.sendResponse(response, HttpServletResponse.SC_OK, this.serialize("saved"));
+        } catch (CouldNotSaveException | EntityNotFoundException | GeneralSecurityException e) {
             int httpStatus = HttpServletResponse.SC_NOT_ACCEPTABLE;
-            this.sendResponse(response, httpStatus, this.serializeJsonResponseBody(e.getMessage()));
+            this.sendResponse(response, httpStatus, this.serialize(e.getMessage()));
         }
     }
 }

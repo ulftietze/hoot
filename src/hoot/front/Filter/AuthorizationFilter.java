@@ -42,7 +42,7 @@ public class AuthorizationFilter implements Filter
 
         if (this.isUnauthorized(httpRequest)) {
             httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            httpResponse.getWriter().print(this.requestSerializer.serializeJsonResponseBody("Unauthorized"));
+            httpResponse.getWriter().print(this.requestSerializer.serialize("Unauthorized"));
             return;
         }
 

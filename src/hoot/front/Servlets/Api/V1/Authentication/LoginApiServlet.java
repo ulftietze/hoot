@@ -1,8 +1,8 @@
 package hoot.front.Servlets.Api.V1.Authentication;
 
 import hoot.front.Servlets.Api.V1.AbstractApiServlet;
-import hoot.front.api.dto.authentication.LoginDTO;
 import hoot.model.entities.User;
+import hoot.model.entities.authentication.Login;
 import hoot.model.query.api.GetUserIdIfValidLogin;
 import hoot.model.repositories.UserRepository;
 import hoot.system.Exception.CouldNotSaveException;
@@ -23,7 +23,7 @@ public class LoginApiServlet extends AbstractApiServlet
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
     {
-        LoginDTO    login    = (LoginDTO) this.deserializeJsonRequestBody(request, LoginDTO.class);
+        Login    login       = (Login) this.deserializeJsonRequestBody(request, Login.class);
         HttpSession session  = request.getSession(true);
         boolean     loggedIn = false;
 
@@ -37,11 +37,11 @@ public class LoginApiServlet extends AbstractApiServlet
             loggedIn = this.login(session, login, user);
         }
 
-        String responseBody = this.serializeJsonResponseBody(loggedIn ? "success" : "failure");
+        String responseBody = this.serialize(loggedIn ? "success" : "failure");
         this.sendResponse(response, HttpServletResponse.SC_OK, responseBody);
     }
 
-    private boolean login(HttpSession session, LoginDTO login, User user)
+    private boolean login(HttpSession session, Login login, User user)
     {
         UserRepository repository = (UserRepository) ObjectManager.get(UserRepository.class);
 

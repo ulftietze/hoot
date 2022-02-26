@@ -131,7 +131,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/user'
+              $ref: '#/components/schemas/userMeSave'
       responses:
         '200':
           description: Returns user information
@@ -142,6 +142,124 @@ paths:
             'text/html':
               schema:
                 type: string
+  /user/me/follow:
+    post:
+      description: Current user follows another user
+      summary: Current user follows another user
+      tags:
+        - user
+      security:
+        - cookieAuth: [ ]
+      operationId: followAnotherUser
+      requestBody:
+        required: true
+        description: A string with the user id to follow.
+        content:
+          application/json:
+            schema:
+              description: User Id to follow
+              type: integer
+      responses:
+        '200':
+          description: Returns user information
+          content:
+            'application/json':
+              schema:
+                type: boolean
+  /user/me/unfollow:
+    post:
+      description: Current user unfollows another user
+      summary: Current user unfollows another user
+      tags:
+        - user
+      security:
+        - cookieAuth: [ ]
+      operationId: unfollowAnotherUser
+      requestBody:
+        required: true
+        description: A string with the user id to unfollow.
+        content:
+          application/json:
+            schema:
+              description: User Id to unfollow
+              type: integer
+      responses:
+        '200':
+          description: Status if successful or not
+          content:
+            'application/json':
+              schema:
+                type: boolean
+  /user/follower:
+    get:
+      description: Load follower of an user
+      summary: Load follower of an user
+      tags:
+        - user
+      parameters:
+        - in: query
+          name: userId
+          description: UserId of the followers which should be loaded
+          schema:
+            type: integer
+            nullable: false
+        - in: query
+          name: lastUserId
+          description: The UserId of the last follower loaded
+          schema:
+            type: integer
+            nullable: true
+            default: null
+        - in: query
+          name: quantity
+          description: Specify the amount of followers to load.
+          schema:
+            type: integer
+            default: 50
+            minimum: 10
+            maximum: 100
+      responses:
+        '200':
+          description: The followers of an user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/followers'
+  /user/follows:
+    get:
+      description: Load users which the user follows
+      summary: Load users which the user follows
+      tags:
+        - user
+      parameters:
+        - in: query
+          name: userId
+          description: UserId of the followers which should be loaded
+          schema:
+            type: integer
+            nullable: false
+        - in: query
+          name: lastUserId
+          description: The UserId of the last follower loaded
+          schema:
+            type: integer
+            nullable: true
+            default: null
+        - in: query
+          name: quantity
+          description: Specify the amount of followers to load.
+          schema:
+            type: integer
+            default: 50
+            minimum: 10
+            maximum: 100
+      responses:
+        '200':
+          description: The followers of an user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/follows'
   /hoot/timeline/global:
     get:
       description: Load the global timeline. You can configure the last hoot id and the loading quantity.
@@ -197,7 +315,7 @@ paths:
             maximum: 100
       responses:
         '200':
-          description: Load the cuirrent users timeline.
+          description: Load the current users timeline.
           content:
             application/json:
               schema:
@@ -317,52 +435,48 @@ components:
     user:
       required:
         - id
-        - name
+        - username
       properties:
         id:
           type: integer
           format: int64
-        name:
+        username:
           type: string
         imageUrl:
+          type: string
+        followerCount:
+          type: integer
+        followsCount:
+          type: integer
+        lastLogin:
+          type: string
+          format: date-time
+        created:
+          type: string
+          format: date-time
+    userMeSave:
+      properties:
+        name:
+          type: string
+        password:
           type: string
         imageFilename:
           type: string
         image:
           type: string
           format: byte
-        followers:
-          type: array
-          items:
-            $ref: '#/components/schemas/follower'
-        follows:
-          type: array
-          items:
-            $ref: '#/components/schemas/follow'
-    follower:
+    followers:
       required:
-        - userId
-        - username
+        - user
       properties:
-        userId:
-          type: integer
-          format: int64
-        username:
-          type: string
-        imageUrl:
-          type: string
-    follow:
+        user:
+          $ref: '#/components/schemas/user'
+    follows:
       required:
-        - userId
-        - username
+        - user
       properties:
-        userId:
-          type: integer
-          format: int64
-        username:
-          type: string
-        imageUrl:
-          type: string
+        user:
+          $ref: '#/components/schemas/user'
     login:
       required:
         - username
@@ -394,7 +508,7 @@ components:
       type: object
       required:
         - id
-        - type
+        - hootType
         - created
         - modified
       properties:
@@ -402,18 +516,32 @@ components:
           type: integer
           format: int64
           nullable: true
-        type:
+        hootType:
           type: string
           enum:
-            - post
-            - comment
-            - image
+            - Post
+            - Comment
+            - Image
         created:
           type: string
           format: date-time
         modified:
           type: string
           format: date-time
+        mentions:
+          $ref: '#/components/schemas/mentions'
+        hootTags:
+          $ref: '#/components/schemas/tags'
+        reactionCount:
+          type: object
+    mentions:
+      type: array
+      items:
+        $ref: '#/components/schemas/user'
+    tags:
+      type: array
+      items:
+        type: string
     image:
       allOf:
         - $ref: '#/components/schemas/hoot'

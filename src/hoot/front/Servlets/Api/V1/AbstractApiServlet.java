@@ -45,9 +45,9 @@ public abstract class AbstractApiServlet extends HttpServlet
      * @param toSerialize The DTO to Serialize
      * @return the serialized json string
      */
-    protected String serializeJsonResponseBody(Object toSerialize)
+    protected String serialize(Object toSerialize)
     {
         RequestSerializer requestSerializer = (RequestSerializer) ObjectManager.get(RequestSerializer.class);
-        return requestSerializer.serializeJsonResponseBody(toSerialize);
+        return requestSerializer.serialize(toSerialize);
     }
 }

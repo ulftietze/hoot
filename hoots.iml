@@ -22,5 +22,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="servlet-api" level="project" />
     <orderEntry type="library" name="gson-2.9.0" level="project" />
+    <orderEntry type="library" name="gson-extras-2.8.5" level="project" />
   </component>
 </module>

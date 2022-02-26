@@ -39,7 +39,7 @@ public class RequestSerializer
      * @param toSerialize The DTO to Serialize
      * @return the serialized json string
      */
-    public String serializeJsonResponseBody(Object toSerialize)
+    public String serialize(Object toSerialize)
     {
         return this.gson.toJson(toSerialize);
     }

@@ -1,14 +1,9 @@
 package hoot.front.Servlets.Api.V1.Hoots;
 
 import hoot.front.Servlets.Api.V1.AbstractApiServlet;
-import hoot.front.api.dto.hoot.HootDTO;
-import hoot.front.api.dto.hoot.HootsDTO;
 import hoot.model.entities.Hoot;
-import hoot.model.mapper.entityToDto.HootToHootDtoMapper;
 import hoot.model.repositories.HootRepository;
 import hoot.model.search.HootSearchCriteria;
-import hoot.system.Annotation.AuthenticationRequired;
-import hoot.system.Exception.CouldNotMapException;
 import hoot.system.Exception.EntityNotFoundException;
 import hoot.system.ObjectManager.ObjectManager;
 
@@ -19,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 
-@AuthenticationRequired
+//@AuthenticationRequired
 @WebServlet("/api/V1/hoot/search")
 public class SearchApiServlet extends AbstractApiServlet
 {
@@ -29,18 +24,11 @@ public class SearchApiServlet extends AbstractApiServlet
         HootSearchCriteria searchCriteria = this.createSearchCriteriaFromRequest(request);
 
         try {
-            ArrayList<Hoot> hoots    = repository.getList(searchCriteria);
-            HootsDTO        hootsDTO = new HootsDTO();
-
-            for (Hoot hoot : hoots) {
-                HootDTO dto = this.getHootToHootDtoMapper().map(hoot);
-                hootsDTO.addHoot(dto);
-            }
-
-            this.sendResponse(response, HttpServletResponse.SC_OK, this.serializeJsonResponseBody(hootsDTO));
-        } catch (EntityNotFoundException | CouldNotMapException e) {
+            ArrayList<Hoot> hoots = repository.getList(searchCriteria);
+            this.sendResponse(response, HttpServletResponse.SC_OK, this.serialize(hoots));
+        } catch (EntityNotFoundException e) {
             int httpStatus = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-            this.sendResponse(response, httpStatus, this.serializeJsonResponseBody(e.getMessage()));
+            this.sendResponse(response, httpStatus, this.serialize(e.getMessage()));
         }
     }
 
@@ -59,10 +47,5 @@ public class SearchApiServlet extends AbstractApiServlet
         searchCriteria.userId          = userId != null && !userId.equals("") ? Integer.valueOf(userId) : null;
 
         return searchCriteria;
-    }
-
-    private HootToHootDtoMapper getHootToHootDtoMapper()
-    {
-        return (HootToHootDtoMapper) ObjectManager.get(HootToHootDtoMapper.class);
     }
 }
