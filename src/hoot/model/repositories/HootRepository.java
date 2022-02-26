@@ -53,7 +53,6 @@ public class HootRepository extends AbstractRepository<Hoot>
     public ArrayList<Hoot> getList(SearchCriteriaInterface searchCriteria) throws EntityNotFoundException
     {
         try {
-            // TODO:
             QueryBuilder queryBuilder = searchCriteria.getQueryBuilder();
 
             this.prepareQueryBuilder(queryBuilder);
