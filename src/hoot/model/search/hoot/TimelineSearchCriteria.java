@@ -3,7 +3,6 @@ package hoot.model.search.hoot;
 import hoot.model.entities.Follower;
 import hoot.model.entities.HootType;
 import hoot.model.repositories.FollowerRepository;
-import hoot.model.search.FollowingSearchCriteria;
 import hoot.model.search.FollowsSearchCriteria;
 import hoot.model.search.SearchCriteriaInterface;
 import hoot.system.Database.QueryBuilder;
@@ -12,6 +11,7 @@ import hoot.system.ObjectManager.ObjectManager;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class TimelineSearchCriteria implements SearchCriteriaInterface
@@ -33,14 +33,18 @@ public class TimelineSearchCriteria implements SearchCriteriaInterface
     {
         QueryBuilder qb = (QueryBuilder) ObjectManager.create(QueryBuilder.class);
 
-        String followsIds = this
+        int[] followsIds = this
                 .getFollowerForUserId(this.userId)
                 .stream()
-                .map(follower -> follower.user.id.toString())
-                .collect(Collectors.joining(","));
+                .mapToInt(follower -> follower.follows.id)
+                .toArray();
 
-        qb.WHERE.add("h.user in (?)");
-        qb.PARAMETERS.add(followsIds);
+        String params = Arrays.stream(followsIds).mapToObj(id -> "?").collect(Collectors.joining(", "));
+
+        qb.WHERE.add("h.user in (" + params + ")");
+        for (int id : followsIds) {
+            qb.PARAMETERS.add(id);
+        }
 
         if (tags != null && !tags.equals("")) {
             qb.WHERE.add("t.tag IN (?) ");
@@ -73,6 +77,6 @@ public class TimelineSearchCriteria implements SearchCriteriaInterface
 
     private FollowsSearchCriteria getFollowsSearchCriteria()
     {
-        return (FollowsSearchCriteria) ObjectManager.create(FollowingSearchCriteria.class);
+        return (FollowsSearchCriteria) ObjectManager.create(FollowsSearchCriteria.class);
     }
 }

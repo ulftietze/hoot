@@ -339,7 +339,7 @@ public class HootRepository extends AbstractRepository<Hoot>
         queryBuilder.JOINS.add("LEFT JOIN Image i ON h.id = i.hoot");
         queryBuilder.JOINS.add("LEFT JOIN Post p ON h.id = p.hoot");
         queryBuilder.JOINS.add("LEFT JOIN Comment c ON h.id = c.hoot");
-        queryBuilder.JOINS.add("LEFT JOIN HootTags ht ON h.id = ht.id");
+        queryBuilder.JOINS.add("LEFT JOIN HootTags ht ON h.id = ht.hoot");
         queryBuilder.JOINS.add("LEFT JOIN Tag t ON ht.tag = t.tag");
         queryBuilder.JOINS.add("LEFT JOIN Reaction r ON h.id = r.hoot");
         queryBuilder.JOINS.add("LEFT JOIN Interaction ia ON r.interaction = ia.interaction");

@@ -1,8 +1,14 @@
 package hoot.system.Database;
 
+import hoot.system.Logger.LoggerInterface;
+import hoot.system.ObjectManager.ObjectManager;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 
 public class QueryBuilder
@@ -14,7 +20,7 @@ public class QueryBuilder
     public ArrayList<String> GROUP_BY   = new ArrayList<>();
     public ArrayList<String> ORDER_BY   = new ArrayList<>();
     public Integer           LIMIT      = 50;
-    public ArrayList<String> PARAMETERS = new ArrayList<>();
+    public ArrayList<Object> PARAMETERS = new ArrayList<>();
 
     public PreparedStatement build(Connection connection) throws SQLException
     {
@@ -29,12 +35,44 @@ public class QueryBuilder
         this.addLimit(QUERY);
 
         PreparedStatement statement = connection.prepareStatement(QUERY.toString());
+        this.mapParameters(statement);
 
-        for (int i = 1; i <= PARAMETERS.size(); i++) {
-            statement.setString(i, PARAMETERS.get(i - 1));
-        }
+        LoggerInterface logger = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
+        logger.log(QUERY.toString() + " [parameters=" + this.PARAMETERS.toString() + "]");
 
         return statement;
+    }
+
+    private void mapParameters(PreparedStatement statement) throws SQLException
+    {
+        for (int i = 1; i <= this.PARAMETERS.size(); i++) {
+            Object param = this.PARAMETERS.get(i - 1);
+            LoggerInterface logger = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
+            logger.log(param.getClass().getName());
+
+            if (param instanceof LocalDateTime) {
+                statement.setTimestamp(i, this.getSQLTimestampFromLocalDateTime((LocalDateTime) param));
+            } else if (param instanceof Integer) {
+                statement.setInt(i, (Integer) param);
+            } else if (param instanceof Long) {
+                statement.setLong(i, (Long) param);
+            } else if (param instanceof Double) {
+                statement.setDouble(i, (Double) param);
+            } else if (param instanceof Float) {
+                statement.setFloat(i, (Float) param);
+            } else if (param instanceof Object[]) {
+                statement.setArray(i, statement.getConnection().createArrayOf("text", (Object[]) param));
+            } else if (param instanceof String){
+                statement.setString(i, (String) param);
+            } else {
+                statement.setObject(i, param);
+            }
+        }
+    }
+
+    private Timestamp getSQLTimestampFromLocalDateTime(LocalDateTime dateTime)
+    {
+        return Timestamp.from(dateTime.toInstant(ZoneId.of("Europe/Berlin").getRules().getOffset(dateTime)));
     }
 
     private void addJoin(StringBuilder query)

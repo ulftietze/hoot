@@ -185,10 +185,25 @@ INSERT INTO Historie (trendingHashtags)
 VALUES ('🐈');
 
 INSERT INTO User (username, passwordHash)
-VALUES ('BeispielUser1','1234'), ('BeispielUser2','5678');
+VALUES
+       ('BeispielUser1','1234'),
+       ('BeispielUser2','5678'),
+       ('test1','9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08'),
+       ('test2','9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08'),
+       ('test3','9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08')
+       ;
 
 INSERT INTO Follower (user, follows)
-VALUES (1, 2);
+VALUES
+       (1, 2),
+       (2, 3),
+       (2, 4),
+       (2, 5),
+       (3, 1),
+       (3, 2),
+       (3, 4),
+       (1, 3)
+       ;
 
 INSERT INTO Interaction (interaction)
 VALUES ('LIKE'), ('DISLIKE');
@@ -197,10 +212,18 @@ INSERT INTO HootType (hootType)
 VALUES ('Post'), ('Comment'), ('Image');
 
 INSERT INTO Hoot (user, hootType)
-VALUES (2, 'Post');
+VALUES
+    (2, 'Post'),
+    (3, 'Post'),
+    (4, 'Post'),
+    (4, 'Post');
 
 INSERT INTO Post (hoot, content, onlyFollower)
-VALUES (1, 'Dies ist mein erster Hoot - bitte seid nett zu mir :)', FALSE);
+VALUES
+       (1, 'Dies ist mein erster Hoot - bitte seid nett zu mir :)', FALSE),
+       (2, 'Dies ist mein zweiter Hoot - bitte seid nett zu mir :)', FALSE),
+       (3, 'Dies ist mein dritter Hoot - bitte seid nett zu mir :)', FALSE),
+       (4, 'Dies ist mein vierter Hoot - bitte seid nett zu mir :)', FALSE);
 
 INSERT INTO Reaction (user, hoot, interaction)
 VALUES (2, 1, 'DISLIKE');

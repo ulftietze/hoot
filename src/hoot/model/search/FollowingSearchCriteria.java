@@ -10,7 +10,7 @@ import java.sql.SQLException;
  */
 public class FollowingSearchCriteria implements SearchCriteriaInterface
 {
-    Integer userID;
+    public Integer userID;
 
     @Override
     public QueryBuilder getQueryBuilder() throws SQLException

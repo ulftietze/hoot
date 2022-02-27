@@ -53,7 +53,7 @@ public class FollowerRepository extends AbstractRepository<Follower>
         try {
             QueryBuilder queryBuilder = searchCriteria.getQueryBuilder();
 
-            queryBuilder.SELECT.add("user");
+            queryBuilder.SELECT.add("*");
             queryBuilder.FROM = "Follower";
 
             Connection        connection = this.getConnection();
