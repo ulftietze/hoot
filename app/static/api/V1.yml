@@ -153,7 +153,7 @@ paths:
       operationId: followAnotherUser
       requestBody:
         required: true
-        description: A string with the user id to follow.
+        description: The user id to follow.
         content:
           application/json:
             schema:
@@ -177,7 +177,7 @@ paths:
       operationId: unfollowAnotherUser
       requestBody:
         required: true
-        description: A string with the user id to unfollow.
+        description: The user id to unfollow.
         content:
           application/json:
             schema:

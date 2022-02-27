@@ -38,9 +38,8 @@ CREATE TABLE User (
 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE Follower (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     user INT UNSIGNED NOT NULL,
-    follows INT UNSIGNED NOT NULL,
+    follows INT UNSIGNED NOT NULL CHECK ( follows <> user ),
     created DateTime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT `Follower_fk_user_userid`
         FOREIGN KEY (user) REFERENCES User (id)
@@ -49,9 +48,9 @@ CREATE TABLE Follower (
     CONSTRAINT `Follower_fk_follows_userid`
         FOREIGN KEY (follows) REFERENCES User (id)
         ON DELETE CASCADE
-        ON UPDATE CASCADE
-)
-CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+        ON UPDATE CASCADE,
+    CONSTRAINT `Follower_user_fk_Follower_follows_fk` PRIMARY KEY (user, follows)
+);
 
 CREATE TABLE Interaction (
     interaction VARCHAR(191) PRIMARY KEY
@@ -71,17 +70,16 @@ CREATE TABLE Hoot (
     modified DateTime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT `Hoot_fk_user_userid`
         FOREIGN KEY (user) REFERENCES User (id)
-        ON DELETE CASCADE
+        ON DELETE NO ACTION
         ON UPDATE CASCADE,
     CONSTRAINT `Hoot_fk_hootType_hootTypeid`
         FOREIGN KEY (hootType) REFERENCES HootType (hootType)
-        ON DELETE CASCADE
+        ON DELETE NO ACTION
         ON UPDATE CASCADE
 )
 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE Reaction (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     user INT UNSIGNED NOT NULL,
     hoot INT UNSIGNED NOT NULL,
     interaction VARCHAR(191) NOT NULL,
@@ -98,7 +96,8 @@ CREATE TABLE Reaction (
     CONSTRAINT `Reaction_fk_interaction_interactionid`
         FOREIGN KEY (interaction) REFERENCES Interaction (interaction)
         ON DELETE CASCADE
-        ON UPDATE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT `Reaction_user_fk_Reaction_hoot_fk` PRIMARY KEY (user, hoot)
 )
 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -141,7 +140,6 @@ CREATE TABLE Image (
 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE HootMentions (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     hoot INT UNSIGNED NOT NULL,
     mention INT UNSIGNED NOT NULL,
     CONSTRAINT `HootMentions_fk_hoot_hootid`
@@ -151,7 +149,8 @@ CREATE TABLE HootMentions (
     CONSTRAINT `HootMentions_fk_user_userid`
         FOREIGN KEY (mention) REFERENCES User (id)
         ON DELETE CASCADE
-        ON UPDATE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT `HootMentions_hoot_fk_HootMentions_mention_fk` PRIMARY KEY (hoot, mention)
 )
 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -161,7 +160,6 @@ CREATE TABLE Tag (
 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE HootTags (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     hoot INT UNSIGNED NOT NULL,
     tag VARCHAR(191) NOT NULL,
     CONSTRAINT `HootTags_fk_hoot_hootid`
@@ -171,7 +169,8 @@ CREATE TABLE HootTags (
     CONSTRAINT `HootTags_fk_tag_tagid`
         FOREIGN KEY (tag) REFERENCES Tag (tag)
         ON DELETE CASCADE
-        ON UPDATE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT `HootTags_hoot_fk_HootTags_tag_fk` PRIMARY KEY (hoot, tag)
 )
 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -179,7 +178,7 @@ CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 SET NAMES utf8mb4;
 
-INSERT INTO Historie (currentLoggedIn, postPerSecond, requestsPerSecond, loginsPerSecond, currentlyRegisteredUsers, trendingHashtags)
+INSERT INTO Historie (currentLoggedIn, postsPerSecond, requestsPerSecond, loginsPerSecond, currentlyRegisteredUsers, trendingHashtags)
 VALUES (50, 1.3, 42.1, 24.9, 2, 'Hier, folgt, ein, Emoji, 🐈');
 
 INSERT INTO Historie (trendingHashtags)
