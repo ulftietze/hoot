@@ -1,7 +1,5 @@
 package hoot.model.entities;
 
-import java.time.LocalDateTime;
-
 public class Image extends Hoot
 {
     public String imagePath;

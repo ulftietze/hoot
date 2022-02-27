@@ -2,7 +2,7 @@ package hoot.model.entities;
 
 public class Reaction
 {
-    public int id;
+    public Integer id;
 
     public User user;
 
