@@ -155,12 +155,9 @@ public class UserRepository extends AbstractRepository<User>
     public User create(String username, String imagePath, String passwordHash) throws CouldNotSaveException
     {
         try {
-            Connection        connection   = this.getConnection();
-            String            sqlStatement = "insert into User (username, imagePath, passwordHash) values (?, ?, ?)";
-            PreparedStatement pss          = connection.prepareStatement(
-                    sqlStatement,
-                    PreparedStatement.RETURN_GENERATED_KEYS
-            );
+            Connection connection   = this.getConnection();
+            String     sqlStatement = "insert into User (username, imagePath, passwordHash) values (?, ?, ?)";
+            PreparedStatement pss = connection.prepareStatement(sqlStatement, PreparedStatement.RETURN_GENERATED_KEYS);
 
             pss.setString(1, username);
             pss.setString(2, imagePath);
@@ -207,13 +204,17 @@ public class UserRepository extends AbstractRepository<User>
         }
 
         try {
-            Connection        connection   = this.getConnection();
-            String            sqlStatement = "update User set username = ?, imagePath = ?, passwordHash = ? where id = ?";
-            PreparedStatement pss          = connection.prepareStatement(sqlStatement);
+            String sqlStatement = "update User " + "set username = ?, imagePath = ?, passwordHash = ?, lastLogin = ?"
+                                  + " where id = ?";
+
+            Connection        connection = this.getConnection();
+            PreparedStatement pss        = connection.prepareStatement(sqlStatement);
+
             pss.setString(1, user.username);
             pss.setString(2, user.imagePath);
             pss.setString(3, user.passwordHash);
-            pss.setInt(4, user.id);
+            pss.setTimestamp(4, this.getSQLTimestampFromLocalDateTime(user.lastLogin));
+            pss.setInt(5, user.id);
             int rowCount = pss.executeUpdate();
 
             if (rowCount == 0) {
@@ -270,7 +271,8 @@ public class UserRepository extends AbstractRepository<User>
         try {
             FollowerRepository fr = (FollowerRepository) ObjectManager.get(FollowerRepository.class);
             user.followerCount = fr.getFollowerCountForUser(user.id);
-        } catch (EntityNotFoundException ignore) {}
+        } catch (EntityNotFoundException ignore) {
+        }
 
         return user;
     }

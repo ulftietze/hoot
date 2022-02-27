@@ -56,4 +56,9 @@ public abstract class AbstractRepository<Type>
     {
         return timestamp.toInstant().atZone(ZoneId.of("Europe/Berlin")).toLocalDateTime();
     }
+
+    protected Timestamp getSQLTimestampFromLocalDateTime(LocalDateTime dateTime)
+    {
+        return Timestamp.from(dateTime.toInstant(ZoneId.of("Europe/Berlin").getRules().getOffset(dateTime)));
+    }
 }
