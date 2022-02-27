@@ -42,7 +42,7 @@ public class ObjectManager
     /**
      * Create an instance of an object for the given class name.
      *
-     * @param className   of the Object to create.
+     * @param className of the Object to create.
      * @return an instance of the given className. This may be a child class.
      */
     public static Object create(Class<?> className)
@@ -154,14 +154,15 @@ public class ObjectManager
 
         try {
             if (!this.canCreateInstance(actualClass)) {
-                throw new InstantiationException();
+                throw new InstantiationException("Can't create instance.");
             }
 
             Constructor<?> constructor = actualClass.getConstructor();
             return constructor.newInstance();
-        } catch (ReflectiveOperationException ignore) {
-            this.getLogger().log("[ERROR] Could not instantiate class: " + className.getName());
-            return null;
+        } catch (ReflectiveOperationException e) {
+            String message = "[ERROR] Could not instantiate class " + className.getName() + ": " + e.getMessage();
+            this.getLogger().log(message);
+            throw new RuntimeException(message);
         }
     }
 

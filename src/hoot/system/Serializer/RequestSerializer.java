@@ -1,19 +1,19 @@
 package hoot.system.Serializer;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import hoot.system.ObjectManager.ObjectManager;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.BufferedReader;
 import java.io.IOException;
 
 public class RequestSerializer
 {
-    private final Gson gson;
+    private final ObjectMapper objectMapper;
 
     public RequestSerializer()
     {
-        this.gson = (Gson) ObjectManager.get(Gson.class);
+        this.objectMapper = (ObjectMapper) ObjectManager.get(ObjectMapper.class);
     }
 
     /**
@@ -24,15 +24,8 @@ public class RequestSerializer
      */
     public Object deserializeJsonRequestBody(HttpServletRequest request, Class<?> targetDTO) throws IOException
     {
-        StringBuilder stringBuilder = new StringBuilder();
-        String        line          = null;
-
-        BufferedReader reader = request.getReader();
-        while ((line = reader.readLine()) != null) {
-            stringBuilder.append(line);
-        }
-
-        return this.gson.fromJson(stringBuilder.toString(), targetDTO);
+        //return this.objectMapper.fromJson(stringBuilder.toString(), targetDTO);
+        return this.objectMapper.readTree(request.getReader());
     }
 
     /**
@@ -41,6 +34,10 @@ public class RequestSerializer
      */
     public String serialize(Object toSerialize)
     {
-        return this.gson.toJson(toSerialize);
+        try {
+            return this.objectMapper.writeValueAsString(toSerialize);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Could not serialize object: " + e.getMessage());
+        }
     }
 }

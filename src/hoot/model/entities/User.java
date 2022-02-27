@@ -1,8 +1,9 @@
 package hoot.model.entities;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class User
+public class User implements Serializable
 {
     public Integer id, followerCount, followsCount;
 
@@ -12,8 +13,6 @@ public class User
 
     public LocalDateTime lastLogin, created;
 
-    // TODO: Expose ImageUrl
-    //@ExposeMethod("imageUrl")
     public String getImageUrl()
     {
         return "https://.../media/" + this.imagePath;

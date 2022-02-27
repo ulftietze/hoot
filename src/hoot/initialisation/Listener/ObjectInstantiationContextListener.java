@@ -1,9 +1,9 @@
 package hoot.initialisation.Listener;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import hoot.initialisation.Factory.ContextLoggerFactory;
 import hoot.initialisation.Factory.DataSourceFactory;
-import hoot.initialisation.Factory.GsonSerializerFactory;
+import hoot.initialisation.Factory.JacksonSerializerFactory;
 import hoot.initialisation.Factory.MediaFileHandlerFactory;
 import hoot.system.Filesystem.MediaFileHandler;
 import hoot.system.Logger.ContextLogger;
@@ -34,6 +34,6 @@ public class ObjectInstantiationContextListener implements ServletContextListene
         //ObjectManager.set(LoggerInterface.class, NullLogger.class);
         ObjectManager.setFactory(DataSource.class, new DataSourceFactory());
         ObjectManager.setFactory(MediaFileHandler.class, new MediaFileHandlerFactory(context));
-        ObjectManager.setFactory(Gson.class, new GsonSerializerFactory());
+        ObjectManager.setFactory(ObjectMapper.class, new JacksonSerializerFactory());
     }
 }
