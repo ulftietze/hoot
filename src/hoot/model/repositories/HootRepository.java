@@ -83,8 +83,8 @@ public class HootRepository extends AbstractRepository<Hoot>
         try {
             Connection connection = this.getConnection();
 
-            String            hootStatement = "insert into Hoot (user, hootType) values (?, ?)";
-            PreparedStatement hootPss       = connection.prepareStatement(
+            String hootStatement = "insert into Hoot (user, hootType) values (?, ?)";
+            PreparedStatement hootPss = connection.prepareStatement(
                     hootStatement,
                     PreparedStatement.RETURN_GENERATED_KEYS
             );
@@ -128,9 +128,7 @@ public class HootRepository extends AbstractRepository<Hoot>
                 case Image:
                     Image image = (Image) hoot;
 
-                    String
-                            imageStatement
-                            = "insert into Image (hoot, imagePath, content, onlyFollower) values (?, ?, ?, ?)";
+                    String imageStatement = "insert into Image (hoot, imagePath, content, onlyFollower) values (?, ?, ?, ?)";
                     PreparedStatement imagePss = connection.prepareStatement(imageStatement);
 
                     imagePss.setInt(1, image.id);
@@ -186,8 +184,12 @@ public class HootRepository extends AbstractRepository<Hoot>
     public void save(Hoot hoot) throws CouldNotSaveException
     {
         if (hoot.id == null) {
-            this.create(hoot);
-            return;
+            if (hoot.user != null && hoot.user.id != null) {
+                this.create(hoot);
+                return;
+            } else {
+                throw new CouldNotSaveException("Hoot with empty ID and empty User");
+            }
         }
 
         try {
@@ -217,9 +219,7 @@ public class HootRepository extends AbstractRepository<Hoot>
                 case Image:
                     Image image = (Image) hoot;
 
-                    String
-                            imageStatement
-                            = "update Image set imagePath = ?, content = ?, onlyFollower = ? where hoot = ?";
+                    String imageStatement = "update Image set imagePath = ?, content = ?, onlyFollower = ? where hoot = ?";
                     PreparedStatement imagePss = connection.prepareStatement(imageStatement);
 
                     imagePss.setString(1, image.imagePath);
@@ -288,7 +288,6 @@ public class HootRepository extends AbstractRepository<Hoot>
             if (hoot.hootType == HootType.Image) {
                 // TODO: Delete Image from FileSystem when an Image Hoot is deleted
             }
-
         } catch (SQLException e) {
             this.log("Hoot.delete(): " + e.getMessage());
             throw new CouldNotDeleteException("Hoot with ID " + hoot.id);
