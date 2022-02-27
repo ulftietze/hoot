@@ -3,7 +3,7 @@ package hoot.front.Servlets.Api.V1.Hoots;
 import hoot.front.Servlets.Api.V1.AbstractApiServlet;
 import hoot.model.entities.Hoot;
 import hoot.model.repositories.HootRepository;
-import hoot.model.search.HootSearchCriteria;
+import hoot.model.search.hoot.HootSearchCriteria;
 import hoot.system.Exception.EntityNotFoundException;
 import hoot.system.ObjectManager.ObjectManager;
 

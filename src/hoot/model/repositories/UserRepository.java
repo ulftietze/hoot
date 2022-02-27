@@ -59,7 +59,7 @@ public class UserRepository extends AbstractRepository<User>
             connection.close();
 
             return user;
-        } catch (EntityNotFoundException | SQLException e) {
+        } catch (SQLException e) {
             this.log(e.getMessage());
             throw new EntityNotFoundException("User with ID: " + id);
         }
@@ -102,7 +102,7 @@ public class UserRepository extends AbstractRepository<User>
             connection.close();
 
             return user;
-        } catch (EntityNotFoundException | SQLException e) {
+        } catch (SQLException e) {
             this.log(e.getMessage());
             throw new EntityNotFoundException("User with username: " + username);
         }
@@ -179,13 +179,13 @@ public class UserRepository extends AbstractRepository<User>
             connection.close();
 
             return this.getById(userid);
-        } catch (SQLException e) {
-            this.log(e.getMessage());
-            throw new CouldNotSaveException("new User with username " + username);
         } catch (EntityNotFoundException e) {
             this.log(e.getMessage());
             this.log("Just inserted a User but could not find it afterwards! This should never happen.");
             throw new CouldNotSaveException("new User with username " + username + " (disappeared after insert)");
+        } catch (SQLException e) {
+            this.log(e.getMessage());
+            throw new CouldNotSaveException("new User with username " + username);
         }
     }
 

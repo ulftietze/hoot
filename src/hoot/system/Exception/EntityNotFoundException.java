@@ -1,6 +1,8 @@
 package hoot.system.Exception;
 
-public class EntityNotFoundException extends Exception
+import java.sql.SQLException;
+
+public class EntityNotFoundException extends SQLException
 {
     public EntityNotFoundException(String entityName)
     {

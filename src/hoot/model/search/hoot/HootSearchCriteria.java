@@ -1,13 +1,13 @@
-package hoot.model.search;
+package hoot.model.search.hoot;
 
 import hoot.model.entities.HootType;
-import hoot.model.repositories.FollowerRepository;
+import hoot.model.search.SearchCriteriaInterface;
 import hoot.system.Database.QueryBuilder;
 import hoot.system.ObjectManager.ObjectManager;
 
 import java.sql.SQLException;
 
-public class TimelineSearchCriteria implements SearchCriteriaInterface
+public class HootSearchCriteria implements SearchCriteriaInterface
 {
     public Integer userId = null;
 
@@ -18,13 +18,6 @@ public class TimelineSearchCriteria implements SearchCriteriaInterface
     public Integer lastPostId = null;
 
     public boolean withComments = false;
-
-    private final FollowerRepository followerRepository;
-
-    public TimelineSearchCriteria()
-    {
-        this.followerRepository = (FollowerRepository) ObjectManager.get(FollowerRepository.class);
-    }
 
     @Override
     public QueryBuilder getQueryBuilder() throws SQLException

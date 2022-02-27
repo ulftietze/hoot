@@ -1,9 +1,10 @@
 package hoot.front.Servlets.Api.V1.Hoots.Timeline;
 
 import hoot.front.Servlets.Api.V1.AbstractApiServlet;
+import hoot.front.Servlets.Api.V1.Authentication.LoginApiServlet;
 import hoot.model.entities.Hoot;
 import hoot.model.repositories.HootRepository;
-import hoot.model.search.TimelineSearchCriteria;
+import hoot.model.search.hoot.TimelineSearchCriteria;
 import hoot.system.Annotation.AuthenticationRequired;
 import hoot.system.Exception.EntityNotFoundException;
 import hoot.system.ObjectManager.ObjectManager;
@@ -38,14 +39,14 @@ public class TimelineMineApiServlet extends AbstractApiServlet
         String lastPost = request.getParameter("lastPostId");
         String quantity = request.getParameter("quantity");
         String tags     = request.getParameter("tags");
-        String userId   = request.getParameter("userId");
+        Integer userId  = (Integer) request.getSession(true).getAttribute(LoginApiServlet.SESSION_USER_IDENTIFIER);
 
         TimelineSearchCriteria searchCriteria = this.createSearchCriteriaClass();
 
         searchCriteria.lastPostId      = lastPost != null && !lastPost.equals("") ? Integer.valueOf(lastPost) : null;
         searchCriteria.defaultPageSize = quantity != null && !quantity.equals("") ? Integer.valueOf(quantity) : null;
         searchCriteria.tags            = tags != null && !tags.equals("") ? tags : null;
-        searchCriteria.userId          = userId != null && !userId.equals("") ? Integer.valueOf(userId) : null;
+        searchCriteria.userId          = userId;
 
         return searchCriteria;
     }

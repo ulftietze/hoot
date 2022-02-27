@@ -1,9 +1,9 @@
 package hoot.model.repositories;
 
 import hoot.model.entities.*;
-import hoot.model.search.MentionSearchCriteria;
 import hoot.model.search.SearchCriteriaInterface;
-import hoot.model.search.TagSearchCriteria;
+import hoot.model.search.hoot.MentionSearchCriteria;
+import hoot.model.search.hoot.TagSearchCriteria;
 import hoot.system.Database.QueryBuilder;
 import hoot.system.Exception.CouldNotDeleteException;
 import hoot.system.Exception.CouldNotSaveException;

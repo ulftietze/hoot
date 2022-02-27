@@ -196,6 +196,8 @@ paths:
       summary: Load follower of an user
       tags:
         - user
+      security:
+        - cookieAuth: [ ]
       parameters:
         - in: query
           name: userId
@@ -231,6 +233,8 @@ paths:
       summary: Load users which the user follows
       tags:
         - user
+      security:
+        - cookieAuth: [ ]
       parameters:
         - in: query
           name: userId
@@ -282,6 +286,12 @@ paths:
             default: 50
             minimum: 10
             maximum: 100
+        - in: query
+          name: tags
+          description: Specify the tags to search
+          schema:
+            type: string
+            example: abc, def, efg
       responses:
         '200':
           description: Load the global timeline.
@@ -313,6 +323,12 @@ paths:
             default: 50
             minimum: 10
             maximum: 100
+        - in: query
+          name: tags
+          description: Specify the tags to search
+          schema:
+            type: string
+            example: abc, def, efg
       responses:
         '200':
           description: Load the current users timeline.

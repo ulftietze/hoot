@@ -48,7 +48,7 @@ public class HootTagRepository extends AbstractRepository<HootTags>
 
                     pss.executeUpdate();
                     pss.close();
-                } catch (CouldNotSaveException | SQLException ignore) {}
+                } catch (SQLException ignore) {}
             }
 
             connection.close();
@@ -82,7 +82,7 @@ public class HootTagRepository extends AbstractRepository<HootTags>
 
                     pss.executeUpdate();
                     pss.close();
-                } catch (CouldNotDeleteException | SQLException ignore) {}
+                } catch (SQLException ignore) {}
             }
 
             connection.close();
