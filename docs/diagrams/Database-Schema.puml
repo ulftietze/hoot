@@ -6,7 +6,7 @@ class Historie {
     -id: Integer
     +timestamp: DateTime
     +currentLoggedIn: Integer
-    +postPerSecond: Float /'Durchschnitt seit letztem Timestamp'/
+    +postsPerSecond: Float /'Durchschnitt seit letztem Timestamp'/
     +requestsPerSecond: Float
     +loginsPerSecond: Float
     +currentlyRegisteredUsers: Integer

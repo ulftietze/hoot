@@ -1,12 +1,12 @@
 package hoot.front.Servlets;
 
-import hoot.front.api.dto.user.UserDTO;
+import hoot.model.entities.User;
+import hoot.model.repositories.FollowerRepository;
 import hoot.model.repositories.UserRepository;
 import hoot.system.Annotation.AuthenticationRequired;
-import hoot.system.Exception.ConnectionFailedException;
 import hoot.system.Exception.EntityNotFoundException;
+import hoot.system.ObjectManager.ObjectManager;
 
-import javax.servlet.ServletContext;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -29,22 +29,28 @@ public class TestServlet extends HttpServlet
         out.println("<title>JDBC Test</title> </head>");
         out.println("<body>");
 
-        UserDTO user = null;
+        UserRepository     ur = (UserRepository) ObjectManager.get(UserRepository.class);
 
-        UserRepository ur = new UserRepository();
+        for (int i = 0; i < 4; ++i) {
+            try {
+                out.println("User " + i + "<br>");
 
-        try {
-            user = ur.getById(1);
-        } catch (EntityNotFoundException | ConnectionFailedException e) {
-            e.printStackTrace(out);
+                User user = ur.getById(i);
+
+                out.println(
+                        "ID: " + user.id + "<br>" +
+                        "Username: " + user.username + "<br>" +
+                        "ImagePath: " + user.imagePath + "<br>" +
+                        "PasswordHash: " + user.passwordHash + "<br>" +
+                        "lastLogin: " + user.lastLogin + "<br>" +
+                        "created: " + user.created + "<br>" +
+                        "followerCount: " + user.followerCount + "<br>"
+                );
+                out.println("<br>");
+            } catch (EntityNotFoundException e) {
+                out.println("DB connection failed or User not found.<br>");
+            }
         }
-
-        if (user != null) {
-            out.println("ID: " + user.id + "<br>" + "UserName: " + user.username + "<br>");
-        } else {
-            out.println("DB connection failed or User not found.");
-        }
-
         out.println("</body>");
         out.println("</html>");
     }

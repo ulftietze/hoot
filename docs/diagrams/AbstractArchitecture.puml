@@ -1,0 +1,50 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+
+
+abstract class AbstractRepository<User> {
+     +getList(SearchCriteria searchCriteria): ArrayList<Type>
+     +save(Type toSave): void
+     +delete(Type toDelete): void
+     #getConnection(): Connection
+}
+
+Interface HttpServlet {
+    +doGet(Request req, Response res): void
+    +doPost(Request req, Response res): void
+    +doPut(Request req, Response res): void
+    +doDelete(Request req, Response res): void
+}
+
+interface MapperInterface<TypeFrom, TypeTo> {
+    +map(TypeFrom): TypeTo
+}
+
+
+abstract class DTO {
+    -id: int
+    -property: String
+}
+
+abstract class EntityModel {
+    -id: int
+    -property1: String
+    -property2: String
+}
+
+package Database <<Database>> {
+
+}
+
+HttpServlet ..> AbstractRepository: use
+HttpServlet ..> MapperInterface: use
+HttpServlet -> DTO: use
+
+(AbstractRepository, HttpServlet) -- EntityModel
+
+AbstractRepository --> Database
+Database --> AbstractRepository
+
+
+@enduml

@@ -1,6 +1,8 @@
 package hoot.system.Exception;
 
-public class CouldNotSaveException extends Exception
+import java.sql.SQLException;
+
+public class CouldNotSaveException extends SQLException
 {
     public CouldNotSaveException(String entityName)
     {

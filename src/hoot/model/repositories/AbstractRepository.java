@@ -1,7 +1,7 @@
 package hoot.model.repositories;
 
+import hoot.model.search.DefaultSearchCriteria;
 import hoot.model.search.SearchCriteriaInterface;
-import hoot.system.Exception.ConnectionFailedException;
 import hoot.system.Exception.CouldNotDeleteException;
 import hoot.system.Exception.CouldNotSaveException;
 import hoot.system.Exception.EntityNotFoundException;
@@ -11,26 +11,54 @@ import hoot.system.ObjectManager.ObjectManager;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 
 public abstract class AbstractRepository<Type>
 {
-    public abstract Type getById(int id) throws EntityNotFoundException, ConnectionFailedException;
+    public ArrayList<Type> getList() throws EntityNotFoundException
+    {
+        return this.getList((DefaultSearchCriteria) ObjectManager.get(DefaultSearchCriteria.class));
+    }
 
-    public abstract ArrayList<Type> getList(SearchCriteriaInterface searchCriteria);
+    public abstract ArrayList<Type> getList(SearchCriteriaInterface searchCriteria) throws EntityNotFoundException;
 
     public abstract void save(Type type) throws CouldNotSaveException;
 
     public abstract void delete(Type type) throws CouldNotDeleteException;
 
-    protected Connection getConnection() throws SQLException
+    /**
+     * TODO: Do we need synchronized here?
+     *
+     * @return
+     * @throws SQLException
+     */
+    protected synchronized Connection getConnection() throws SQLException
     {
         DataSource ds = (DataSource) ObjectManager.get(DataSource.class);
         return ds.getConnection();
     }
 
-    protected LoggerInterface getLogger()
+    /**
+     * TODO: Do we need synchronized here?
+     *
+     * @param message
+     */
+    protected synchronized void log(String message)
     {
-        return (LoggerInterface) ObjectManager.get(LoggerInterface.class);
+        LoggerInterface logger = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
+        logger.log(message);
+    }
+
+    protected LocalDateTime getLocalDateTimeFromSQLTimestamp(Timestamp timestamp)
+    {
+        return timestamp.toInstant().atZone(ZoneId.of("Europe/Berlin")).toLocalDateTime();
+    }
+
+    protected Timestamp getSQLTimestampFromLocalDateTime(LocalDateTime dateTime)
+    {
+        return Timestamp.from(dateTime.toInstant(ZoneId.of("Europe/Berlin").getRules().getOffset(dateTime)));
     }
 }
