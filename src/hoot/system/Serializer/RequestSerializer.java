@@ -24,8 +24,7 @@ public class RequestSerializer
      */
     public Object deserializeJsonRequestBody(HttpServletRequest request, Class<?> targetDTO) throws IOException
     {
-        //return this.objectMapper.fromJson(stringBuilder.toString(), targetDTO);
-        return this.objectMapper.readTree(request.getReader());
+        return this.objectMapper.readValue(request.getReader(), targetDTO);
     }
 
     /**
