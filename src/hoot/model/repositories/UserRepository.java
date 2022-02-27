@@ -192,7 +192,7 @@ public class UserRepository extends AbstractRepository<User>
     /**
      * Save changes to an already existing User in the DB
      *
-     * @param user an User entity
+     * @param user a User entity
      * @throws CouldNotSaveException if any SQL errors occurred.
      */
     @Override
@@ -231,7 +231,7 @@ public class UserRepository extends AbstractRepository<User>
     /**
      * Delete an existing User from the DB.
      *
-     * @param user an User entity
+     * @param user a User entity
      * @throws CouldNotDeleteException if any SQL errors occurred.
      */
     @Override

@@ -78,31 +78,221 @@ public class HootRepository extends AbstractRepository<Hoot>
         }
     }
 
+    private void create(Hoot hoot) throws CouldNotSaveException
+    {
+        try {
+            Connection connection = this.getConnection();
+
+            String            hootStatement = "insert into Hoot (user, hootType) values (?, ?)";
+            PreparedStatement hootPss       = connection.prepareStatement(
+                    hootStatement,
+                    PreparedStatement.RETURN_GENERATED_KEYS
+            );
+            hootPss.setInt(1, hoot.user.id);
+            hootPss.setString(2, hoot.hootType.toString());
+
+            int rowCount = hootPss.executeUpdate();
+
+            ResultSet rs = hootPss.getGeneratedKeys();
+            rs.next();
+
+            hoot.id = rs.getInt(1);
+
+            hootPss.close();
+
+            if (rowCount == 0 || hoot.id == null) {
+                throw new CouldNotSaveException("new Hoot");
+            }
+
+            switch (hoot.hootType) {
+                case Post:
+                    Post post = (Post) hoot;
+
+                    String postStatement = "insert into Post (hoot, content, onlyFollower) values (?, ?, ?)";
+                    PreparedStatement postPss = connection.prepareStatement(postStatement);
+
+                    postPss.setInt(1, post.id);
+                    postPss.setString(2, post.content);
+                    postPss.setBoolean(3, post.onlyFollower);
+
+                    int postRows = postPss.executeUpdate();
+
+                    postPss.close();
+                    connection.close();
+
+                    if (postRows == 0) {
+                        throw new CouldNotSaveException("Post with ID " + post.id);
+                    }
+
+                    break;
+                case Image:
+                    Image image = (Image) hoot;
+
+                    String
+                            imageStatement
+                            = "insert into Image (hoot, imagePath, content, onlyFollower) values (?, ?, ?, ?)";
+                    PreparedStatement imagePss = connection.prepareStatement(imageStatement);
+
+                    imagePss.setInt(1, image.id);
+                    imagePss.setString(2, image.imagePath);
+                    imagePss.setString(3, image.content);
+                    imagePss.setBoolean(4, image.onlyFollower);
+
+                    int imageRows = imagePss.executeUpdate();
+
+                    imagePss.close();
+                    connection.close();
+
+                    if (imageRows == 0) {
+                        throw new CouldNotSaveException("Image with ID " + image.id);
+                    }
+
+                    break;
+                case Comment:
+                    Comment comment = (Comment) hoot;
+
+                    String commentStatement = "insert into Comment (hoot, parent, content) values (?, ?, ?)";
+                    PreparedStatement commentPss = connection.prepareStatement(commentStatement);
+
+                    commentPss.setInt(1, comment.id);
+                    commentPss.setInt(2, comment.parent.id);
+                    commentPss.setString(3, comment.content);
+
+                    int commentRows = commentPss.executeUpdate();
+
+                    commentPss.close();
+                    connection.close();
+
+                    if (commentRows == 0) {
+                        throw new CouldNotSaveException("Comment with ID " + comment.id);
+                    }
+
+                    break;
+            }
+        } catch (SQLException e) {
+            this.log("Hoot.save(): " + e.getMessage());
+            throw new CouldNotSaveException("Hoot");
+        }
+    }
+
+    /**
+     * Save or update a Hoot in the DB.<br>
+     * If Hoot.id is null, a new Hoot is inserted. If Hoot.id is set, the method will try to update the existing Hoot.
+     *
+     * @param hoot a Hoot object (Post, Image, Comment)
+     * @throws CouldNotSaveException if the Hoot could not be saved
+     */
     @Override
     public void save(Hoot hoot) throws CouldNotSaveException
     {
-        // save parent hoot info
+        if (hoot.id == null) {
+            this.create(hoot);
+            return;
+        }
 
-        switch (hoot.hootType) {
-            case Post:
-                // save post data
-                Post postHoot = (Post) hoot;
-                break;
-            case Image:
-                // save image data
-                Image imageHoot = (Image) hoot;
-                break;
-            case Comment:
-                // save comment data
-                Comment commentHoot = (Comment) hoot;
-                break;
+        try {
+            Connection connection = this.getConnection();
+
+            switch (hoot.hootType) {
+                case Post:
+                    Post post = (Post) hoot;
+
+                    String postStatement = "update Post set content = ?, onlyFollower = ? where hoot = ?";
+                    PreparedStatement postPss = connection.prepareStatement(postStatement);
+
+                    postPss.setString(1, post.content);
+                    postPss.setBoolean(2, post.onlyFollower);
+                    postPss.setInt(3, post.id);
+
+                    int postRows = postPss.executeUpdate();
+
+                    postPss.close();
+                    connection.close();
+
+                    if (postRows == 0) {
+                        throw new CouldNotSaveException("Post with ID " + post.id);
+                    }
+
+                    break;
+                case Image:
+                    Image image = (Image) hoot;
+
+                    String
+                            imageStatement
+                            = "update Image set imagePath = ?, content = ?, onlyFollower = ? where hoot = ?";
+                    PreparedStatement imagePss = connection.prepareStatement(imageStatement);
+
+                    imagePss.setString(1, image.imagePath);
+                    imagePss.setString(2, image.content);
+                    imagePss.setBoolean(3, image.onlyFollower);
+                    imagePss.setInt(4, image.id);
+
+                    int imageRows = imagePss.executeUpdate();
+
+                    imagePss.close();
+                    connection.close();
+
+                    if (imageRows == 0) {
+                        throw new CouldNotSaveException("Image with ID " + image.id);
+                    }
+
+                    break;
+                case Comment:
+                    Comment comment = (Comment) hoot;
+
+                    String commentStatement = "update Comment set content = ? where hoot = ?";
+                    PreparedStatement commentPss = connection.prepareStatement(commentStatement);
+
+                    commentPss.setString(1, comment.content);
+                    commentPss.setInt(2, comment.id);
+
+                    int commentRows = commentPss.executeUpdate();
+
+                    commentPss.close();
+                    connection.close();
+
+                    if (commentRows == 0) {
+                        throw new CouldNotSaveException("Comment with ID " + comment.id);
+                    }
+
+                    break;
+            }
+        } catch (SQLException e) {
+            this.log("Hoot.save(): " + e.getMessage());
+            throw new CouldNotSaveException("Hoot");
         }
     }
 
     @Override
     public void delete(Hoot hoot) throws CouldNotDeleteException
     {
-        // delete parent hoot ID (CASCADE delete in DB)
+        if (hoot.id == null) {
+            throw new CouldNotDeleteException("Hoot with ID null");
+        }
+
+        try {
+            Connection connection = this.getConnection();
+
+            String            sqlStatement = "delete from Hoot where id = ?";
+            PreparedStatement pss          = connection.prepareStatement(sqlStatement);
+            pss.setInt(1, hoot.id);
+            int rowCount = pss.executeUpdate();
+
+            if (rowCount == 0) {
+                throw new CouldNotDeleteException("Hoot with ID " + hoot.id);
+            }
+
+            pss.close();
+            connection.close();
+
+            if (hoot.hootType == HootType.Image) {
+                // TODO: Delete Image from FileSystem when an Image Hoot is deleted
+            }
+
+        } catch (SQLException e) {
+            this.log("Hoot.delete(): " + e.getMessage());
+            throw new CouldNotDeleteException("Hoot with ID " + hoot.id);
+        }
     }
 
     public HootMentions getMentions(Hoot hoot) throws EntityNotFoundException
