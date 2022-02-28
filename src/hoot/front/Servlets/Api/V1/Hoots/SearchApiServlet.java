@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 //@AuthenticationRequired
 @WebServlet("/api/V1/hoot/search")
@@ -41,9 +42,12 @@ public class SearchApiServlet extends AbstractApiServlet
 
         HootSearchCriteria searchCriteria = (HootSearchCriteria) ObjectManager.create(HootSearchCriteria.class);
 
+        if (tags != null && !tags.equals("")) {
+            searchCriteria.tags.addAll(Arrays.asList(tags.split(",")));
+        }
+
         searchCriteria.lastPostId      = lastPost != null && !lastPost.equals("") ? Integer.valueOf(lastPost) : null;
         searchCriteria.defaultPageSize = quantity != null && !quantity.equals("") ? Integer.valueOf(quantity) : null;
-        searchCriteria.tags            = tags != null && !tags.equals("") ? tags : null;
         searchCriteria.userId          = userId != null && !userId.equals("") ? Integer.valueOf(userId) : null;
 
         return searchCriteria;

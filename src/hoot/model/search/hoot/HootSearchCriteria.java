@@ -6,47 +6,41 @@ import hoot.system.Database.QueryBuilder;
 import hoot.system.ObjectManager.ObjectManager;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class HootSearchCriteria implements SearchCriteriaInterface
 {
-    public Integer userId = null;
-
-    public String tags = null;
-
-    public Integer defaultPageSize = 50;
-
-    public Integer lastPostId = null;
-
-    public boolean withComments = false;
+    public Integer           userId          = null;
+    public ArrayList<String> tags            = new ArrayList<>();
+    public Integer           defaultPageSize = 50;
+    public Integer           lastPostId      = null;
+    public boolean           withComments    = false;
 
     @Override
     public QueryBuilder getQueryBuilder() throws SQLException
     {
-        QueryBuilder qb = (QueryBuilder) ObjectManager.create(QueryBuilder.class);
+        QueryBuilder queryBuilder = (QueryBuilder) ObjectManager.create(QueryBuilder.class);
 
-        qb.LIMIT = defaultPageSize;
+        queryBuilder.LIMIT = defaultPageSize;
 
         if (userId != null) {
-            qb.WHERE.add("userId = ?");
-            qb.PARAMETERS.add(userId.toString());
+            queryBuilder.WHERE.add("userId = ?");
+            queryBuilder.PARAMETERS.add(userId.toString());
         }
 
-        if (tags != null && !tags.equals("")) {
-            qb.WHERE.add("t.tag IN (?) ");
-            qb.PARAMETERS.add(tags);
-        }
+        queryBuilder.addWhereIn("t.tag", tags);
 
         if (lastPostId != null) {
-            // IDs are incremental, so this is easier than a timestamp comparison
-            qb.WHERE.add("h.id < ?");
-            qb.PARAMETERS.add(lastPostId.toString());
+            // IDs are incremental, so this is easier+quicker than a timestamp comparison
+            queryBuilder.WHERE.add("h.id < ?");
+            queryBuilder.PARAMETERS.add(lastPostId.toString());
         }
 
         if (!withComments) {
-            qb.WHERE.add("h.hootType != ?");
-            qb.PARAMETERS.add(HootType.Comment.toString());
+            queryBuilder.WHERE.add("h.hootType != ?");
+            queryBuilder.PARAMETERS.add(HootType.Comment.toString());
         }
 
-        return qb;
+        return queryBuilder;
     }
 }
