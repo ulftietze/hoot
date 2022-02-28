@@ -18,7 +18,7 @@ import java.io.IOException;
 
 @AuthenticationRequired
 @WebServlet({"/api/V1/user/me/follow"})
-public class FollowApiServlet extends AbstractApiServlet
+public class MeFollowApiServlet extends AbstractApiServlet
 {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
     {

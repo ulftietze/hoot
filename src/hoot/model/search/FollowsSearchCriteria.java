@@ -10,19 +10,27 @@ import java.sql.SQLException;
  */
 public class FollowsSearchCriteria implements SearchCriteriaInterface
 {
-    public Integer userID;
+    public Integer userId;
+    public Integer lastUserId;
+    public Integer defaultPageSize;
 
     @Override
     public QueryBuilder getQueryBuilder() throws SQLException
     {
-        if (userID == null) {
-            return null;
+        if (userId == null) {
+            throw new SQLException("Required Parameter UserId is missing");
         }
 
         QueryBuilder queryBuilder = (QueryBuilder) ObjectManager.create(QueryBuilder.class);
 
-        queryBuilder.WHERE.add("user = ?");
-        queryBuilder.PARAMETERS.add(this.userID.toString());
+        queryBuilder.addWhere("user = ?", this.userId);
+
+        if (this.lastUserId != null) {
+            String where = "created < (SELECT created FROM Follower WHERE user = ? AND follows = ?)";
+            queryBuilder.addWhere(where, this.userId, this.lastUserId);
+        }
+
+        queryBuilder.LIMIT = defaultPageSize;
 
         return queryBuilder;
     }

@@ -10,6 +10,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class QueryBuilder
 {
@@ -26,13 +27,13 @@ public class QueryBuilder
     {
         StringBuilder QUERY = new StringBuilder();
 
-        this.addSelect(QUERY);
-        this.addFrom(QUERY);
-        this.addJoin(QUERY);
-        this.addWhere(QUERY);
-        this.addGroupBy(QUERY);
-        this.addOrderBy(QUERY);
-        this.addLimit(QUERY);
+        this.buildSelect(QUERY);
+        this.buildFrom(QUERY);
+        this.buildJoin(QUERY);
+        this.buildWhere(QUERY);
+        this.buildGroupBy(QUERY);
+        this.buildOrderBy(QUERY);
+        this.buildLimit(QUERY);
 
         PreparedStatement statement = connection.prepareStatement(QUERY.toString());
         this.mapParameters(statement);
@@ -41,6 +42,37 @@ public class QueryBuilder
         //logger.log(QUERY.toString() + " [parameters=" + this.PARAMETERS.toString() + "]");
 
         return statement;
+    }
+
+    public void addWhere(String where, Object... params)
+    {
+        this.WHERE.add(where);
+        this.PARAMETERS.addAll(Arrays.asList(params));
+    }
+
+    public void addJoin(String join)
+    {
+        this.JOINS.add(join);
+    }
+
+    public void addWhereIn(String where, ArrayList<?> inList)
+    {
+        if (inList.size() < 1) {
+            return;
+        }
+
+        StringBuilder whereIn = new StringBuilder(where + " in (");
+
+        for (int i = 0; i < inList.size(); i++) {
+            whereIn.append("?");
+            if (i < inList.size() - 1) {
+                whereIn.append(", ");
+            }
+            this.PARAMETERS.add(inList.get(i));
+        }
+
+        whereIn.append(")");
+        this.WHERE.add(whereIn.toString());
     }
 
     private void mapParameters(PreparedStatement statement) throws SQLException
@@ -60,9 +92,7 @@ public class QueryBuilder
                 statement.setDouble(i, (Double) param);
             } else if (param instanceof Float) {
                 statement.setFloat(i, (Float) param);
-            } else if (param instanceof Object[]) {
-                statement.setArray(i, statement.getConnection().createArrayOf("text", (Object[]) param));
-            } else if (param instanceof String){
+            } else if (param instanceof String) {
                 statement.setString(i, (String) param);
             } else {
                 statement.setObject(i, param);
@@ -75,14 +105,14 @@ public class QueryBuilder
         return Timestamp.from(dateTime.toInstant(ZoneId.of("Europe/Berlin").getRules().getOffset(dateTime)));
     }
 
-    private void addJoin(StringBuilder query)
+    private void buildJoin(StringBuilder query)
     {
         for (String join : this.JOINS) {
             query.append(" ").append(join);
         }
     }
 
-    private void addSelect(StringBuilder query)
+    private void buildSelect(StringBuilder query)
     {
         if (this.SELECT.size() >= 1) {
             query.append("SELECT ").append(this.SELECT.get(0));
@@ -95,12 +125,12 @@ public class QueryBuilder
         }
     }
 
-    private void addFrom(StringBuilder query)
+    private void buildFrom(StringBuilder query)
     {
         query.append(" FROM ").append(this.FROM).append(" ");
     }
 
-    private void addWhere(StringBuilder query)
+    private void buildWhere(StringBuilder query)
     {
         if (this.WHERE.size() >= 1) {
             query.append(" WHERE ").append(this.WHERE.get(0));
@@ -111,7 +141,7 @@ public class QueryBuilder
         }
     }
 
-    private void addGroupBy(StringBuilder query)
+    private void buildGroupBy(StringBuilder query)
     {
         if (this.GROUP_BY.size() >= 1) {
             query.append(" GROUP BY ").append(this.GROUP_BY.get(0));
@@ -122,7 +152,7 @@ public class QueryBuilder
         }
     }
 
-    private void addOrderBy(StringBuilder query)
+    private void buildOrderBy(StringBuilder query)
     {
         if (this.ORDER_BY.size() >= 1) {
             query.append(" ORDER BY ").append(this.ORDER_BY.get(0));
@@ -133,7 +163,7 @@ public class QueryBuilder
         }
     }
 
-    private void addLimit(StringBuilder query)
+    private void buildLimit(StringBuilder query)
     {
         query.append(" LIMIT ").append(LIMIT);
     }

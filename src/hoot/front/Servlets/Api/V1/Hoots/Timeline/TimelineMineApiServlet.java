@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 @AuthenticationRequired
 @WebServlet("/api/V1/hoot/timeline/mine")
@@ -36,17 +37,20 @@ public class TimelineMineApiServlet extends AbstractApiServlet
 
     private TimelineSearchCriteria createSearchCriteriaFromRequest(HttpServletRequest request)
     {
-        String lastPost = request.getParameter("lastPostId");
-        String quantity = request.getParameter("quantity");
-        String tags     = request.getParameter("tags");
-        Integer userId  = (Integer) request.getSession(true).getAttribute(LoginApiServlet.SESSION_USER_IDENTIFIER);
+        String  lastPost = request.getParameter("lastPostId");
+        String  quantity = request.getParameter("quantity");
+        String  tags     = request.getParameter("tags");
+        Integer userId   = (Integer) request.getSession(true).getAttribute(LoginApiServlet.SESSION_USER_IDENTIFIER);
 
         TimelineSearchCriteria searchCriteria = this.createSearchCriteriaClass();
 
+        if (tags != null && !tags.equals("")) {
+            searchCriteria.tags.addAll(Arrays.asList(tags.split(",")));
+        }
+
         searchCriteria.lastPostId      = lastPost != null && !lastPost.equals("") ? Integer.valueOf(lastPost) : null;
-        searchCriteria.defaultPageSize = quantity != null && !quantity.equals("") ? Integer.valueOf(quantity) : null;
-        searchCriteria.tags            = tags != null && !tags.equals("") ? tags : null;
-        searchCriteria.userId          = userId;
+        searchCriteria.defaultPageSize   = quantity != null && !quantity.equals("") ? Integer.valueOf(quantity) : null;
+        searchCriteria.timelineForUserId = userId;
 
         return searchCriteria;
     }

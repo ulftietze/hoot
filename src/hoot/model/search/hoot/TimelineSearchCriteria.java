@@ -11,17 +11,15 @@ import hoot.system.ObjectManager.ObjectManager;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.stream.Collectors;
 
 public class TimelineSearchCriteria implements SearchCriteriaInterface
 {
     private final FollowerRepository followerRepository;
-    public        Integer            userId          = null;
-    public        String             tags            = null;
-    public        Integer            defaultPageSize = 50;
-    public        Integer            lastPostId      = null;
-    public        boolean            withComments    = false;
+    public        Integer            timelineForUserId = null;
+    public        ArrayList<String>  tags              = new ArrayList<>();
+    public        Integer            defaultPageSize   = 50;
+    public        Integer            lastPostId        = null;
+    public        boolean            withComments      = false;
 
     public TimelineSearchCriteria()
     {
@@ -33,26 +31,14 @@ public class TimelineSearchCriteria implements SearchCriteriaInterface
     {
         QueryBuilder qb = (QueryBuilder) ObjectManager.create(QueryBuilder.class);
 
-        int[] followsIds = this
-                .getFollowerForUserId(this.userId)
-                .stream()
-                .mapToInt(follower -> follower.follows.id)
-                .toArray();
+        ArrayList<Integer> followIds = new ArrayList<>();
+        this.getFollowerForUserId(this.timelineForUserId).forEach(follower -> followIds.add(follower.follows.id));
 
-        String params = Arrays.stream(followsIds).mapToObj(id -> "?").collect(Collectors.joining(", "));
+        qb.addWhereIn("h.user", followIds);
+        qb.addWhereIn("t.tag", tags);
 
-        qb.WHERE.add("h.user in (" + params + ")");
-        for (int id : followsIds) {
-            qb.PARAMETERS.add(id);
-        }
-
-        if (tags != null && !tags.equals("")) {
-            qb.WHERE.add("t.tag IN (?) ");
-            qb.PARAMETERS.add(tags);
-        }
-
-        if (lastPostId != null) {
-            // IDs are incremental, so this is easier than a timestamp comparison
+        if (this.lastPostId != null) {
+            // IDs are incremental, so this is easier+quicker than a timestamp comparison
             qb.WHERE.add("h.id < ?");
             qb.PARAMETERS.add(lastPostId.toString());
         }
@@ -70,7 +56,7 @@ public class TimelineSearchCriteria implements SearchCriteriaInterface
     private ArrayList<Follower> getFollowerForUserId(Integer userId) throws EntityNotFoundException
     {
         FollowsSearchCriteria followsSearchCriteria = this.getFollowsSearchCriteria();
-        followsSearchCriteria.userID = userId;
+        followsSearchCriteria.userId = userId;
 
         return this.followerRepository.getList(followsSearchCriteria);
     }
