@@ -179,7 +179,7 @@ CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 SET NAMES utf8mb4;
 
 INSERT INTO Historie (currentLoggedIn, postsPerSecond, requestsPerSecond, loginsPerSecond, currentlyRegisteredUsers, trendingHashtags)
-VALUES (50, 1.3, 42.1, 24.9, 2, 'Hier, folgt, ein, Emoji, 🐈');
+VALUES (50, 1.3, 42.1, 24.9, 2, 'Hier,folgt,ein,Emoji,🐈');
 
 INSERT INTO Historie (trendingHashtags)
 VALUES ('🐈');
