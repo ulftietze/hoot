@@ -458,7 +458,7 @@ paths:
               $ref: '#/components/schemas/reactionMeSend'
       responses:
         '200':
-          description: Boolean flag if interaction was set to post
+          description: Boolean flag if interaction was set to hoot
           content:
             application/json:
               schema:
