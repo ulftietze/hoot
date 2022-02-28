@@ -1,0 +1,18 @@
+package hoot.model.search.hoot;
+
+import hoot.model.search.SearchCriteriaInterface;
+import hoot.system.Database.QueryBuilder;
+import hoot.system.ObjectManager.ObjectManager;
+
+import java.sql.SQLException;
+
+public class HistorieSearchCriteria implements SearchCriteriaInterface
+{
+    @Override
+    public QueryBuilder getQueryBuilder() throws SQLException
+    {
+        QueryBuilder queryBuilder = (QueryBuilder) ObjectManager.create(QueryBuilder.class);
+
+        return queryBuilder;
+    }
+}
