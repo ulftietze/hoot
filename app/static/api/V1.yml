@@ -581,11 +581,7 @@ components:
           format: int64
           nullable: true
         hootType:
-          type: string
-          enum:
-            - Post
-            - Comment
-            - Image
+          $ref: '#/components/schemas/hootType'
         created:
           type: string
           format: date-time
@@ -600,6 +596,12 @@ components:
           type: object
         onlyFollower:
           type: boolean
+    hootType:
+      type: string
+      enum:
+        - Post
+        - Comment
+        - Image
     mentions:
       type: array
       items:
@@ -657,10 +659,13 @@ components:
       type: object
       required:
         - hootId
+        - hootType
       properties:
         hootId:
           type: integer
           format: int64
+        hootType:
+          $ref: '#/components/schemas/hootType'
         interaction:
           $ref: '#/components/schemas/interaction'
     interaction:

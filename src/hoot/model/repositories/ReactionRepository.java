@@ -34,6 +34,10 @@ public class ReactionRepository extends AbstractRepository<Reaction>
             while (resultSet.next()) {
                 reactions.add(this.mapResultSet(resultSet));
             }
+
+            resultSet.close();
+            statement.close();
+            connection.close();
         } catch (SQLException e) {
             this.log("Something went wrong while loading reactions list: " + e.getMessage());
             throw new EntityNotFoundException("Reaction");
@@ -55,7 +59,8 @@ public class ReactionRepository extends AbstractRepository<Reaction>
             statement.setInt(2, reaction.hoot.id);
             statement.setString(3, reaction.interaction.toString());
 
-            statement.executeQuery().close();
+            statement.executeUpdate();
+
             statement.close();
             connection.close();
         } catch (SQLException e) {
@@ -75,7 +80,8 @@ public class ReactionRepository extends AbstractRepository<Reaction>
             statement.setInt(1, reaction.user.id);
             statement.setInt(2, reaction.hoot.id);
 
-            statement.executeQuery().close();
+            statement.executeUpdate();
+
             statement.close();
             connection.close();
         } catch (SQLException e) {

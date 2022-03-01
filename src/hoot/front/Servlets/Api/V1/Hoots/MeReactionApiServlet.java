@@ -3,10 +3,7 @@ package hoot.front.Servlets.Api.V1.Hoots;
 import com.fasterxml.jackson.databind.JsonNode;
 import hoot.front.Servlets.Api.V1.AbstractApiServlet;
 import hoot.front.Servlets.Api.V1.Authentication.LoginApiServlet;
-import hoot.model.entities.Hoot;
-import hoot.model.entities.Interaction;
-import hoot.model.entities.Reaction;
-import hoot.model.entities.User;
+import hoot.model.entities.*;
 import hoot.model.repositories.ReactionRepository;
 import hoot.system.Annotation.AuthenticationRequired;
 import hoot.system.Exception.CouldNotDeleteException;
@@ -59,7 +56,7 @@ public class MeReactionApiServlet extends AbstractApiServlet
         Reaction reaction     = (Reaction) ObjectManager.create(Reaction.class);
 
         reaction.user    = (User) ObjectManager.create(User.class);
-        reaction.hoot    = (Hoot) ObjectManager.create(Hoot.class);
+        reaction.hoot    = this.getHootByType(reactionBody.get("hootType").asText());
         reaction.user.id = (Integer) request.getSession(true).getAttribute(LoginApiServlet.SESSION_USER_IDENTIFIER);
         reaction.hoot.id = reactionBody.get("hootId").asInt();
 
@@ -68,5 +65,19 @@ public class MeReactionApiServlet extends AbstractApiServlet
         }
 
         return reaction;
+    }
+
+    private Hoot getHootByType(String type)
+    {
+        switch (HootType.valueOf(type)) {
+            case Post:
+                return (Post) ObjectManager.create(Post.class);
+            case Image:
+                return (Image) ObjectManager.create(Image.class);
+            case Comment:
+                return (Comment) ObjectManager.create(Comment.class);
+        }
+
+        throw new RuntimeException("Could not detect hootType: " + type);
     }
 }

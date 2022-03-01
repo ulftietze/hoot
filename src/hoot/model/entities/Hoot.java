@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Hoot
+public abstract class Hoot
 {
     public Integer id;
 
