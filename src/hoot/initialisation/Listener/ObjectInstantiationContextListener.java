@@ -8,6 +8,8 @@ import hoot.initialisation.Factory.MediaFileHandlerFactory;
 import hoot.system.Filesystem.MediaFileHandler;
 import hoot.system.Logger.ContextLogger;
 import hoot.system.Logger.LoggerInterface;
+import hoot.system.Logger.NullLogger;
+import hoot.system.Logger.QueryLoggerInterface;
 import hoot.system.ObjectManager.ObjectManager;
 
 import javax.servlet.ServletContext;
@@ -21,8 +23,7 @@ public class ObjectInstantiationContextListener implements ServletContextListene
     Timer timer;
 
     /**
-     * TODO: Breaking We need to check if the classes have dependencies to each other.
-     * TODO: Maybe lazy load objects?
+     * TODO: Documentation
      */
     public void contextInitialized(ServletContextEvent servletContextEvent)
     {
@@ -30,6 +31,7 @@ public class ObjectInstantiationContextListener implements ServletContextListene
 
         // System
         ObjectManager.set(LoggerInterface.class, ContextLogger.class);
+        ObjectManager.set(QueryLoggerInterface.class, NullLogger.class);
         ObjectManager.setFactory(ContextLogger.class, new ContextLoggerFactory(context));
         //ObjectManager.set(LoggerInterface.class, NullLogger.class);
         ObjectManager.setFactory(DataSource.class, new DataSourceFactory());

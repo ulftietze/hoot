@@ -3,12 +3,12 @@ package hoot.front.Servlets.Api.V1.User;
 import hoot.front.Servlets.Api.V1.AbstractApiServlet;
 import hoot.model.entities.User;
 import hoot.model.entities.authentication.SecureUser;
-import hoot.model.mapper.SecureUserToUserMapper;
 import hoot.model.repositories.UserRepository;
 import hoot.system.Annotation.AuthenticationRequired;
 import hoot.system.Exception.CouldNotSaveException;
 import hoot.system.Exception.EntityNotFoundException;
 import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.Security.Hasher;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -45,13 +45,11 @@ public class UserApiServlet extends AbstractApiServlet
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
     {
-        UserRepository         repository = (UserRepository) ObjectManager.get(UserRepository.class);
-        SecureUserToUserMapper mapper     = (SecureUserToUserMapper) ObjectManager.get(SecureUserToUserMapper.class);
-
-        SecureUser secureUser = (SecureUser) this.deserializeJsonRequestBody(request, SecureUser.class);
+        UserRepository repository = (UserRepository) ObjectManager.get(UserRepository.class);
+        SecureUser     secureUser = (SecureUser) this.deserializeJsonRequestBody(request, SecureUser.class);
 
         try {
-            User entity = mapper.map(secureUser);
+            User entity = this.map(secureUser);
             repository.save(entity);
 
             this.sendResponse(response, HttpServletResponse.SC_OK, this.serialize("saved"));
@@ -63,13 +61,11 @@ public class UserApiServlet extends AbstractApiServlet
 
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
     {
-        UserRepository         repository = (UserRepository) ObjectManager.get(UserRepository.class);
-        SecureUserToUserMapper mapper     = (SecureUserToUserMapper) ObjectManager.get(SecureUserToUserMapper.class);
-
-        SecureUser secureUser = (SecureUser) this.deserializeJsonRequestBody(request, SecureUser.class);
+        UserRepository repository = (UserRepository) ObjectManager.get(UserRepository.class);
+        SecureUser     secureUser = (SecureUser) this.deserializeJsonRequestBody(request, SecureUser.class);
 
         try {
-            User entity = mapper.map(secureUser);
+            User entity = this.map(secureUser);
             repository.save(entity);
 
             this.sendResponse(response, HttpServletResponse.SC_OK, this.serialize("saved"));
@@ -77,5 +73,22 @@ public class UserApiServlet extends AbstractApiServlet
             int httpStatus = HttpServletResponse.SC_NOT_ACCEPTABLE;
             this.sendResponse(response, httpStatus, this.serialize(e.getMessage()));
         }
+    }
+
+    public User map(SecureUser secureUser) throws EntityNotFoundException, GeneralSecurityException
+    {
+        UserRepository repository = (UserRepository) ObjectManager.get(UserRepository.class);
+        Hasher         hasher     = (Hasher) ObjectManager.get(Hasher.class);
+        User           user       = repository.getById(secureUser.id);
+
+        user.username = secureUser.username;
+
+        if (secureUser.password != null) {
+            user.passwordHash = hasher.hash(secureUser.password);
+        }
+
+        this.saveImage(secureUser.imageFilename, secureUser.image);
+
+        return user;
     }
 }
