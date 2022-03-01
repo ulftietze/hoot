@@ -6,11 +6,14 @@ import hoot.model.search.SearchCriteriaInterface;
 import hoot.system.Exception.CouldNotDeleteException;
 import hoot.system.Exception.CouldNotSaveException;
 import hoot.system.Exception.EntityNotFoundException;
+import hoot.system.Logger.QueryLoggerInterface;
+import hoot.system.ObjectManager.ObjectManager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 public class HootMentionRepository extends AbstractRepository<HootMentions>
 {
@@ -31,22 +34,30 @@ public class HootMentionRepository extends AbstractRepository<HootMentions>
         }
 
         try {
-            Connection connection = this.getConnection();
+            this.delete(hootMentions);
+
+            Connection         connection = this.getConnection();
+            ArrayList<Integer> parameters = new ArrayList<>();
+
+            String statement = "INSERT INTO HootMentions (hoot, mention) VALUES ";
+            statement += hootMentions.mentions.stream().map(mention -> "(?,?)").collect(Collectors.joining(","));
+
+            PreparedStatement pss = connection.prepareStatement(statement);
 
             for (Mention mention : hootMentions.mentions) {
-                try {
-                    String            statement = "insert into HootMentions (hoot, mention) VALUES (?, ?)";
-                    PreparedStatement pss       = connection.prepareStatement(statement);
-
-                    pss.setInt(1, hootMentions.hoot.id);
-                    pss.setInt(2, mention.mentioned.id);
-
-                    pss.executeUpdate();
-                    pss.close();
-                } catch (SQLException ignore) {
-                }
+                parameters.add(hootMentions.hoot.id);
+                parameters.add(mention.mentioned.id);
             }
 
+            for (int i = 1; i <= parameters.size(); i++) {
+                pss.setInt(i, parameters.get(i - 1));
+            }
+
+            QueryLoggerInterface logger = (QueryLoggerInterface) ObjectManager.get(QueryLoggerInterface.class);
+            logger.log(statement + " [parameters=" + parameters.toString() + "]");
+
+            pss.executeUpdate();
+            pss.close();
             connection.close();
         } catch (SQLException e) {
             this.log(e.getMessage());
@@ -64,20 +75,12 @@ public class HootMentionRepository extends AbstractRepository<HootMentions>
         try {
             Connection connection = this.getConnection();
 
-            for (Mention mention : hootMentions.mentions) {
-                try {
-                    String            statement = "delete from HootMentions where hoot = ? and mention = ?";
-                    PreparedStatement pss       = connection.prepareStatement(statement);
+            String            statement = "delete from HootMentions where hoot = ?";
+            PreparedStatement pss       = connection.prepareStatement(statement);
+            pss.setInt(1, hootMentions.hoot.id);
 
-                    pss.setInt(1, hootMentions.hoot.id);
-                    pss.setInt(2, mention.mentioned.id);
-
-                    pss.executeUpdate();
-                    pss.close();
-                } catch (SQLException ignore) {
-                }
-            }
-
+            pss.executeUpdate();
+            pss.close();
             connection.close();
         } catch (SQLException e) {
             this.log(e.getMessage());

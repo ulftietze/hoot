@@ -3,10 +3,10 @@ package hoot.front.Servlets.Api.V1.Authentication;
 import hoot.front.Servlets.Api.V1.AbstractApiServlet;
 import hoot.model.entities.User;
 import hoot.model.entities.authentication.Registration;
-import hoot.model.mapper.RegistrationToUserMapper;
 import hoot.model.repositories.UserRepository;
 import hoot.system.Exception.CouldNotSaveException;
 import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.Security.Hasher;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -22,12 +22,16 @@ public class RegisterApiServlet extends AbstractApiServlet
     {
         Registration register = (Registration) this.deserializeJsonRequestBody(request, Registration.class);
 
-        RegistrationToUserMapper mapper     = (RegistrationToUserMapper) ObjectManager.get(RegistrationToUserMapper.class);
-        UserRepository           repository = (UserRepository) ObjectManager.get(UserRepository.class);
+        UserRepository repository = (UserRepository) ObjectManager.get(UserRepository.class);
+        Hasher         hasher     = (Hasher) ObjectManager.get(Hasher.class);
 
         try {
-            User user = mapper.map(register);
-            repository.save(user);
+            User entity = (User) ObjectManager.create(User.class);
+            entity.username     = register.username;
+            entity.passwordHash = hasher.hash(register.password);
+            this.saveImage(register.imageFilename, register.image);
+
+            repository.save(entity);
 
             this.sendResponse(response, HttpServletResponse.SC_CREATED, this.serialize("Registered"));
         } catch (GeneralSecurityException | CouldNotSaveException e) {

@@ -2,7 +2,7 @@ package hoot.system.Logger;
 
 import javax.servlet.ServletContext;
 
-public class ContextLogger implements LoggerInterface
+public class ContextLogger implements LoggerInterface, QueryLoggerInterface
 {
     private final ServletContext context;
 
