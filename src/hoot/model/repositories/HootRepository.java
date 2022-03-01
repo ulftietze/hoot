@@ -98,6 +98,7 @@ public class HootRepository extends AbstractRepository<Hoot>
 
             hoot.id = rs.getInt(1);
 
+            rs.close();
             hootPss.close();
 
             if (rowCount == 0 || hoot.id == null) {

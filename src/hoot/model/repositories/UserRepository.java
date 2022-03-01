@@ -2,6 +2,7 @@ package hoot.model.repositories;
 
 import hoot.model.entities.User;
 import hoot.model.search.SearchCriteriaInterface;
+import hoot.system.Cache.UserCache;
 import hoot.system.Database.QueryBuilder;
 import hoot.system.Exception.CouldNotDeleteException;
 import hoot.system.Exception.CouldNotSaveException;
@@ -26,6 +27,12 @@ public class UserRepository extends AbstractRepository<User>
      */
     public User getById(int id) throws EntityNotFoundException
     {
+        UserCache userCache  = (UserCache) ObjectManager.get(UserCache.class);
+        User      cachedUser = userCache.get(id);
+        if (cachedUser != null) {
+            return cachedUser;
+        }
+
         try {
             // TODO: Build with query builder
             Connection connection = this.getConnection();
@@ -74,6 +81,12 @@ public class UserRepository extends AbstractRepository<User>
      */
     public User getByUsername(String username) throws EntityNotFoundException
     {
+        UserCache userCache  = (UserCache) ObjectManager.get(UserCache.class);
+        User      cachedUser = userCache.get(username);
+        if (cachedUser != null) {
+            return cachedUser;
+        }
+
         try {
             Connection connection = this.getConnection();
 
@@ -146,9 +159,9 @@ public class UserRepository extends AbstractRepository<User>
     private void create(User user) throws CouldNotSaveException
     {
         try {
-            Connection connection   = this.getConnection();
-            String     sqlStatement = "insert into User (username, imagePath, passwordHash) values (?, ?, ?)";
-            PreparedStatement pss = connection.prepareStatement(sqlStatement);
+            Connection        connection   = this.getConnection();
+            String            sqlStatement = "insert into User (username, imagePath, passwordHash) values (?, ?, ?)";
+            PreparedStatement pss          = connection.prepareStatement(sqlStatement);
 
             pss.setString(1, user.username);
             pss.setString(2, user.imagePath);
@@ -241,9 +254,16 @@ public class UserRepository extends AbstractRepository<User>
 
     private User mapResultSetToUser(ResultSet rs) throws SQLException
     {
-        User user = new User();
+        UserCache userCache = (UserCache) ObjectManager.get(UserCache.class);
+        User      user      = new User();
 
-        user.id           = rs.getInt("id");
+        user.id = rs.getInt("id");
+
+        User searchedUser = userCache.get(user.id);
+        if (searchedUser != null) {
+            return searchedUser;
+        }
+
         user.username     = rs.getString("username");
         user.imagePath    = rs.getString("imagePath");
         user.passwordHash = rs.getString("passwordHash");
@@ -255,6 +275,8 @@ public class UserRepository extends AbstractRepository<User>
             user.followerCount = fr.getFollowerCountForUser(user.id);
         } catch (EntityNotFoundException ignore) {
         }
+
+        userCache.put(user);
 
         return user;
     }
