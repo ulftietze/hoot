@@ -57,7 +57,7 @@ public class TagRepository extends AbstractRepository<Tag>
     {
         try {
             Connection        connection   = this.getConnection();
-            String            sqlStatement = "insert into Tag values (?)";
+            String            sqlStatement = "INSERT INTO Tag values (?) ON DUPLICATE KEY UPDATE tag = tag";
             PreparedStatement statement    = connection.prepareStatement(sqlStatement);
 
             statement.setString(1, tag.tag.toLowerCase());

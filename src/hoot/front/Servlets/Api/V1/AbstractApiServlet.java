@@ -1,5 +1,6 @@
 package hoot.front.Servlets.Api.V1;
 
+import hoot.system.Filesystem.MediaFileHandler;
 import hoot.system.ObjectManager.ObjectManager;
 import hoot.system.Serializer.RequestSerializer;
 
@@ -49,5 +50,18 @@ public abstract class AbstractApiServlet extends HttpServlet
     {
         RequestSerializer requestSerializer = (RequestSerializer) ObjectManager.get(RequestSerializer.class);
         return requestSerializer.serialize(toSerialize);
+    }
+
+    protected void saveImage(String relativeFilename, String base64E)
+    {
+        if (relativeFilename == null || relativeFilename.equals("") || base64E == null || base64E.equals("")) {
+            return;
+        }
+
+        String imageName    = relativeFilename.substring(relativeFilename.lastIndexOf("/") + 1);
+        String relativePath = relativeFilename.substring(relativeFilename.lastIndexOf("/"));
+
+        MediaFileHandler mediaFileHandler = (MediaFileHandler) ObjectManager.get(MediaFileHandler.class);
+        mediaFileHandler.saveMedia(imageName, relativePath, base64E);
     }
 }

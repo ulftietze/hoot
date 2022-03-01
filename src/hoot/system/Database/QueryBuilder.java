@@ -1,6 +1,6 @@
 package hoot.system.Database;
 
-import hoot.system.Logger.LoggerInterface;
+import hoot.system.Logger.QueryLoggerInterface;
 import hoot.system.ObjectManager.ObjectManager;
 
 import java.sql.Connection;
@@ -38,8 +38,8 @@ public class QueryBuilder
         PreparedStatement statement = connection.prepareStatement(QUERY.toString());
         this.mapParameters(statement);
 
-        //LoggerInterface logger = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
-        //logger.log(QUERY.toString() + " [parameters=" + this.PARAMETERS.toString() + "]");
+        QueryLoggerInterface logger = (QueryLoggerInterface) ObjectManager.get(QueryLoggerInterface.class);
+        logger.log(QUERY.toString() + " [parameters=" + this.PARAMETERS.toString() + "]");
 
         return statement;
     }

@@ -391,7 +391,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/post'
+              $ref: '#/components/schemas/hootPostSave'
       responses:
         '200':
           description: Successfully created post.
@@ -412,7 +412,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/comment'
+              $ref: '#/components/schemas/hootCommentSave'
       responses:
         '200':
           description: Successfully created post.
@@ -433,7 +433,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/image'
+              $ref: '#/components/schemas/hootImageSave'
       responses:
         '200':
           description: Successfully created post.
@@ -480,7 +480,7 @@ components:
           type: string
         image:
           type: string
-          format: byte
+          description: Base64 Encoded
     followers:
       required:
         - user
@@ -511,15 +511,18 @@ components:
           type: string
         password:
           type: string
-        imageFilename:
-          type: string
         image:
           type: string
-          format: byte
+          description: Base64 Encoded
+        imageFilename:
+          type: string
     hoots:
       type: array
       items:
-        $ref: '#/components/schemas/hoot'
+        oneOf:
+          - $ref: '#/components/schemas/post'
+          - $ref: '#/components/schemas/image'
+          - $ref: '#/components/schemas/comment'
     hoot:
       type: object
       required:
@@ -527,6 +530,9 @@ components:
         - hootType
         - created
         - modified
+        - mentions
+        - hootTags
+        - reactionCount
       properties:
         id:
           type: integer
@@ -550,6 +556,8 @@ components:
           $ref: '#/components/schemas/tags'
         reactionCount:
           type: object
+        onlyFollower:
+          type: boolean
     mentions:
       type: array
       items:
@@ -570,11 +578,6 @@ components:
               type: string
             imageUrl:
               type: string
-            imageFilename:
-              type: string
-            image:
-              type: string
-              format: byte
     post:
       allOf:
         - $ref: '#/components/schemas/hoot'
@@ -596,3 +599,48 @@ components:
               $ref: '#/components/schemas/hoot'
             content:
               type: string
+    hootPostSave:
+      type: object
+      required:
+        - content
+      properties:
+        id:
+          type: integer
+          format: int64
+        content:
+          type: string
+        onlyFollower:
+          type: boolean
+    hootImageSave:
+      type: object
+      required:
+        - content
+        - imageFilename
+        - image
+      properties:
+        id:
+          type: integer
+          format: int64
+        content:
+          type: string
+        imageFilename:
+          type: string
+        image:
+          type: string
+          description: Base64 Encoded
+        onlyFollower:
+          type: boolean
+    hootCommentSave:
+      type: object
+      required:
+        - content
+        - parentHootId
+      properties:
+        id:
+          type: integer
+          format: int64
+        content:
+          type: string
+        parentHootId:
+          type: integer
+          format: int64

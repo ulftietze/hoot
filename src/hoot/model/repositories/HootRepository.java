@@ -167,6 +167,10 @@ public class HootRepository extends AbstractRepository<Hoot>
 
                     break;
             }
+
+            this.getHootMentionRepository().save(hoot.mentions);
+            this.getHootTagRepository().save(hoot.tags);
+
         } catch (SQLException e) {
             this.log("Hoot.save(): " + e.getMessage());
             throw new CouldNotSaveException("Hoot");
@@ -257,6 +261,10 @@ public class HootRepository extends AbstractRepository<Hoot>
 
                     break;
             }
+
+            this.getHootMentionRepository().save(hoot.mentions);
+            this.getHootTagRepository().save(hoot.tags);
+
         } catch (SQLException e) {
             this.log("Hoot.save(): " + e.getMessage());
             throw new CouldNotSaveException("Hoot");
@@ -406,5 +414,15 @@ public class HootRepository extends AbstractRepository<Hoot>
                 this.log("HootType from DB was not found in Java entity enum.");
                 throw new EntityNotFoundException("HootType");
         }
+    }
+
+    private HootMentionRepository getHootMentionRepository()
+    {
+        return (HootMentionRepository) ObjectManager.get(HootMentionRepository.class);
+    }
+
+    private HootTagRepository getHootTagRepository()
+    {
+        return (HootTagRepository) ObjectManager.get(HootTagRepository.class);
     }
 }
