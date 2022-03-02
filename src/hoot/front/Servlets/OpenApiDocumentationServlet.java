@@ -19,6 +19,7 @@ public class OpenApiDocumentationServlet extends HttpServlet
         PrintWriter out = response.getWriter();
         out.println("<!doctype html><html lang=\"en\">");
         out.println("<head>");
+        out.println("<meta charset='utf-8'>");
         out.println("<link "
                     + "rel=\"stylesheet\" "
                     + "href=\"https://cdn.jsdelivr.net/npm/swagger-ui-dist@4.5.0/swagger-ui.css\">");
