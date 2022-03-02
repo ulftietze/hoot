@@ -1,8 +1,8 @@
 package hoot.model.repositories;
 
+import hoot.model.cache.UserCache;
 import hoot.model.entities.User;
 import hoot.model.search.SearchCriteriaInterface;
-import hoot.system.Cache.UserCache;
 import hoot.system.Database.QueryBuilder;
 import hoot.system.Exception.CouldNotDeleteException;
 import hoot.system.Exception.CouldNotSaveException;
@@ -200,7 +200,9 @@ public class UserRepository extends AbstractRepository<User>
         }
 
         try {
-            String sqlStatement = "update User set username = ?, imagePath = ?, passwordHash = ?, lastLogin = ? where id = ?";
+            String
+                    sqlStatement
+                    = "update User set username = ?, imagePath = ?, passwordHash = ?, lastLogin = ? where id = ?";
 
             Connection        connection = this.getConnection();
             PreparedStatement pss        = connection.prepareStatement(sqlStatement);
@@ -255,13 +257,13 @@ public class UserRepository extends AbstractRepository<User>
     private User mapResultSetToUser(ResultSet rs) throws SQLException
     {
         UserCache userCache = (UserCache) ObjectManager.get(UserCache.class);
-        User      user      = new User();
+        User      user      = (User) ObjectManager.create(User.class);
 
         user.id = rs.getInt("id");
 
         User searchedUser = userCache.get(user.id);
         if (searchedUser != null) {
-            return searchedUser;
+            user = searchedUser;
         }
 
         user.username     = rs.getString("username");
@@ -276,7 +278,9 @@ public class UserRepository extends AbstractRepository<User>
         } catch (EntityNotFoundException ignore) {
         }
 
-        userCache.put(user);
+        if (searchedUser != null) {
+            userCache.put(user);
+        }
 
         return user;
     }

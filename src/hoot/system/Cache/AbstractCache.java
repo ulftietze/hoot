@@ -12,12 +12,15 @@ import java.util.concurrent.TimeUnit;
 
 public abstract class AbstractCache<Type>
 {
-    protected static final Long hoursUntilDestroy = 6L;
+    protected static final Long            hoursUntilDestroy = 6L;
+    protected final        LoggerInterface logger;
 
     protected final TreeMap<LocalDateTime, ArrayList<CacheObject>> timedDeleteMap = new TreeMap<>();
 
     public AbstractCache()
     {
+        this.logger = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
+
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
         executor.scheduleAtFixedRate(this::clearCache, hoursUntilDestroy * 4 * 15, 15, TimeUnit.MINUTES);
     }
@@ -27,10 +30,10 @@ public abstract class AbstractCache<Type>
     protected synchronized Type getTypeFromCacheObject(CacheObject cacheObject)
     {
         if (cacheObject != null) {
-            timedDeleteMap.get(cacheObject.getDestroy()).remove(cacheObject);
-            Type user = cacheObject.getObject();
+            this.timedDeleteMap.get(cacheObject.getDestroyTimestamp()).remove(cacheObject);
+            Type object = cacheObject.getObject();
             this.putInTimedDeleteMap(cacheObject);
-            return user;
+            return object;
         } else {
             return null;
         }
@@ -38,10 +41,10 @@ public abstract class AbstractCache<Type>
 
     protected synchronized void putInTimedDeleteMap(CacheObject cacheObject)
     {
-        if (!timedDeleteMap.containsKey(cacheObject.getDestroy())) {
-            timedDeleteMap.put(cacheObject.getDestroy(), new ArrayList<>());
+        if (!this.timedDeleteMap.containsKey(cacheObject.getDestroyTimestamp())) {
+            this.timedDeleteMap.put(cacheObject.getDestroyTimestamp(), new ArrayList<>());
         }
-        timedDeleteMap.get(cacheObject.getDestroy()).add(cacheObject);
+        this.timedDeleteMap.get(cacheObject.getDestroyTimestamp()).add(cacheObject);
     }
 
     protected synchronized void clearCache()
@@ -56,32 +59,26 @@ public abstract class AbstractCache<Type>
 
     protected abstract void removeReferences(Type type);
 
-    protected synchronized void log(String message)
-    {
-        LoggerInterface logger = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
-        logger.log(message);
-    }
-
     protected class CacheObject
     {
         private final Type          object;
-        private       LocalDateTime destroy;
+        private       LocalDateTime destroyTimestamp;
 
         public CacheObject(Type object)
         {
-            this.object  = object;
-            this.destroy = LocalDateTime.now().plusHours(AbstractCache.hoursUntilDestroy);
+            this.object           = object;
+            this.destroyTimestamp = LocalDateTime.now().plusHours(AbstractCache.hoursUntilDestroy);
         }
 
         public Type getObject()
         {
-            this.destroy = this.destroy.plusHours(AbstractCache.hoursUntilDestroy);
+            this.destroyTimestamp = this.destroyTimestamp.plusHours(AbstractCache.hoursUntilDestroy);
             return this.object;
         }
 
-        public LocalDateTime getDestroy()
+        public LocalDateTime getDestroyTimestamp()
         {
-            return this.destroy;
+            return this.destroyTimestamp;
         }
     }
 }

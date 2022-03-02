@@ -1,6 +1,7 @@
-package hoot.system.Cache;
+package hoot.model.cache;
 
 import hoot.model.entities.User;
+import hoot.system.Cache.AbstractCache;
 
 import java.util.HashMap;
 
@@ -17,34 +18,40 @@ public class UserCache extends AbstractCache<User>
 
     public synchronized User get(int id)
     {
-        CacheObject cacheObject = idLookupMap.get(id);
+        CacheObject cacheObject = this.idLookupMap.get(id);
         return this.getTypeFromCacheObject(cacheObject);
     }
 
     public synchronized User get(String username)
     {
-        CacheObject cacheObject = usernameLookupMap.get(username);
+        CacheObject cacheObject = this.usernameLookupMap.get(username);
         return this.getTypeFromCacheObject(cacheObject);
     }
 
     @Override
     public synchronized void put(User user)
     {
-        if (user == null || this.get(user.id) != null) {
+        if (user == null) {
             return;
         }
 
-        CacheObject cacheObject = new CacheObject(user);
+        CacheObject cacheObject = this.idLookupMap.get(user.id);
+        if (cacheObject != null) {
+            this.timedDeleteMap.get(cacheObject.getDestroyTimestamp()).remove(cacheObject);
+            this.removeReferences(cacheObject.getObject());
+        }
+
+        cacheObject = new CacheObject(user);
         this.putInTimedDeleteMap(cacheObject);
 
-        idLookupMap.put(user.id, cacheObject);
-        usernameLookupMap.put(user.username, cacheObject);
+        this.idLookupMap.put(user.id, cacheObject);
+        this.usernameLookupMap.put(user.username, cacheObject);
     }
 
     @Override
     protected synchronized void removeReferences(User user)
     {
-        idLookupMap.remove(user.id);
-        usernameLookupMap.remove(user.username);
+        this.idLookupMap.remove(user.id);
+        this.usernameLookupMap.remove(user.username);
     }
 }
