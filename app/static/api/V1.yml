@@ -415,7 +415,7 @@ paths:
               $ref: '#/components/schemas/hootCommentSave'
       responses:
         '200':
-          description: Successfully created post.
+          description: The successfully created post.
           content:
             application/json:
               schema:
@@ -441,6 +441,49 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/image'
+  /hoot/me/reaction:
+    post:
+      summary: Set an interaction to a hoot
+      description: Save an interaction like LIKE or DISLIKE
+      tags:
+        - hoot
+      security:
+        - cookieAuth: [ ]
+      requestBody:
+        required: true
+        description: The Reaction to give
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/reactionMeSend'
+      responses:
+        '200':
+          description: Boolean flag if interaction was set to hoot
+          content:
+            application/json:
+              schema:
+                type: boolean
+    delete:
+      summary: Delete any reaction to a post
+      description: Delete any reaction to a post
+      tags:
+        - hoot
+      security:
+        - cookieAuth: [ ]
+      requestBody:
+        required: true
+        description: The Reaction to delete
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/reactionMeSend'
+      responses:
+        '200':
+          description: Boolean flag if interaction was set to post
+          content:
+            application/json:
+              schema:
+                type: boolean
 components:
   securitySchemes:
     cookieAuth: # arbitrary name for the security scheme; will be used in the "security" key later
@@ -451,7 +494,6 @@ components:
     user:
       required:
         - id
-        - username
       properties:
         id:
           type: integer
@@ -539,11 +581,7 @@ components:
           format: int64
           nullable: true
         hootType:
-          type: string
-          enum:
-            - Post
-            - Comment
-            - Image
+          $ref: '#/components/schemas/hootType'
         created:
           type: string
           format: date-time
@@ -558,6 +596,12 @@ components:
           type: object
         onlyFollower:
           type: boolean
+    hootType:
+      type: string
+      enum:
+        - Post
+        - Comment
+        - Image
     mentions:
       type: array
       items:
@@ -599,6 +643,36 @@ components:
               $ref: '#/components/schemas/hoot'
             content:
               type: string
+    reaction:
+      type: object
+      required:
+        - user
+        - hoot
+      properties:
+        user:
+          $ref: '#/components/schemas/user'
+        hoot:
+          $ref: '#/components/schemas/hoot'
+        interaction:
+          $ref: '#/components/schemas/interaction'
+    reactionMeSend:
+      type: object
+      required:
+        - hootId
+        - hootType
+      properties:
+        hootId:
+          type: integer
+          format: int64
+        hootType:
+          $ref: '#/components/schemas/hootType'
+        interaction:
+          $ref: '#/components/schemas/interaction'
+    interaction:
+      type: string
+      enum:
+        - LIKE
+        - DISLIKE
     hootPostSave:
       type: object
       required:
