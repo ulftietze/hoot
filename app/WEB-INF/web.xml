@@ -8,8 +8,4 @@
         <param-name>redis-pwd</param-name>
         <param-value>REDIS_PWD</param-value>
     </context-param>
-
-    <listener>
-        <listener-class>hoot.initialisation.Listener.ObjectInstantiationContextListener</listener-class>
-    </listener>
 </web-app>

@@ -15,13 +15,12 @@ import hoot.system.ObjectManager.ObjectManager;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.servlet.annotation.WebListener;
 import javax.sql.DataSource;
-import java.util.Timer;
 
+@WebListener
 public class ObjectInstantiationContextListener implements ServletContextListener
 {
-    Timer timer;
-
     /**
      * TODO: Documentation
      */
