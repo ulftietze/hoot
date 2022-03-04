@@ -41,9 +41,7 @@ public abstract class AbstractCache<Type>
 
     protected synchronized void putInTimedDeleteMap(CacheObject cacheObject)
     {
-        if (!this.timedDeleteMap.containsKey(cacheObject.getDestroyTimestamp())) {
-            this.timedDeleteMap.put(cacheObject.getDestroyTimestamp(), new ArrayList<>());
-        }
+        this.timedDeleteMap.computeIfAbsent(cacheObject.getDestroyTimestamp(), k -> new ArrayList<>());
         this.timedDeleteMap.get(cacheObject.getDestroyTimestamp()).add(cacheObject);
     }
 

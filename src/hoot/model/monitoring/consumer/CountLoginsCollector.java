@@ -20,24 +20,28 @@ public class CountLoginsCollector extends Thread implements CollectorInterface, 
 
     private final QueueManager queueManager;
 
-    private final List<Instant> loginsPerPeriod;
+    private final NavigableMap<Instant, ArrayList<User>> loginsPerPeriod;
 
-    private final Map<Instant, User> currentlyLoggedIn;
+    private final NavigableMap<Instant, ArrayList<User>> currentlyLoggedIn;
 
     public CountLoginsCollector()
     {
         this.queueManager      = (QueueManager) ObjectManager.get(QueueManager.class);
-        this.loginsPerPeriod   = Collections.synchronizedList(new LinkedList<>());
-        this.currentlyLoggedIn = Collections.synchronizedMap(new LinkedHashMap<>());
+        this.loginsPerPeriod   = Collections.synchronizedNavigableMap(new TreeMap<>());
+        this.currentlyLoggedIn = Collections.synchronizedNavigableMap(new TreeMap<>());
     }
 
     @Override
     public void run()
     {
         while (true) {
-            User loggedIn = (User) this.queueManager.take(LoginPublisher.QUEUE_ID);
-            this.loginsPerPeriod.add(Instant.now());
-            this.currentlyLoggedIn.put(Instant.now(), loggedIn);
+            User    loggedInUser = (User) this.queueManager.take(LoginPublisher.QUEUE_ID);
+            Instant now          = Instant.now();
+
+            this.loginsPerPeriod.computeIfAbsent(now, k -> new ArrayList<>());
+            this.loginsPerPeriod.get(now).add(loggedInUser);
+            this.currentlyLoggedIn.computeIfAbsent(now, k -> new ArrayList<>());
+            this.currentlyLoggedIn.get(now).add(loggedInUser);
         }
     }
 
@@ -50,31 +54,15 @@ public class CountLoginsCollector extends Thread implements CollectorInterface, 
     @Override
     public Object collect() throws CollectorException
     {
-        // TODO: HashMap for calculation is better than linked list!
+        Instant ofMinutes = Instant.now().minus(Duration.ofMinutes(PERIOD_CURRENTLY_LOGGED_IN_MINUTES));
+        this.currentlyLoggedIn
+                .headMap(ofMinutes, false)
+                .forEach((instant, list) -> this.currentlyLoggedIn.remove(instant));
 
-        Instant now = Instant.now();
-
-        Iterator<Map.Entry<Instant, User>> it = this.currentlyLoggedIn.entrySet().iterator();
-        while (it.hasNext()) {
-            Instant from = it.next().getKey();
-
-            if (Duration.between(from, now).compareTo(Duration.ofMinutes(PERIOD_CURRENTLY_LOGGED_IN_MINUTES)) <= 0) {
-                break;
-            }
-
-            it.remove();
-        }
-
-        ListIterator<Instant> loginsPerPeriodIt = this.loginsPerPeriod.listIterator();
-        while (loginsPerPeriodIt.hasNext()) {
-            Instant t = loginsPerPeriodIt.next();
-
-            if (Duration.between(t, now).compareTo(Duration.ofHours(PERIOD_LOGINS_SINCE_HOURS)) <= 0) {
-                break;
-            }
-
-            loginsPerPeriodIt.remove();
-        }
+        Instant ofHours = Instant.now().minus(Duration.ofHours(PERIOD_LOGINS_SINCE_HOURS));
+        this.loginsPerPeriod
+                .headMap(ofMinutes, false)
+                .forEach((instant, list) -> this.loginsPerPeriod.remove(instant));
 
         return new HashMap<>()
         {{

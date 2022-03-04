@@ -1,5 +1,6 @@
 package hoot.model.monitoring.consumer;
 
+import hoot.model.entities.User;
 import hoot.model.queue.publisher.RegistrationPublisher;
 import hoot.model.repositories.UserRepository;
 import hoot.system.Exception.CollectorException;
@@ -14,12 +15,12 @@ import java.util.*;
 
 public class CountRegistrationsCollector extends Thread implements CollectorInterface, ConsumerInterface
 {
-    public final static  String COLLECTOR_NAME            = "Count Registrations";
-    private final static long   PERIOD_LOGINS_SINCE_HOURS = 2;
+    public final static  String COLLECTOR_NAME               = "Count Registrations";
+    private final static long   PERIOD_REGISTRATIONS_MINUTES = 2;
 
     private final QueueManager queueManager;
 
-    private final List<Instant> registrationsPerPeriod;
+    private final NavigableMap<Instant, ArrayList<User>> registrationsPerPeriod;
 
     private Integer currentlyRegisteredUsers;
 
@@ -27,8 +28,8 @@ public class CountRegistrationsCollector extends Thread implements CollectorInte
     {
         UserRepository userRepository = (UserRepository) ObjectManager.get(UserRepository.class);
 
-        this.queueManager            = (QueueManager) ObjectManager.get(QueueManager.class);
-        this.registrationsPerPeriod   = Collections.synchronizedList(new LinkedList<>());
+        this.queueManager             = (QueueManager) ObjectManager.get(QueueManager.class);
+        this.registrationsPerPeriod   = Collections.synchronizedNavigableMap(new TreeMap<>());
         this.currentlyRegisteredUsers = userRepository.getAllUsersCount();
     }
 
@@ -36,8 +37,11 @@ public class CountRegistrationsCollector extends Thread implements CollectorInte
     public void run()
     {
         while (true) {
-            this.queueManager.take(RegistrationPublisher.QUEUE_ID);
-            this.registrationsPerPeriod.add(Instant.now());
+            User    registeredUser = (User) this.queueManager.take(RegistrationPublisher.QUEUE_ID);
+            Instant now            = Instant.now();
+
+            this.registrationsPerPeriod.computeIfAbsent(now, k -> new ArrayList<>());
+            this.registrationsPerPeriod.get(now).add(registeredUser);
             this.currentlyRegisteredUsers++;
         }
     }
@@ -51,18 +55,10 @@ public class CountRegistrationsCollector extends Thread implements CollectorInte
     @Override
     public Object collect() throws CollectorException
     {
-        Instant now = Instant.now();
-
-        ListIterator<Instant> registrationsPerPeriodIt = this.registrationsPerPeriod.listIterator();
-        while (registrationsPerPeriodIt.hasNext()) {
-            Instant t = registrationsPerPeriodIt.next();
-
-            if (Duration.between(t, now).compareTo(Duration.ofHours(PERIOD_LOGINS_SINCE_HOURS)) <= 0) {
-                break;
-            }
-
-            registrationsPerPeriodIt.remove();
-        }
+        Instant ofMinutes = Instant.now().minus(Duration.ofHours(PERIOD_REGISTRATIONS_MINUTES));
+        this.registrationsPerPeriod
+                .headMap(ofMinutes, false)
+                .forEach((instant, list) -> this.registrationsPerPeriod.remove(instant));
 
         return new HashMap<>()
         {{
