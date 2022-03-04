@@ -2,7 +2,7 @@ package hoot.system.Monitoring;
 
 import hoot.system.Exception.CollectorException;
 
-public interface CollectorInterface extends Runnable
+public interface CollectorInterface
 {
     public String getCollectorName();
 

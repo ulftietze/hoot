@@ -6,8 +6,8 @@ import hoot.model.entities.authentication.Login;
 import hoot.model.query.api.GetUserIdIfValidLogin;
 import hoot.model.repositories.UserRepository;
 import hoot.system.Exception.CouldNotSaveException;
-import hoot.system.Monitoring.QueueManager;
 import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.Queue.QueueManager;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

@@ -21,13 +21,6 @@ public class Monitor extends Thread
         this.logger        = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
     }
 
-    @Override
-    public synchronized void start()
-    {
-        this.collectorList.forEach(collector -> new Thread(collector).start());
-        super.start();
-    }
-
     public MonitorData getMonitorData()
     {
         return this.monitorData;

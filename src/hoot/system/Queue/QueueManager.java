@@ -1,4 +1,4 @@
-package hoot.system.Monitoring;
+package hoot.system.Queue;
 
 import hoot.system.Logger.LoggerInterface;
 import hoot.system.ObjectManager.ObjectManager;

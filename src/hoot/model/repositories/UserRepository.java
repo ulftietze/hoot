@@ -18,6 +18,32 @@ import java.util.Objects;
 
 public class UserRepository extends AbstractRepository<User>
 {
+    public Integer getAllUsersCount()
+    {
+        try {
+            Connection connection     = this.getConnection();
+            QueryBuilder queryBuilder = (QueryBuilder) ObjectManager.create(QueryBuilder.class);
+            queryBuilder.SELECT.add("count(*) AS quantity");
+            queryBuilder.FROM = "User";
+
+            PreparedStatement statement = queryBuilder.build(connection);
+            ResultSet resultSet         = statement.executeQuery();
+
+            resultSet.next();
+            Integer userCount = resultSet.getInt("quantity");
+
+            resultSet.close();
+            statement.close();
+            connection.close();
+
+            return userCount;
+        } catch (SQLException e) {
+            this.log(e.getMessage());
+        }
+
+        return 0;
+    }
+
     /**
      * Try to return a User object representing the database entry with the given id.
      * TODO: Check if synchronisation is required!
