@@ -36,13 +36,16 @@ public class TestServlet extends HttpServlet
             Historie h = (Historie) ObjectManager.create(Historie.class);
             h.timestamp                = LocalDateTime.of(2022, 3, 4, 10, 51, j++);
             h.currentlyRegisteredUsers = ThreadLocalRandom.current().nextInt(1, 100 + 1);
+            out.println(h.currentlyRegisteredUsers);
             historyList.add(h);
         }
 
-        Gnuplotter plotter = (Gnuplotter) ObjectManager.create(Gnuplotter.class);
+        // The Image will sometimes stay the same, even if the numbers change.
+        // This is because the browser will cache the generated image and might not notice that it has changed after reloading.
+        // We cannot do anything about this (without JS and force reload)!
+        String url = Gnuplotter.createPNGUrlFromHistories(historyList);
 
-        String url = plotter.createPNGUrlFromHistories(historyList);
-
+        out.println("<br>");
         out.println("<img src=\"" + url + "\" alt=\"Graph\"> ");
 
         out.println("</body>");
