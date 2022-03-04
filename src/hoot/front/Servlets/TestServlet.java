@@ -21,10 +21,9 @@ public class TestServlet extends HttpServlet
 {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException
     {
-        PrintWriter out = response.getWriter();
         response.setContentType("text/html");
 
-        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
         out.println("<!doctype html><html>");
         out.println("<head> <meta charset='utf-8'>");
         out.println("<title>JDBC Test</title> </head>");
@@ -42,7 +41,7 @@ public class TestServlet extends HttpServlet
 
         Gnuplotter plotter = (Gnuplotter) ObjectManager.create(Gnuplotter.class);
 
-        String url = plotter.createPNGFromHistories(historyList);
+        String url = plotter.createPNGUrlFromHistories(historyList);
 
         out.println("<img src=\"" + url + "\" alt=\"Graph\"> ");
 
