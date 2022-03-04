@@ -1,11 +1,8 @@
 package hoot.front.Servlets;
 
-import hoot.model.entities.History;
-import hoot.model.entities.Tag;
-import hoot.model.repositories.HistoryRepository;
+import hoot.model.entities.Historie;
+import hoot.model.monitoring.Gnuplotter;
 import hoot.system.Annotation.AuthenticationRequired;
-import hoot.system.Exception.CouldNotSaveException;
-import hoot.system.Exception.EntityNotFoundException;
 import hoot.system.ObjectManager.ObjectManager;
 
 import javax.servlet.annotation.WebServlet;
@@ -14,6 +11,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.concurrent.ThreadLocalRandom;
 
 @AuthenticationRequired(authenticationRequired = false)
 @WebServlet("/test")
@@ -30,76 +30,21 @@ public class TestServlet extends HttpServlet
         out.println("<title>JDBC Test</title> </head>");
         out.println("<body>");
 
-        /*UserRepository     ur = (UserRepository) ObjectManager.get(UserRepository.class);
+        ArrayList<Historie> historyList = new ArrayList<>();
 
-        for (int i = 0; i < 4; ++i) {
-            try {
-                out.println("User " + i + "<br>");
-
-                User user = ur.getById(i);
-
-                out.println(
-                        "ID: " + user.id + "<br>" +
-                        "Username: " + user.username + "<br>" +
-                        "ImagePath: " + user.imagePath + "<br>" +
-                        "PasswordHash: " + user.passwordHash + "<br>" +
-                        "lastLogin: " + user.lastLogin + "<br>" +
-                        "created: " + user.created + "<br>" +
-                        "followerCount: " + user.followerCount + "<br>"
-                );
-                out.println("<br>");
-            } catch (EntityNotFoundException e) {
-                out.println("DB connection failed or User not found.<br>");
-            }
-        }*/
-
-        HistoryRepository repository = (HistoryRepository) ObjectManager.create(HistoryRepository.class);
-
-        History h = new History();
-        h.memoryUsed = 1337;
-
-        try {
-            repository.save(h);
-        } catch (CouldNotSaveException e) {
-            e.printStackTrace();
+        int j = 0;
+        for (int i = 0; i < 20; ++i) {
+            Historie h = (Historie) ObjectManager.create(Historie.class);
+            h.timestamp                = LocalDateTime.of(2022, 3, 4, 10, 51, j++);
+            h.currentlyRegisteredUsers = ThreadLocalRandom.current().nextInt(1, 100 + 1);
+            historyList.add(h);
         }
 
-        out.println(h.id + " " + h.timestamp + "<br><br><br>");
+        Gnuplotter plotter = (Gnuplotter) ObjectManager.create(Gnuplotter.class);
 
-        h.currentLoggedIn = 9999;
+        String url = plotter.createPNGFromHistories(historyList);
 
-        try {
-            repository.save(h);
-        } catch (CouldNotSaveException e) {
-            e.printStackTrace();
-        }
-
-        for (long i = 1; i < 10; ++i) {
-            try {
-                out.println("Historie: " + i);
-
-                History history = repository.getById(i);
-
-                out.println(
-                        "ID: " + history.id + "<br>" +
-                        "timestamp: " + history.timestamp + "<br>" +
-                        "currentLoggedIn: " + history.currentLoggedIn + "<br>" +
-                        "requestsPerSecond: " + history.requestsPerSecond + "<br>" +
-                        "currentlyRegisteredUsers: " + history.currentlyRegisteredUsers + "<br>"
-                );
-
-                out.println("Tags: ");
-                if (history.trendingHashtags != null) {
-                    for (Tag tag : history.trendingHashtags) {
-                        out.println(tag.tag + " ");
-                    }
-                }
-                out.println("<br>");
-                out.println("<br>");
-            } catch (EntityNotFoundException e) {
-                out.println("DB connection failed or Historie not found.<br>");
-            }
-        }
+        out.println("<img src=\"" + url + "\" alt=\"Graph\"> ");
 
         out.println("</body>");
         out.println("</html>");

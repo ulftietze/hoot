@@ -13,7 +13,7 @@ import java.util.Base64.Decoder;
 
 public class MediaFileHandler
 {
-    public final static String mediaPath = "media/";
+    public final static String mediaPath = "media";
 
     private final String webrootOnFilesystem;
     private final String contextUriPath;
@@ -75,11 +75,11 @@ public class MediaFileHandler
      */
     public String getImageUrl(String relativePath)
     {
-        return this.contextUriPath + File.separator + MediaFileHandler.mediaPath + File.separator + relativePath;
+        return this.contextUriPath + "/" + MediaFileHandler.mediaPath + "/" + relativePath;
     }
 
     private String getMediaFilePath(String relativePath)
     {
-        return this.webrootOnFilesystem + MediaFileHandler.mediaPath + relativePath;
+        return this.webrootOnFilesystem + MediaFileHandler.mediaPath + File.separator + relativePath;
     }
 }
