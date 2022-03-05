@@ -35,7 +35,7 @@ public abstract class AbstractRepository<Type>
      * @return
      * @throws SQLException
      */
-    protected synchronized Connection getConnection() throws SQLException
+    protected Connection getConnection() throws SQLException
     {
         DataSource ds = (DataSource) ObjectManager.get(DataSource.class);
         return ds.getConnection();
@@ -46,7 +46,7 @@ public abstract class AbstractRepository<Type>
      *
      * @param message
      */
-    protected synchronized void log(String message)
+    protected void log(String message)
     {
         LoggerInterface logger = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
         logger.log(message);
