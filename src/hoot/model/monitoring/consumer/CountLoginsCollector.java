@@ -12,10 +12,7 @@ import hoot.system.Queue.QueueManager;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.NavigableMap;
-import java.util.TreeMap;
+import java.util.*;
 
 public class CountLoginsCollector extends Thread implements CollectorInterface, ConsumerInterface
 {
@@ -27,16 +24,22 @@ public class CountLoginsCollector extends Thread implements CollectorInterface, 
 
     private final NavigableMap<Instant, ArrayList<User>> loginsInPeriod;
 
+    private final NavigableMap<Integer, Instant> userLoggedInInPeriod;
+
     private final NavigableMap<Instant, ArrayList<User>> curLoggedIn;
+
+    private final NavigableMap<Integer, Instant> userCurLoggedIn;
 
     private final LoggerInterface logger;
 
     public CountLoginsCollector()
     {
-        this.queueManager   = (QueueManager) ObjectManager.get(QueueManager.class);
-        this.loginsInPeriod = Collections.synchronizedNavigableMap(new TreeMap<>());
-        this.curLoggedIn    = Collections.synchronizedNavigableMap(new TreeMap<>());
-        this.logger         = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
+        this.queueManager         = (QueueManager) ObjectManager.get(QueueManager.class);
+        this.loginsInPeriod       = Collections.synchronizedNavigableMap(new TreeMap<>());
+        this.userCurLoggedIn      = Collections.synchronizedNavigableMap(new TreeMap<>());
+        this.userLoggedInInPeriod = Collections.synchronizedNavigableMap(new TreeMap<>());
+        this.curLoggedIn          = Collections.synchronizedNavigableMap(new TreeMap<>());
+        this.logger               = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
     }
 
     @Override
@@ -45,6 +48,18 @@ public class CountLoginsCollector extends Thread implements CollectorInterface, 
         while (true) {
             User    loggedInUser = (User) this.queueManager.take(LoginPublisher.QUEUE_ID);
             Instant now          = Instant.now();
+
+            this.userCurLoggedIn.computeIfPresent(loggedInUser.id, (k, v) -> {
+                this.curLoggedIn.get(v).removeIf(user -> Objects.equals(user.id, k));
+                return now;
+            });
+            this.userCurLoggedIn.computeIfAbsent(loggedInUser.id, k -> now);
+
+            this.userLoggedInInPeriod.computeIfPresent(loggedInUser.id, (k, v) -> {
+                this.loginsInPeriod.get(v).removeIf(user -> Objects.equals(user.id, k));
+                return now;
+            });
+            this.userLoggedInInPeriod.computeIfAbsent(loggedInUser.id, k -> now);
 
             this.loginsInPeriod.computeIfAbsent(now, k -> new ArrayList<>());
             this.loginsInPeriod.get(now).add(loggedInUser);
@@ -63,15 +78,20 @@ public class CountLoginsCollector extends Thread implements CollectorInterface, 
     public CollectorResult collect() throws CollectorException
     {
         Instant ofMinutes = Instant.now().minus(Duration.ofMinutes(PERIOD_CURRENTLY_LOGGED_IN_MINUTES));
-        this.curLoggedIn.headMap(ofMinutes, true).clear();
+        Instant ofHours   = Instant.now().minus(Duration.ofHours(PERIOD_LOGINS_SINCE_HOURS));
 
-        Instant ofHours = Instant.now().minus(Duration.ofHours(PERIOD_LOGINS_SINCE_HOURS));
-        this.loginsInPeriod.headMap(ofHours, true).clear();
+        Map<Instant, ArrayList<User>> currentlyLoggedIn = this.curLoggedIn.headMap(ofMinutes, true);
+        currentlyLoggedIn.forEach((instant, users) -> users.forEach(user -> this.userCurLoggedIn.remove(user.id)));
+        currentlyLoggedIn.clear();
+
+        Map<Instant, ArrayList<User>> loginInPeriod = this.loginsInPeriod.headMap(ofHours, true);
+        loginInPeriod.forEach((instant, users) -> users.forEach(user -> this.userLoggedInInPeriod.remove(user.id)));
+        loginInPeriod.clear();
 
         return new CollectorResult()
         {{
-            put("LoginsPerPeriod", loginsInPeriod.size());
-            put("CurrentlyLoggedIn", curLoggedIn.size());
+            put("LoginsPerPeriod", userLoggedInInPeriod.size());
+            put("CurrentlyLoggedIn", userCurLoggedIn.size());
             put("CurrentlyLoggedInUsers", curLoggedIn);
         }};
     }
