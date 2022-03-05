@@ -5,7 +5,7 @@ manager="$USER-manager"
 export $(echo $(cat .env | sed 's/#.*//g' | sed 's/\r//g' | xargs))
 
 # tomcat available?
-if ! curl -f -s -o /dev/null https://informatik.hs-bremerhaven.de/$manager/ ; then 
+if ! curl -f -s -o /dev/null https://informatik.hs-bremerhaven.de/$manager/ ; then
    echo "Ihr tomcat ist nicht aktiviert. Aktivieren Sie auf hopper mit"
    echo "  hbv_dockertomcatstarten"
    echo "zuerst Ihren tomcat."
@@ -34,6 +34,8 @@ jar -cf $name.war -C build .
 ls $name.war
 
 echo deploy as $name
+sudo -u tomcat rm /var/lib/tomcat9/webapps/${name}/media
 curl -s -n -T $name.war "https://informatik.hs-bremerhaven.de/$manager/text/deploy?path=/$name&update=true"
 #curl -s https://informatik.hs-bremerhaven.de/$name/hello|html2text
 
+sudo -u tomcat ln -s $REMOTE_PATH/media /var/lib/tomcat9/webapps/${name}/media

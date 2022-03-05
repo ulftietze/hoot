@@ -1,6 +1,7 @@
 package hoot.front.Servlets.Api.V1;
 
 import hoot.system.Filesystem.MediaFileHandler;
+import hoot.system.Logger.LoggerInterface;
 import hoot.system.ObjectManager.ObjectManager;
 import hoot.system.Serializer.RequestSerializer;
 
@@ -57,9 +58,22 @@ public abstract class AbstractApiServlet extends HttpServlet
         if (relativeFilename == null || relativeFilename.equals("") || base64E == null || base64E.equals("")) {
             return;
         }
-
-        String imageName    = relativeFilename.substring(relativeFilename.lastIndexOf("/") + 1);
-        String relativePath = relativeFilename.substring(relativeFilename.lastIndexOf("/"));
+        String imageName;
+        String relativePath;
+        LoggerInterface l = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
+        if (relativeFilename.contains("/")) {
+            imageName    = relativeFilename.substring(relativeFilename.lastIndexOf("/") + 1);
+            relativePath = relativeFilename.substring(relativeFilename.lastIndexOf("/"));
+            imageName = imageName.substring(0, imageName.length() -1);
+            relativePath = relativePath.substring(0, relativePath.length() -1).substring(1);
+            l.log("imagename: " + imageName);
+            l.log("relative path: " + relativePath);
+        } else {
+            imageName = relativeFilename.substring(0, relativeFilename.length() - 1 ).substring(1);
+            relativePath = relativeFilename.substring(0, relativeFilename.length() -1).substring(1);
+            l.log("imagename: " + imageName);
+            l.log("relative path: " + relativePath);
+        }
 
         MediaFileHandler mediaFileHandler = (MediaFileHandler) ObjectManager.get(MediaFileHandler.class);
         mediaFileHandler.saveMedia(imageName, relativePath, base64E);
