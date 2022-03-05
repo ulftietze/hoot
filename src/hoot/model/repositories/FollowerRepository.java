@@ -35,6 +35,10 @@ public class FollowerRepository extends AbstractRepository<Follower>
             PreparedStatement preparedStatement = queryBuilder.build(connection);
             ResultSet         resultSet         = preparedStatement.executeQuery();
 
+            resultSet.close();
+            preparedStatement.close();
+            connection.close();
+
             resultSet.next();
             followerCount = resultSet.getInt(1);
 
