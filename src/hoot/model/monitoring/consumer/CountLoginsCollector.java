@@ -63,10 +63,10 @@ public class CountLoginsCollector extends Thread implements CollectorInterface, 
     public CollectorResult collect() throws CollectorException
     {
         Instant ofMinutes = Instant.now().minus(Duration.ofMinutes(PERIOD_CURRENTLY_LOGGED_IN_MINUTES));
-        this.curLoggedIn.headMap(ofMinutes, true).forEach((instant, users) -> this.curLoggedIn.remove(instant));
+        this.curLoggedIn.headMap(ofMinutes, true).clear();
 
         Instant ofHours = Instant.now().minus(Duration.ofHours(PERIOD_LOGINS_SINCE_HOURS));
-        this.loginsInPeriod.headMap(ofHours, true).forEach((instant, users) -> this.loginsInPeriod.remove(instant));
+        this.loginsInPeriod.headMap(ofHours, true).clear();
 
         return new CollectorResult()
         {{

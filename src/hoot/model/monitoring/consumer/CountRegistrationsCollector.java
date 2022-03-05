@@ -60,9 +60,7 @@ public class CountRegistrationsCollector extends Thread implements CollectorInte
     public CollectorResult collect() throws CollectorException
     {
         Instant ofMinutes = Instant.now().minus(Duration.ofHours(PERIOD_REGISTRATIONS_MINUTES));
-        this.registrationsPerPeriod
-                .headMap(ofMinutes, false)
-                .forEach((instant, users) -> this.registrationsPerPeriod.remove(instant));
+        this.registrationsPerPeriod.headMap(ofMinutes, false).clear();
 
         return new CollectorResult()
         {{
