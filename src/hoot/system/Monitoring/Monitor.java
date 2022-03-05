@@ -21,7 +21,7 @@ public class Monitor extends Thread
         this.logger        = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
     }
 
-    public MonitorData getMonitorData()
+    public synchronized MonitorData getMonitorData()
     {
         return this.monitorData;
     }
@@ -47,13 +47,21 @@ public class Monitor extends Thread
             for (CollectorInterface collector : this.collectorList) {
                 String collectorName = collector.getCollectorName();
                 try {
-                    this.monitorData.put(collectorName, collector.collect());
+                    this.putToMonitorData(collectorName, collector.collect());
                 } catch (CollectorException e) {
                     this.logger.log("[ERROR] Could not collect data from " + collectorName + ": " + e.getMessage());
+                } catch (Exception e) {
+                    String exceptionClassName = e.getClass().getName();
+                    this.logger.log("[ERROR] Could not collect data: " + exceptionClassName + "=>" + e.getMessage());
                 }
             }
 
             last = now;
         }
+    }
+
+    private synchronized void putToMonitorData(String collectorName, CollectorResult result)
+    {
+        this.monitorData.put(collectorName, result);
     }
 }

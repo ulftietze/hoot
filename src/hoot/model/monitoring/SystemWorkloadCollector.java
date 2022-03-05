@@ -2,12 +2,11 @@ package hoot.model.monitoring;
 
 import hoot.system.Exception.CollectorException;
 import hoot.system.Monitoring.CollectorInterface;
-
-import java.util.HashMap;
+import hoot.system.Monitoring.CollectorResult;
 
 public class SystemWorkloadCollector implements CollectorInterface
 {
-    public final static String COLLECTOR_NAME = "System Workload";
+    public final static String COLLECTOR_NAME = "SystemWorkload";
 
     @Override
     public String getCollectorName()
@@ -16,9 +15,9 @@ public class SystemWorkloadCollector implements CollectorInterface
     }
 
     @Override
-    public Object collect() throws CollectorException
+    public CollectorResult collect() throws CollectorException
     {
-        return new HashMap<>() {{
+        return new CollectorResult() {{
             put("Memory Max", Runtime.getRuntime().maxMemory());
             put("Memory Total", Runtime.getRuntime().totalMemory());
             put("Memory free", Runtime.getRuntime().freeMemory());

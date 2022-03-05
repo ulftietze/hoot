@@ -6,5 +6,5 @@ public interface CollectorInterface
 {
     public String getCollectorName();
 
-    public Object collect() throws CollectorException;
+    public CollectorResult collect() throws CollectorException;
 }

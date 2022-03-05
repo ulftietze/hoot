@@ -157,7 +157,14 @@ public class ObjectManager
                 throw new InstantiationException("Can't create instance.");
             }
 
+            if (actualClass.getEnclosingClass() != null) {
+                Constructor<?> constructor = actualClass.getConstructor(actualClass.getEnclosingClass());
+                constructor.setAccessible(true);
+                return constructor.newInstance(ObjectManager.get(actualClass.getEnclosingClass()));
+            }
+
             Constructor<?> constructor = actualClass.getConstructor();
+            constructor.setAccessible(true);
             return constructor.newInstance();
         } catch (ReflectiveOperationException e) {
             String message = "[ERROR] Could not instantiate class " + className.getName() + ": " + e.getMessage();

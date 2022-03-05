@@ -1,10 +1,7 @@
 package hoot.initialisation.Listener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import hoot.initialisation.Factory.ContextLoggerFactory;
-import hoot.initialisation.Factory.DataSourceFactory;
-import hoot.initialisation.Factory.JacksonSerializerFactory;
-import hoot.initialisation.Factory.MediaFileHandlerFactory;
+import hoot.initialisation.Factory.*;
 import hoot.system.Filesystem.MediaFileHandler;
 import hoot.system.Logger.ContextLogger;
 import hoot.system.Logger.LoggerInterface;
@@ -17,6 +14,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 import javax.sql.DataSource;
+import java.util.concurrent.ScheduledExecutorService;
 
 @WebListener
 public class ObjectInstantiationContextListener implements ServletContextListener
@@ -26,6 +24,7 @@ public class ObjectInstantiationContextListener implements ServletContextListene
      */
     public void contextInitialized(ServletContextEvent servletContextEvent)
     {
+        servletContextEvent.getServletContext().log("init ObjectInstantiationContextListener");
         ServletContext context = servletContextEvent.getServletContext();
 
         // System
@@ -36,5 +35,6 @@ public class ObjectInstantiationContextListener implements ServletContextListene
         ObjectManager.setFactory(DataSource.class, new DataSourceFactory());
         ObjectManager.setFactory(MediaFileHandler.class, new MediaFileHandlerFactory(context));
         ObjectManager.setFactory(ObjectMapper.class, new JacksonSerializerFactory());
+        ObjectManager.setFactory(ScheduledExecutorService.class, new SingleThreadScheduledExecutorFactory());
     }
 }

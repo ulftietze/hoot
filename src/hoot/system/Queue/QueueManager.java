@@ -11,7 +11,7 @@ public class QueueManager
 {
     private final Map<String, Queue> queues = new HashMap<>();
 
-    public QueueManager(Integer queueSize)
+    public QueueManager()
     {
         LoggerInterface logger = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
     }
@@ -30,19 +30,18 @@ public class QueueManager
 
     private class Queue
     {
-        private final Integer            queueSize;
-        private final LoggerInterface    logger;
-        private       LinkedList<Object> queue = new LinkedList<>();
+        private final static int                QUEUE_SIZE = 20_000;
+        private final        LinkedList<Object> queue      = new LinkedList<>();
+        private final        LoggerInterface    logger;
 
-        public Queue(Integer queueSize)
+        public Queue()
         {
-            this.queueSize = queueSize;
-            this.logger    = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
+            this.logger = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
         }
 
         public synchronized void add(Object data)
         {
-            while (this.queueSize <= this.queue.size()) {
+            while (QUEUE_SIZE <= this.queue.size()) {
                 this.doWait();
             }
 

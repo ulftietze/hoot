@@ -5,17 +5,21 @@ import hoot.model.queue.publisher.RegistrationPublisher;
 import hoot.model.repositories.UserRepository;
 import hoot.system.Exception.CollectorException;
 import hoot.system.Monitoring.CollectorInterface;
+import hoot.system.Monitoring.CollectorResult;
 import hoot.system.ObjectManager.ObjectManager;
 import hoot.system.Queue.ConsumerInterface;
 import hoot.system.Queue.QueueManager;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.NavigableMap;
+import java.util.TreeMap;
 
 public class CountRegistrationsCollector extends Thread implements CollectorInterface, ConsumerInterface
 {
-    public final static  String COLLECTOR_NAME               = "Count Registrations";
+    public final static  String COLLECTOR_NAME               = "CountRegistrations";
     private final static long   PERIOD_REGISTRATIONS_MINUTES = 2;
 
     private final QueueManager queueManager;
@@ -53,14 +57,14 @@ public class CountRegistrationsCollector extends Thread implements CollectorInte
     }
 
     @Override
-    public Object collect() throws CollectorException
+    public CollectorResult collect() throws CollectorException
     {
         Instant ofMinutes = Instant.now().minus(Duration.ofHours(PERIOD_REGISTRATIONS_MINUTES));
         this.registrationsPerPeriod
                 .headMap(ofMinutes, false)
-                .forEach((instant, list) -> this.registrationsPerPeriod.remove(instant));
+                .forEach((instant, users) -> this.registrationsPerPeriod.remove(instant));
 
-        return new HashMap<>()
+        return new CollectorResult()
         {{
             put("CurrentlyRegisteredUser", currentlyRegisteredUsers);
             put("RegistrationsPerPeriod", registrationsPerPeriod.size());
