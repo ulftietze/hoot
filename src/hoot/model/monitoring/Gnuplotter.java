@@ -56,7 +56,15 @@ public class Gnuplotter
         for (Historie historie : input) {
             inputs.append(historie.timestamp.toString());
             inputs.append("\t");
+            inputs.append(historie.currentLoggedIn);
+            inputs.append("\t");
             inputs.append(historie.currentlyRegisteredUsers);
+            inputs.append("\t");
+            inputs.append(historie.postsPerSecond);
+            inputs.append("\t");
+            inputs.append(historie.requestsPerSecond);
+            inputs.append("\t");
+            inputs.append(historie.loginsPerSecond);
             inputs.append(System.lineSeparator());
         }
 
@@ -71,18 +79,35 @@ public class Gnuplotter
 
         gnuplotCall.append("echo \"");
         gnuplotCall.append(data);
-        gnuplotCall.append("\"");
-        gnuplotCall.append("| gnuplot -e '");
-        gnuplotCall.append("set terminal png size 1024,576;");
-        gnuplotCall.append("set xdata time;");
-        gnuplotCall.append("set timefmt \"%Y-%m-%dT%H:%M:%S\";");
+        gnuplotCall.append("\" > tmp.txt;");
+        gnuplotCall.append("gnuplot -e '");
+        gnuplotCall.append("set terminal png size 1024,576; ");
+        gnuplotCall.append("set xdata time; ");
+        gnuplotCall.append("set timefmt \"%Y-%m-%dT%H:%M:%S\"; ");
 
-        gnuplotCall.append("plot \"-\" u 1:2");
-        gnuplotCall.append("t \"Registered Users\"");
+        gnuplotCall.append("plot \"tmp.txt\" u 1:2 ");
+        gnuplotCall.append("t \"currentLoggedIn\" ");
+        gnuplotCall.append("w lines, ");
+
+        gnuplotCall.append("\"tmp.txt\" u 1:3 ");
+        gnuplotCall.append("t \"currentlyRegisteredUsers\" ");
+        gnuplotCall.append("w lines, ");
+
+        gnuplotCall.append("\"tmp.txt\" u 1:4 ");
+        gnuplotCall.append("t \"postsPerSecond\" ");
+        gnuplotCall.append("w lines, ");
+
+        gnuplotCall.append("\"tmp.txt\" u 1:5 ");
+        gnuplotCall.append("t \"requestsPerSecond\" ");
+        gnuplotCall.append("w lines, ");
+
+        gnuplotCall.append("\"tmp.txt\" u 1:6 ");
+        gnuplotCall.append("t \"loginsPerSecond\" ");
         gnuplotCall.append("w lines");
 
         gnuplotCall.append("'");
-        gnuplotCall.append("| base64");
+        gnuplotCall.append("| base64;");
+        gnuplotCall.append("rm tmp.txt");
 
         return gnuplotCall.toString();
     }

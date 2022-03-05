@@ -32,11 +32,14 @@ public class TestServlet extends HttpServlet
         ArrayList<Historie> historyList = new ArrayList<>();
 
         int j = 0;
-        for (int i = 0; i < 20; ++i) {
+        for (int i = 0; i < 59; ++i) {
             Historie h = (Historie) ObjectManager.create(Historie.class);
             h.timestamp                = LocalDateTime.of(2022, 3, 4, 10, 51, j++);
-            h.currentlyRegisteredUsers = ThreadLocalRandom.current().nextInt(1, 100 + 1);
-            out.println(h.currentlyRegisteredUsers);
+            h.currentlyRegisteredUsers = ThreadLocalRandom.current().nextInt(80, 100 + 1);
+            h.loginsPerSecond          = ThreadLocalRandom.current().nextFloat() * 15;
+            h.requestsPerSecond        = ThreadLocalRandom.current().nextFloat() * 50;
+            h.postsPerSecond           = ThreadLocalRandom.current().nextFloat() * 5;
+            h.currentLoggedIn          = ThreadLocalRandom.current().nextInt(15, 30);
             historyList.add(h);
         }
 
