@@ -1,6 +1,7 @@
 package hoot.model.repositories;
 
 import hoot.model.entities.*;
+import hoot.model.queue.publisher.TagsPublisher;
 import hoot.model.search.SearchCriteriaInterface;
 import hoot.model.search.hoot.MentionSearchCriteria;
 import hoot.model.search.hoot.TagSearchCriteria;
@@ -172,6 +173,8 @@ public class HootRepository extends AbstractRepository<Hoot>
             this.getHootMentionRepository().save(hoot.mentions);
             this.getHootTagRepository().save(hoot.tags);
 
+            TagsPublisher tagsPublisher = (TagsPublisher) ObjectManager.get(TagsPublisher.class);
+            tagsPublisher.publish(hoot.tags);
         } catch (SQLException e) {
             this.log("Hoot.save(): " + e.getMessage());
             throw new CouldNotSaveException("Hoot");
@@ -266,6 +269,8 @@ public class HootRepository extends AbstractRepository<Hoot>
             this.getHootMentionRepository().save(hoot.mentions);
             this.getHootTagRepository().save(hoot.tags);
 
+            TagsPublisher tagsPublisher = (TagsPublisher) ObjectManager.get(TagsPublisher.class);
+            tagsPublisher.publish(hoot.tags);
         } catch (SQLException e) {
             this.log("Hoot.save(): " + e.getMessage());
             throw new CouldNotSaveException("Hoot");

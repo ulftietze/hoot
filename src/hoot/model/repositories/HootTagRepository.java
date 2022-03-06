@@ -38,6 +38,10 @@ public class HootTagRepository extends AbstractRepository<HootTags>
         try {
             this.delete(hootTags);
 
+            if (hootTags.tags.isEmpty()) {
+                return;
+            }
+
             Connection        connection = this.getConnection();
             ArrayList<String> parameters = new ArrayList<>();
 

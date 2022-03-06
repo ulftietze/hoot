@@ -20,17 +20,13 @@ public class CountLoginsCollector extends Thread implements CollectorInterface, 
     private final static long   PERIOD_LOGINS_SINCE_HOURS          = 2;
     private final static long   PERIOD_CURRENTLY_LOGGED_IN_MINUTES = 1;
 
-    private final QueueManager queueManager;
-
+    private final QueueManager                           queueManager;
     private final NavigableMap<Instant, ArrayList<User>> loginsInPeriod;
-
-    private final NavigableMap<Integer, Instant> userLoggedInInPeriod;
-
+    private final NavigableMap<Integer, Instant>         userLoggedInInPeriod;
     private final NavigableMap<Instant, ArrayList<User>> curLoggedIn;
-
-    private final NavigableMap<Integer, Instant> userCurLoggedIn;
-
-    private final LoggerInterface logger;
+    private final NavigableMap<Integer, Instant>         userCurLoggedIn;
+    private final LoggerInterface                        logger;
+    private       boolean                                running = true;
 
     public CountLoginsCollector()
     {
@@ -45,9 +41,13 @@ public class CountLoginsCollector extends Thread implements CollectorInterface, 
     @Override
     public void run()
     {
-        while (true) {
+        while (this.running) {
             User    loggedInUser = (User) this.queueManager.take(LoginPublisher.QUEUE_ID);
             Instant now          = Instant.now();
+
+            if (loggedInUser == null) {
+                continue;
+            }
 
             this.userCurLoggedIn.computeIfPresent(loggedInUser.id, (k, v) -> {
                 this.curLoggedIn.get(v).removeIf(user -> Objects.equals(user.id, k));
@@ -94,5 +94,11 @@ public class CountLoginsCollector extends Thread implements CollectorInterface, 
             put("CurrentlyLoggedIn", userCurLoggedIn.size());
             put("CurrentlyLoggedInUsers", curLoggedIn);
         }};
+    }
+
+    @Override
+    public void stopRun()
+    {
+        this.running = false;
     }
 }

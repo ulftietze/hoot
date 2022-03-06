@@ -13,6 +13,7 @@ public class Monitor extends Thread
     private final LoggerInterface               logger;
     private final MonitorData                   monitorData;
     private final ArrayList<CollectorInterface> collectorList;
+    private       boolean                       running = true;
 
     public Monitor()
     {
@@ -36,7 +37,7 @@ public class Monitor extends Thread
     {
         long last = System.nanoTime();
 
-        while (true) {
+        while (this.running) {
             long now = System.nanoTime();
 
             // This may be flexibel and configurable
@@ -63,5 +64,10 @@ public class Monitor extends Thread
     private synchronized void putToMonitorData(String collectorName, CollectorResult result)
     {
         this.monitorData.put(collectorName, result);
+    }
+
+    public void stopRun()
+    {
+        this.running = false;
     }
 }

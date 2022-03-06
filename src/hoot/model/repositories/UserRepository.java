@@ -29,13 +29,15 @@ public class UserRepository extends AbstractRepository<User>
             PreparedStatement statement = queryBuilder.build(connection);
             ResultSet resultSet         = statement.executeQuery();
 
+            resultSet.next();
+
+            int quantity = resultSet.getInt("quantity");
+
             resultSet.close();
             statement.close();
             connection.close();
 
-            resultSet.next();
-
-            return resultSet.getInt("quantity");
+            return quantity;
         } catch (SQLException e) {
             this.log(e.getMessage());
         }
@@ -75,10 +77,6 @@ public class UserRepository extends AbstractRepository<User>
             pss.setInt(1, id);
             ResultSet rs = pss.executeQuery();
 
-            rs.close();
-            pss.close();
-            connection.close();
-
             rs.next();          // will throw SQLException if result set is empty
             if (!rs.isLast()) { // throw Exception if result set contains more than one result
                 throw new EntityNotFoundException("User with id " + id);
@@ -88,7 +86,13 @@ public class UserRepository extends AbstractRepository<User>
                 throw new EntityNotFoundException("User with id " + id + " (id " + rs.getInt("id") + " was returned)");
             }
 
-            return this.mapResultSetToUser(rs);
+            User user = this.mapResultSetToUser(rs);
+
+            rs.close();
+            pss.close();
+            connection.close();
+
+            return user;
         } catch (SQLException e) {
             this.log(e.getMessage());
             throw new EntityNotFoundException("User with ID: " + id);

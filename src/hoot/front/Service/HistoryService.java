@@ -4,6 +4,7 @@ import hoot.model.entities.Historie;
 import hoot.model.monitoring.SystemWorkloadCollector;
 import hoot.model.monitoring.consumer.CountLoginsCollector;
 import hoot.model.monitoring.consumer.CountRegistrationsCollector;
+import hoot.model.monitoring.consumer.TagCollector;
 import hoot.model.repositories.HistorieRepository;
 import hoot.system.Logger.LoggerInterface;
 import hoot.system.Monitoring.CollectorResult;
@@ -40,6 +41,7 @@ public class HistoryService implements ServiceInterface
             CollectorResult logins        = monitorData.get(CountLoginsCollector.COLLECTOR_NAME);
             CollectorResult registrations = monitorData.get(CountRegistrationsCollector.COLLECTOR_NAME);
             CollectorResult workload      = monitorData.get(SystemWorkloadCollector.COLLECTOR_NAME);
+            CollectorResult mostUsedTags  = monitorData.get(TagCollector.COLLECTOR_NAME);
 
             this.mapLoginsToEntity(logins, entity);
             this.mapRegistrationsToEntity(registrations, entity);

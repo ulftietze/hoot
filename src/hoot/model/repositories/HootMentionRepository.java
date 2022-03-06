@@ -36,6 +36,10 @@ public class HootMentionRepository extends AbstractRepository<HootMentions>
         try {
             this.delete(hootMentions);
 
+            if (hootMentions.mentions.size() == 0) {
+                return;
+            }
+
             Connection         connection = this.getConnection();
             ArrayList<Integer> parameters = new ArrayList<>();
 

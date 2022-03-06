@@ -25,6 +25,8 @@ public class CountRegistrationsCollector extends Thread implements CollectorInte
 
     private final NavigableMap<Integer, Instant> userRegisteredInPeriod;
 
+    private boolean running = true;
+
     private Integer currentlyRegisteredUsers;
 
     public CountRegistrationsCollector()
@@ -40,9 +42,13 @@ public class CountRegistrationsCollector extends Thread implements CollectorInte
     @Override
     public void run()
     {
-        while (true) {
+        while (this.running) {
             User    registeredUser = (User) this.queueManager.take(RegistrationPublisher.QUEUE_ID);
             Instant now            = Instant.now();
+
+            if (registeredUser == null) {
+                continue;
+            }
 
             this.userRegisteredInPeriod.computeIfPresent(registeredUser.id, (k, v) -> {
                 this.registrationsInPeriod.get(v).removeIf(user -> Objects.equals(user.id, k));
@@ -73,5 +79,11 @@ public class CountRegistrationsCollector extends Thread implements CollectorInte
             put("CurrentlyRegisteredUser", currentlyRegisteredUsers);
             put("RegistrationsPerPeriod", userRegisteredInPeriod.size());
         }};
+    }
+
+    @Override
+    public void stopRun()
+    {
+        this.running = false;
     }
 }

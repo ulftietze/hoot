@@ -16,10 +16,10 @@ import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class HashtagCollector extends Thread implements CollectorInterface, ConsumerInterface
+public class TagCollector extends Thread implements CollectorInterface, ConsumerInterface
 {
     public final static  String COLLECTOR_NAME               = "Popular Tags";
-    private final static int    AMOUNT_OF_POPULAR_TAGS       = 10;
+    private final static int    AMOUNT_OF_POPULAR_TAGS       = 3;
     private final static long   PERIOD_POPULAR_TAGS_IN_HOURS = 24;
 
     private final QueueManager queueManager;
@@ -32,39 +32,31 @@ public class HashtagCollector extends Thread implements CollectorInterface, Cons
 
     private final LoggerInterface logger;
 
-    public HashtagCollector()
+    private boolean running = true;
+
+    public TagCollector()
     {
         this.queueManager   = (QueueManager) ObjectManager.get(QueueManager.class);
         this.tagsInPeriod   = Collections.synchronizedNavigableMap(new TreeMap<>());
         this.tagUsageAmount = Collections.synchronizedNavigableMap(new TreeMap<>());
-        this.mostUsedTags   = new PriorityQueue<>(); // Ignore Synchronized, we only save in one process
+        this.mostUsedTags   = new PriorityQueue<>(); // Ignore Synchronized, we only update in one process
         this.logger         = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
     }
 
     @Override
     public void run()
     {
-        while (true) {
+        while (this.running) {
             HootTags hootTags = (HootTags) this.queueManager.take(TagsPublisher.QUEUE_ID);
             Instant  now      = Instant.now();
 
-            hootTags.tags.forEach(tag -> {
-                this.tagsInPeriod.computeIfAbsent(now, k -> new ArrayList<>());
-                this.tagsInPeriod.get(now).add(tag);
+            if (hootTags == null) {
+                continue;
+            }
 
-                this.tagUsageAmount.computeIfAbsent(tag, k -> new AtomicInteger());
-                int           amount               = this.tagUsageAmount.get(tag).incrementAndGet();
-                //TagAmountPair tagInList            = this.mostUsedTags.stream().filter(pair -> pair.tag == tag);
-                //boolean       tagNotInMostUsedList = this.mostUsedTags.stream().noneMatch(pair -> pair.tag == tag);
-                //int           mostUsedSize         = this.mostUsedTags.size();
-                //TagAmountPair lowestOfMostUsed     = this.mostUsedTags.peek();
-
-                //if (mostUsedSize < AMOUNT_OF_POPULAR_TAGS) {
-
-                //} else if (!tagNotInMostUsedList && lowestOfMostUsed.quantity > amount) {
-
-                //}
-            });
+            this.logger.log("--------------------------- save tags ---------------------------");
+            hootTags.tags.forEach(tag -> this.addTagToDataStorage(tag, now));
+            this.logger.log("--------------------------- end tags ---------------------------");
         }
     }
 
@@ -87,12 +79,51 @@ public class HashtagCollector extends Thread implements CollectorInterface, Cons
 
         return new CollectorResult()
         {{
-            //put("popularTags", tagUsageAmount.headMap());
+            put("popularTags", mostUsedTags);
         }};
+    }
+
+    @Override
+    public void stopRun()
+    {
+        this.running = false;
+    }
+
+    private void addTagToDataStorage(Tag tag, Instant now)
+    {
+        this.tagsInPeriod.computeIfAbsent(now, k -> new ArrayList<>());
+        this.tagsInPeriod.get(now).add(tag);
+        this.tagUsageAmount.computeIfAbsent(tag, k -> new AtomicInteger());
+
+        int mostUsedSize = this.mostUsedTags.size();
+        int quantity     = this.tagUsageAmount.get(tag).incrementAndGet();
+
+        TagAmountPair tagInList = this.mostUsedTags
+                .stream()
+                .filter(p -> Objects.equals(p.tag.tag, tag.tag))
+                .findFirst()
+                .orElse(null);
+
+        if (tagInList != null) {
+            this.mostUsedTags.remove(tagInList);
+            tagInList.quantity++;
+            this.mostUsedTags.add(tagInList);
+        } else if (mostUsedSize < AMOUNT_OF_POPULAR_TAGS) {
+            this.mostUsedTags.add(new TagAmountPair(quantity, tag)); // TODO: ObjectManager Create with params
+        } else if (this.mostUsedTags.peek().quantity >= quantity) {
+            this.mostUsedTags.poll();
+            this.mostUsedTags.add(new TagAmountPair(quantity, tag));
+        }
+
+        this.logger.log("Tag " + tag + " exists: " + ((tagInList != null) ? "true" : false));
+        this.logger.log("-----------------");
+        this.mostUsedTags.forEach(p -> this.logger.log(p.tag.tag + ": " + p.quantity));
+        this.logger.log("-----------------");
     }
 
     private class TagAmountPair implements Comparable<TagAmountPair>
     {
+
         Integer quantity;
         Tag     tag;
 
