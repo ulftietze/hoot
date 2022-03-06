@@ -291,7 +291,6 @@ public class HootRepository extends AbstractRepository<Hoot>
             pss.close();
 
             if (hoot.hootType == HootType.Image) {
-
                 Image            image            = (Image) hoot;
                 MediaFileHandler mediaFileHandler = (MediaFileHandler) ObjectManager.get(MediaFileHandler.class);
                 mediaFileHandler.deleteMedia(image.imagePath);

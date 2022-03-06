@@ -26,20 +26,23 @@ public class MediaFileHandler
     /**
      * Decodes and saves types of media with Base64 in the designated media folder.
      *
-     * @param mediaName    is the image-name with its format.
-     * @param relativePath is the relative path to the media which is about to be saved.
+     * @param mediaName    is the mediaName with its format.
+     * @param relativePath is the relative path without the mediaName.
      * @param base64E      is the media in Base64 encoded.
      */
     public void saveMedia(String mediaName, String relativePath, String base64E)
     {
-        String fs        = File.separator;
-        String imagePath = this.webrootOnFilesystem +  MediaFileHandler.mediaPath  + relativePath;
-        File   directory = new File(imagePath);
-
         LoggerInterface logger = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
-        logger.log("imagepath: " + imagePath);
 
-        directory.mkdirs();
+        String imagePath;
+        File   directory;
+        if (relativePath != null) {
+            imagePath = this.webrootOnFilesystem + MediaFileHandler.mediaPath + relativePath;
+            directory = new File(imagePath);
+            directory.mkdirs();
+        } else {
+            imagePath = this.webrootOnFilesystem + MediaFileHandler.mediaPath;
+        }
 
         String[] parts       = base64E.split(",");
         String   imageString = parts[1];
@@ -48,27 +51,24 @@ public class MediaFileHandler
         byte[]  imageByte = decoder.decode(imageString);
 
         try {
-            Path path = Paths.get(imagePath + fs + mediaName);
-            logger.log("TRY PATH: "+ path);
+            Path path = Paths.get(imagePath + mediaName);
             Files.write(path, imageByte);
         } catch (IOException e) {
 
-            logger.log("Saving of File " + imagePath + fs + mediaName + " failed: " + e.getMessage());
+            logger.log("Saving of File " + imagePath + mediaName + " failed: " + e.getMessage());
         }
     }
 
     /**
      * Deletes the specified media from the media folder.
      *
-     * @param relativePath is the relative path to the media which is about to be deleted.
+     * @param relativePath is the relative path to the media with the filename which is about to be deleted.
      */
 
     public void deleteMedia(String relativePath)
     {
-        LoggerInterface l  = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
-        String          fs = File.separator;
 
-        String imagePath = this.webrootOnFilesystem + MediaFileHandler.mediaPath + fs + relativePath;
+        String imagePath = this.webrootOnFilesystem + MediaFileHandler.mediaPath + relativePath;
         File   file      = new File(imagePath);
         file.delete();
     }

@@ -62,17 +62,11 @@ public abstract class AbstractApiServlet extends HttpServlet
         String relativePath;
         LoggerInterface l = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
         if (relativeFilename.contains("/")) {
-            imageName    = relativeFilename.substring(relativeFilename.lastIndexOf("/") + 1);
-            relativePath = relativeFilename.substring(relativeFilename.lastIndexOf("/"));
-            imageName = imageName.substring(0, imageName.length() -1);
-            relativePath = relativePath.substring(0, relativePath.length() -1).substring(1);
-            l.log("imagename: " + imageName);
-            l.log("relative path: " + relativePath);
+            imageName    = relativeFilename.substring(0, relativeFilename.length() -1).substring(relativeFilename.lastIndexOf("/") + 1);
+            relativePath = relativeFilename.substring(0, relativeFilename.lastIndexOf("/")).substring(1);
         } else {
             imageName = relativeFilename.substring(0, relativeFilename.length() - 1 ).substring(1);
-            relativePath = relativeFilename.substring(0, relativeFilename.length() -1).substring(1);
-            l.log("imagename: " + imageName);
-            l.log("relative path: " + relativePath);
+            relativePath = null;
         }
 
         MediaFileHandler mediaFileHandler = (MediaFileHandler) ObjectManager.get(MediaFileHandler.class);
