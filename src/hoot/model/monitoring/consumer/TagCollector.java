@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class TagCollector extends Thread implements CollectorInterface, ConsumerInterface
 {
     public final static  String COLLECTOR_NAME               = "Popular Tags";
-    private final static int    AMOUNT_OF_POPULAR_TAGS       = 3;
+    private final static int    AMOUNT_OF_POPULAR_TAGS       = 15;
     private final static long   PERIOD_POPULAR_TAGS_IN_HOURS = 24;
 
     private final QueueManager queueManager;
@@ -54,9 +54,7 @@ public class TagCollector extends Thread implements CollectorInterface, Consumer
                 continue;
             }
 
-            this.logger.log("--------------------------- save tags ---------------------------");
             hootTags.tags.forEach(tag -> this.addTagToDataStorage(tag, now));
-            this.logger.log("--------------------------- end tags ---------------------------");
         }
     }
 
@@ -98,11 +96,13 @@ public class TagCollector extends Thread implements CollectorInterface, Consumer
         int mostUsedSize = this.mostUsedTags.size();
         int quantity     = this.tagUsageAmount.get(tag).incrementAndGet();
 
-        TagAmountPair tagInList = this.mostUsedTags
-                .stream()
-                .filter(p -> Objects.equals(p.tag.tag, tag.tag))
-                .findFirst()
-                .orElse(null);
+        TagAmountPair tagInList = null;
+        for (TagAmountPair pair: this.mostUsedTags) {
+            if (Objects.equals(pair.tag.tag, tag.tag)) {
+                tagInList = pair;
+                break;
+            }
+        }
 
         if (tagInList != null) {
             this.mostUsedTags.remove(tagInList);
@@ -110,15 +110,10 @@ public class TagCollector extends Thread implements CollectorInterface, Consumer
             this.mostUsedTags.add(tagInList);
         } else if (mostUsedSize < AMOUNT_OF_POPULAR_TAGS) {
             this.mostUsedTags.add(new TagAmountPair(quantity, tag)); // TODO: ObjectManager Create with params
-        } else if (this.mostUsedTags.peek().quantity >= quantity) {
+        } else if (this.mostUsedTags.peek().quantity <= quantity) {
             this.mostUsedTags.poll();
             this.mostUsedTags.add(new TagAmountPair(quantity, tag));
         }
-
-        this.logger.log("Tag " + tag + " exists: " + ((tagInList != null) ? "true" : false));
-        this.logger.log("-----------------");
-        this.mostUsedTags.forEach(p -> this.logger.log(p.tag.tag + ": " + p.quantity));
-        this.logger.log("-----------------");
     }
 
     private class TagAmountPair implements Comparable<TagAmountPair>
