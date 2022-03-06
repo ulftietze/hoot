@@ -14,6 +14,7 @@ import hoot.system.Queue.QueueManager;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TagCollector extends Thread implements CollectorInterface, ConsumerInterface
@@ -28,7 +29,7 @@ public class TagCollector extends Thread implements CollectorInterface, Consumer
 
     private final NavigableMap<Tag, AtomicInteger> tagUsageAmount;
 
-    private final PriorityQueue<TagAmountPair> mostUsedTags;
+    private final PriorityBlockingQueue<TagAmountPair> mostUsedTags;
 
     private final LoggerInterface logger;
 
@@ -39,7 +40,7 @@ public class TagCollector extends Thread implements CollectorInterface, Consumer
         this.queueManager   = (QueueManager) ObjectManager.get(QueueManager.class);
         this.tagsInPeriod   = Collections.synchronizedNavigableMap(new TreeMap<>());
         this.tagUsageAmount = Collections.synchronizedNavigableMap(new TreeMap<>());
-        this.mostUsedTags   = new PriorityQueue<>(); // Ignore Synchronized, we only update in one process
+        this.mostUsedTags   = new PriorityBlockingQueue<>();
         this.logger         = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
     }
 
@@ -67,13 +68,14 @@ public class TagCollector extends Thread implements CollectorInterface, Consumer
     @Override
     public CollectorResult collect() throws CollectorException
     {
-        Instant ofHours = Instant.now().minus(Duration.ofHours(PERIOD_POPULAR_TAGS_IN_HOURS));
+        Instant ofHours = Instant.now().minus(Duration.ofSeconds(10));
 
         Map<Instant, ArrayList<Tag>> outdatedTagsPublished = this.tagsInPeriod.headMap(ofHours, true);
-        outdatedTagsPublished.forEach((t, tags) -> tags.forEach(tag -> this.tagUsageAmount.get(tag).decrementAndGet()));
+        outdatedTagsPublished.forEach((t, tags) -> tags.forEach(tag -> {
+            this.tagUsageAmount.get(tag).decrementAndGet();
+            this.mostUsedTags.remove(this.getIfTagIsInMostUsed(tag));
+        }));
         outdatedTagsPublished.clear();
-
-        Integer amountOfTags = AMOUNT_OF_POPULAR_TAGS;
 
         return new CollectorResult()
         {{
@@ -93,16 +95,9 @@ public class TagCollector extends Thread implements CollectorInterface, Consumer
         this.tagsInPeriod.get(now).add(tag);
         this.tagUsageAmount.computeIfAbsent(tag, k -> new AtomicInteger());
 
-        int mostUsedSize = this.mostUsedTags.size();
-        int quantity     = this.tagUsageAmount.get(tag).incrementAndGet();
-
-        TagAmountPair tagInList = null;
-        for (TagAmountPair pair: this.mostUsedTags) {
-            if (Objects.equals(pair.tag.tag, tag.tag)) {
-                tagInList = pair;
-                break;
-            }
-        }
+        int           mostUsedSize = this.mostUsedTags.size();
+        int           quantity     = this.tagUsageAmount.get(tag).incrementAndGet();
+        TagAmountPair tagInList    = this.getIfTagIsInMostUsed(tag);
 
         if (tagInList != null) {
             this.mostUsedTags.remove(tagInList);
@@ -111,9 +106,28 @@ public class TagCollector extends Thread implements CollectorInterface, Consumer
         } else if (mostUsedSize < AMOUNT_OF_POPULAR_TAGS) {
             this.mostUsedTags.add(new TagAmountPair(quantity, tag)); // TODO: ObjectManager Create with params
         } else if (this.mostUsedTags.peek().quantity <= quantity) {
-            this.mostUsedTags.poll();
+            this.mostUsedTags.peek().tag = tag;
+            this.mostUsedTags.peek().quantity = quantity;
             this.mostUsedTags.add(new TagAmountPair(quantity, tag));
         }
+
+//        this.logger.log("-------AFTER----------");
+//        this.mostUsedTags.forEach(p -> this.logger.log(p.tag.tag + ": " + p.quantity));
+//        this.logger.log("-----------------");
+    }
+
+    private TagAmountPair getIfTagIsInMostUsed(Tag tag)
+    {
+        TagAmountPair tagInList = null;
+
+        for (TagAmountPair pair : this.mostUsedTags) {
+            if (Objects.equals(pair.tag.tag, tag.tag)) {
+                tagInList = pair;
+                break;
+            }
+        }
+
+        return tagInList;
     }
 
     private class TagAmountPair implements Comparable<TagAmountPair>
