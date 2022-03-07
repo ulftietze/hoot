@@ -1,7 +1,6 @@
 package hoot.front.Servlets.Api.V1;
 
 import hoot.system.Filesystem.MediaFileHandler;
-import hoot.system.Logger.LoggerInterface;
 import hoot.system.ObjectManager.ObjectManager;
 import hoot.system.Serializer.RequestSerializer;
 
@@ -60,7 +59,6 @@ public abstract class AbstractApiServlet extends HttpServlet
         }
         String imageName;
         String relativePath;
-        LoggerInterface l = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
         if (relativeFilename.contains("/")) {
             imageName    = relativeFilename.substring(0, relativeFilename.length() -1).substring(relativeFilename.lastIndexOf("/") + 1);
             relativePath = relativeFilename.substring(0, relativeFilename.lastIndexOf("/")).substring(1);
