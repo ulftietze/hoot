@@ -12,6 +12,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class TagRepository extends AbstractRepository<Tag>
 {
@@ -23,7 +24,7 @@ public class TagRepository extends AbstractRepository<Tag>
             QueryBuilder   queryBuilder = searchCriteria.getQueryBuilder();
 
             queryBuilder.SELECT.add("tag");
-            queryBuilder.FROM = "HootTags";
+            queryBuilder.FROM = "HootTags ht";
 
             Connection        connection = this.getConnection();
             PreparedStatement statement  = queryBuilder.build(connection);

@@ -5,6 +5,9 @@ import hoot.system.Logger.LoggerInterface;
 import hoot.system.ObjectManager.ObjectManager;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 public class Monitor extends Thread
 {
@@ -52,8 +55,8 @@ public class Monitor extends Thread
                 } catch (CollectorException e) {
                     this.logger.log("[ERROR] Could not collect data from " + collectorName + ": " + e.getMessage());
                 } catch (Exception e) {
-                    String exceptionClassName = e.getClass().getName();
-                    this.logger.log("[ERROR] Could not collect data: " + exceptionClassName + "=>" + e.getMessage());
+                    String msg = "[ERROR] Could not collect data: " + e.getClass().getName() + "=>" + e.getMessage();
+                    this.logger.logException(msg, e);
                 }
             }
 

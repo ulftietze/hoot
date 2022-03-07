@@ -7,4 +7,10 @@ public class NullLogger implements LoggerInterface, QueryLoggerInterface
     {
 
     }
+
+    @Override
+    public void logException(String message, Throwable e)
+    {
+
+    }
 }

@@ -168,7 +168,7 @@ public class ObjectManager
             return constructor.newInstance();
         } catch (ReflectiveOperationException e) {
             String message = "[ERROR] Could not instantiate class " + className.getName() + ": " + e.getMessage();
-            this.getLogger().log(message);
+            this.getLogger().logException(message, e);
             throw new RuntimeException(message);
         }
     }
