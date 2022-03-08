@@ -22,8 +22,7 @@ public class ReactionRepository extends AbstractRepository<Reaction>
     {
         ArrayList<Reaction> reactions = new ArrayList<>();
 
-        try {
-            Connection   connection   = this.getConnection();
+        try (Connection connection = this.getConnection()) {
             QueryBuilder queryBuilder = searchCriteria.getQueryBuilder();
             queryBuilder.SELECT.add("*");
             queryBuilder.FROM = "Reaction r";
@@ -37,7 +36,6 @@ public class ReactionRepository extends AbstractRepository<Reaction>
 
             resultSet.close();
             statement.close();
-            connection.close();
         } catch (SQLException e) {
             this.log("Something went wrong while loading reactions list: " + e.getMessage());
             throw new EntityNotFoundException("Reaction");
@@ -49,8 +47,7 @@ public class ReactionRepository extends AbstractRepository<Reaction>
     @Override
     public void save(Reaction reaction) throws CouldNotSaveException
     {
-        try {
-            Connection connection = this.getConnection();
+        try (Connection connection = this.getConnection()) {
             String query = "INSERT INTO Reaction (user, hoot, interaction) " + "VALUES (?,?,?) "
                            + "ON DUPLICATE KEY UPDATE " + "interaction = VALUES(interaction)";
 
@@ -62,7 +59,6 @@ public class ReactionRepository extends AbstractRepository<Reaction>
             statement.executeUpdate();
 
             statement.close();
-            connection.close();
         } catch (SQLException e) {
             this.log("Something went wrong while loading reactions list: " + e.getMessage());
             throw new CouldNotSaveException("Reaction");
@@ -72,9 +68,8 @@ public class ReactionRepository extends AbstractRepository<Reaction>
     @Override
     public void delete(Reaction reaction) throws CouldNotDeleteException
     {
-        try {
-            Connection connection = this.getConnection();
-            String     query      = "DELETE FROM Reaction WHERE user = ? AND hoot = ?";
+        try (Connection connection = this.getConnection()) {
+            String query = "DELETE FROM Reaction WHERE user = ? AND hoot = ?";
 
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1, reaction.user.id);
@@ -83,7 +78,6 @@ public class ReactionRepository extends AbstractRepository<Reaction>
             statement.executeUpdate();
 
             statement.close();
-            connection.close();
         } catch (SQLException e) {
             this.log("Something went wrong while deleting reaction: " + e.getMessage());
             throw new CouldNotDeleteException("Reaction");

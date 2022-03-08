@@ -33,10 +33,13 @@ public class HootMentionRepository extends AbstractRepository<HootMentions>
             throw new CouldNotSaveException("HootMentions for null Hoot");
         }
 
-        try {
+        try (Connection connection = this.getConnection()) {
             this.delete(hootMentions);
 
-            Connection         connection = this.getConnection();
+            if (hootMentions.mentions.size() == 0) {
+                return;
+            }
+
             ArrayList<Integer> parameters = new ArrayList<>();
 
             String statement = "INSERT INTO HootMentions (hoot, mention) VALUES ";
@@ -54,11 +57,10 @@ public class HootMentionRepository extends AbstractRepository<HootMentions>
             }
 
             QueryLoggerInterface logger = (QueryLoggerInterface) ObjectManager.get(QueryLoggerInterface.class);
-            logger.log(statement + " [parameters=" + parameters.toString() + "]");
+            logger.log(statement + " [parameters=" + parameters + "]");
 
             pss.executeUpdate();
             pss.close();
-            connection.close();
         } catch (SQLException e) {
             this.log(e.getMessage());
             throw new CouldNotSaveException("HootMentions for Hoot " + hootMentions.hoot.id);
@@ -72,16 +74,13 @@ public class HootMentionRepository extends AbstractRepository<HootMentions>
             throw new CouldNotDeleteException("HootMentions for null Hoot");
         }
 
-        try {
-            Connection connection = this.getConnection();
-
+        try (Connection connection = this.getConnection()) {
             String            statement = "delete from HootMentions where hoot = ?";
             PreparedStatement pss       = connection.prepareStatement(statement);
             pss.setInt(1, hootMentions.hoot.id);
 
             pss.executeUpdate();
             pss.close();
-            connection.close();
         } catch (SQLException e) {
             this.log(e.getMessage());
             throw new CouldNotDeleteException("HootMentions for Hoot " + hootMentions.hoot.id);

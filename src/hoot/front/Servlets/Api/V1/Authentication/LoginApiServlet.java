@@ -4,6 +4,7 @@ import hoot.front.Servlets.Api.V1.AbstractApiServlet;
 import hoot.model.entities.User;
 import hoot.model.entities.authentication.Login;
 import hoot.model.query.api.GetUserIdIfValidLogin;
+import hoot.model.query.api.IsValidUserSession;
 import hoot.model.repositories.UserRepository;
 import hoot.system.Exception.CouldNotSaveException;
 import hoot.system.ObjectManager.ObjectManager;
@@ -20,8 +21,6 @@ import java.time.LocalDateTime;
 @WebServlet("/api/V1/login")
 public class LoginApiServlet extends AbstractApiServlet
 {
-    public static String SESSION_USER_IDENTIFIER = "userId";
-
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
     {
         Login    login       = (Login) this.deserializeJsonRequestBody(request, Login.class);
@@ -31,7 +30,7 @@ public class LoginApiServlet extends AbstractApiServlet
         GetUserIdIfValidLogin getUserIdIfValid = (GetUserIdIfValidLogin) ObjectManager.get(GetUserIdIfValidLogin.class);
         User                  user             = getUserIdIfValid.execute(login);
 
-        session.setAttribute(LoginApiServlet.SESSION_USER_IDENTIFIER, null);
+        session.setAttribute(IsValidUserSession.SESSION_USER_IDENTIFIER, null);
 
         // TODO: If already logged in this may be irrelevant
         if (user != null) {
@@ -50,7 +49,7 @@ public class LoginApiServlet extends AbstractApiServlet
         try {
             user.lastLogin = LocalDateTime.now();
             repository.save(user);
-            session.setAttribute(LoginApiServlet.SESSION_USER_IDENTIFIER, user.id);
+            session.setAttribute(IsValidUserSession.SESSION_USER_IDENTIFIER, user.id);
             queueManager.add("login", user);
         } catch (CouldNotSaveException ignore) {
             return false;

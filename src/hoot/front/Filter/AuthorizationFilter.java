@@ -2,6 +2,7 @@ package hoot.front.Filter;
 
 import hoot.model.query.api.IsAuthenticationRequired;
 import hoot.model.query.api.IsValidUserSession;
+import hoot.model.queue.publisher.HttpRequestPublisher;
 import hoot.system.ObjectManager.ObjectManager;
 import hoot.system.Serializer.RequestSerializer;
 
@@ -20,11 +21,14 @@ public class AuthorizationFilter implements Filter
 
     private IsValidUserSession isValidUserSession;
 
+    private HttpRequestPublisher requestPublisher;
+
     public void init(FilterConfig config)
     {
         this.requestSerializer        = (RequestSerializer) ObjectManager.get(RequestSerializer.class);
         this.isValidUserSession       = (IsValidUserSession) ObjectManager.get(IsValidUserSession.class);
         this.isAuthenticationRequired = (IsAuthenticationRequired) ObjectManager.get(IsAuthenticationRequired.class);
+        this.requestPublisher         = (HttpRequestPublisher) ObjectManager.get(HttpRequestPublisher.class);
     }
 
     /**
@@ -40,6 +44,8 @@ public class AuthorizationFilter implements Filter
         HttpServletRequest  httpRequest  = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
+        this.requestPublisher.publish(httpRequest);
+
         if (this.isUnauthorized(httpRequest)) {
             httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             httpResponse.getWriter().print(this.requestSerializer.serialize("Unauthorized"));
@@ -51,9 +57,9 @@ public class AuthorizationFilter implements Filter
 
     private boolean isUnauthorized(HttpServletRequest httpRequest) throws ServletException
     {
-        String servletName = httpRequest.getHttpServletMapping().getServletName();
-        String httpMethod  = httpRequest.getMethod();
-        boolean isRequired = this.isAuthenticationRequired.execute(servletName, httpMethod);
+        String  servletName = httpRequest.getHttpServletMapping().getServletName();
+        String  httpMethod  = httpRequest.getMethod();
+        boolean isRequired  = this.isAuthenticationRequired.execute(servletName, httpMethod);
 
         return isRequired && !this.isValidUserSession.execute(httpRequest.getSession());
     }

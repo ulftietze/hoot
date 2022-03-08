@@ -19,14 +19,13 @@ public class MentionRepository extends AbstractRepository<Mention>
     @Override
     public ArrayList<Mention> getList(SearchCriteriaInterface searchCriteria) throws EntityNotFoundException
     {
-        try {
-            ArrayList<Mention> mentioned    = new ArrayList<>();
-            QueryBuilder       queryBuilder = searchCriteria.getQueryBuilder();
+        ArrayList<Mention> mentioned = new ArrayList<>();
 
+        try (Connection connection = this.getConnection()) {
+            QueryBuilder queryBuilder = searchCriteria.getQueryBuilder();
             queryBuilder.SELECT.add("mention");
             queryBuilder.FROM = "HootMentions";
 
-            Connection        connection = this.getConnection();
             PreparedStatement statement  = queryBuilder.build(connection);
             ResultSet         resultSet  = statement.executeQuery();
 
@@ -40,13 +39,11 @@ public class MentionRepository extends AbstractRepository<Mention>
 
             resultSet.close();
             statement.close();
-            connection.close();
-
-            return mentioned;
         } catch (SQLException e) {
             this.log("MentionRepository.getList(): " + e.getMessage());
-            return new ArrayList<>();
         }
+
+        return mentioned;
     }
 
     @Override

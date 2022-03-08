@@ -1,9 +1,12 @@
 package hoot.front.Service;
 
 import hoot.model.entities.Historie;
+import hoot.model.entities.Tag;
 import hoot.model.monitoring.SystemWorkloadCollector;
 import hoot.model.monitoring.consumer.CountLoginsCollector;
 import hoot.model.monitoring.consumer.CountRegistrationsCollector;
+import hoot.model.monitoring.TagCollector;
+import hoot.model.monitoring.consumer.RequestsCollector;
 import hoot.model.repositories.HistorieRepository;
 import hoot.system.Logger.LoggerInterface;
 import hoot.system.Monitoring.CollectorResult;
@@ -12,8 +15,10 @@ import hoot.system.Monitoring.MonitorData;
 import hoot.system.ObjectManager.ObjectManager;
 import hoot.system.Service.ServiceInterface;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class HistoryService implements ServiceInterface
 {
@@ -40,14 +45,21 @@ public class HistoryService implements ServiceInterface
             CollectorResult logins        = monitorData.get(CountLoginsCollector.COLLECTOR_NAME);
             CollectorResult registrations = monitorData.get(CountRegistrationsCollector.COLLECTOR_NAME);
             CollectorResult workload      = monitorData.get(SystemWorkloadCollector.COLLECTOR_NAME);
-
-            this.mapLoginsToEntity(logins, entity);
-            this.mapRegistrationsToEntity(registrations, entity);
+            CollectorResult requests      = monitorData.get(RequestsCollector.COLLECTOR_NAME);
+            CollectorResult mostUsedTags  = monitorData.get(TagCollector.COLLECTOR_NAME);
 
             this.logger.log("\n"
-                            + entity.currentLoggedIn + "\n"
-                            + entity.currentlyRegisteredUsers + "\n"
-                            + workload.get("Memory used") + "\n"
+                            + "LoginsPerPeriod: " + logins.get("LoginsPerPeriod") + "\n"
+                            + "Currently Registered User: " + registrations.get("Currently Registered User") + "\n"
+                            + "Registrations in Period: " + registrations.get("Registrations in Period") + "\n"
+                            + "Currently Logged In: " + requests.get("Currently Logged In") + "\n"
+                            + "Requests Per Second: " + requests.get("Requests Per Second") + "\n"
+                            + "Memory used: " + workload.get("Memory used") + "\n"
+                            + "Available Processors: " + workload.get("Available Processors") + "\n"
+                            + "System Load Average: " + workload.get("System Load Average") + "\n"
+                            + "Process CPU Load: " + workload.get("Process CPU Load") + "\n"
+                            + "Most recent tags: "
+                            + ((ArrayList<Tag>) mostUsedTags.get("popularTags")).stream().map(t -> t.tag).collect(Collectors.joining(",")) + "\n"
             );
 
             //try {
@@ -57,7 +69,7 @@ public class HistoryService implements ServiceInterface
             //}
         } catch (Exception e) {
             String msg = "[ERROR] Could not execute HistoryService::execute properly: " + e.getMessage();
-            this.logger.log(msg + "\n" + Arrays.toString(e.getStackTrace()));
+            this.logger.logException(msg, e);
         }
     }
 

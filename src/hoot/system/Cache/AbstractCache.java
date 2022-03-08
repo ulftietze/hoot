@@ -21,6 +21,7 @@ public abstract class AbstractCache<Type>
     {
         this.logger = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
 
+        // TODO: We need to ensure that this executor is shut-down properly when context is destroyed
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
         executor.scheduleAtFixedRate(this::clearCache, hoursUntilDestroy * 4 * 15, 15, TimeUnit.MINUTES);
     }

@@ -20,8 +20,7 @@ public class UserRepository extends AbstractRepository<User>
 {
     public Integer getAllUsersCount()
     {
-        try {
-            Connection connection     = this.getConnection();
+        try (Connection connection = this.getConnection()) {
             QueryBuilder queryBuilder = (QueryBuilder) ObjectManager.create(QueryBuilder.class);
             queryBuilder.SELECT.add("count(*) AS quantity");
             queryBuilder.FROM = "User";
@@ -29,13 +28,15 @@ public class UserRepository extends AbstractRepository<User>
             PreparedStatement statement = queryBuilder.build(connection);
             ResultSet resultSet         = statement.executeQuery();
 
+            resultSet.next();
+
+            int quantity = resultSet.getInt("quantity");
+
             resultSet.close();
             statement.close();
             connection.close();
 
-            resultSet.next();
-
-            return resultSet.getInt("quantity");
+            return quantity;
         } catch (SQLException e) {
             this.log(e.getMessage());
         }
@@ -58,37 +59,26 @@ public class UserRepository extends AbstractRepository<User>
             return cachedUser;
         }
 
-        try {
-            // TODO: Build with query builder
-            Connection connection = this.getConnection();
-            String
-                    sqlStatement
-                    = "select id, username, imagePath, passwordHash, lastLogin, created from User where id = ?";
-
+        try (Connection connection = this.getConnection()) {
             QueryBuilder qb = (QueryBuilder) ObjectManager.create(QueryBuilder.class);
             qb.SELECT.add("*");
             qb.FROM = "User u";
             qb.WHERE.add("id = ?");
             qb.PARAMETERS.add(Integer.toString(id));
 
-            PreparedStatement pss = connection.prepareStatement(sqlStatement);
+            PreparedStatement pss = qb.build(connection);
             pss.setInt(1, id);
             ResultSet rs = pss.executeQuery();
+
+            rs.next(); // will throw SQLException if result set is empty
+
+            User user = this.mapResultSetToUser(rs);
 
             rs.close();
             pss.close();
             connection.close();
 
-            rs.next();          // will throw SQLException if result set is empty
-            if (!rs.isLast()) { // throw Exception if result set contains more than one result
-                throw new EntityNotFoundException("User with id " + id);
-            }
-
-            if (id != rs.getInt("id")) {
-                throw new EntityNotFoundException("User with id " + id + " (id " + rs.getInt("id") + " was returned)");
-            }
-
-            return this.mapResultSetToUser(rs);
+            return user;
         } catch (SQLException e) {
             this.log(e.getMessage());
             throw new EntityNotFoundException("User with ID: " + id);
@@ -105,43 +95,32 @@ public class UserRepository extends AbstractRepository<User>
     public User getByUsername(String username) throws EntityNotFoundException
     {
         UserCache userCache  = (UserCache) ObjectManager.get(UserCache.class);
-        User      cachedUser = userCache.get(username);
-        if (cachedUser != null) {
-            return cachedUser;
+        User      user = userCache.get(username);
+
+        if (user != null) {
+            return user;
         }
 
-        try {
-            Connection connection = this.getConnection();
+        try (Connection connection = this.getConnection()) {
+            QueryBuilder qb = (QueryBuilder) ObjectManager.create(QueryBuilder.class);
+            qb.SELECT.add("*");
+            qb.FROM = "User";
+            qb.addWhere("username = ?", username);
+            PreparedStatement pss = qb.build(connection);
 
-            // TODO: Build with query builder
-            String            sqlStatement = "select * from User where username = ?";
-            PreparedStatement pss          = connection.prepareStatement(sqlStatement);
-            pss.setString(1, username);
             ResultSet rs = pss.executeQuery();
+            rs.next(); // will throw SQLException if result set is empty
 
-            // TODO: this code is similar to getById() and getList(), lets check if we can prevent duplicated code
-            rs.next();          // will throw SQLException if result set is empty
-            if (!rs.isLast()) { // throw Exception if result set contains more than one result
-                throw new EntityNotFoundException("User with username " + username);
-            }
-
-            // TODO: Do we need this check?
-            if (!Objects.equals(username, rs.getString("username"))) {
-                throw new EntityNotFoundException(
-                        "User with username " + username + " (id " + rs.getInt("id") + " was returned)");
-            }
-
-            User user = this.mapResultSetToUser(rs);
+            user = this.mapResultSetToUser(rs);
 
             rs.close();
             pss.close();
-            connection.close();
-
-            return user;
         } catch (SQLException e) {
             this.log(e.getMessage());
             throw new EntityNotFoundException("User with username: " + username);
         }
+
+        return user;
     }
 
     /**
@@ -155,12 +134,11 @@ public class UserRepository extends AbstractRepository<User>
     {
         ArrayList<User> users = new ArrayList<>();
 
-        try {
+        try (Connection connection = this.getConnection()) {
             QueryBuilder queryBuilder = searchCriteria.getQueryBuilder();
             queryBuilder.SELECT.add("*");
             queryBuilder.FROM = "User";
 
-            Connection        connection = this.getConnection();
             PreparedStatement statement  = queryBuilder.build(connection);
             ResultSet         resultSet  = statement.executeQuery();
 
@@ -171,7 +149,6 @@ public class UserRepository extends AbstractRepository<User>
 
             resultSet.close();
             statement.close();
-            connection.close();
         } catch (SQLException e) {
             this.log("UserRepository.getList(): " + e.getMessage());
         }
@@ -181,8 +158,7 @@ public class UserRepository extends AbstractRepository<User>
 
     private void create(User user) throws CouldNotSaveException
     {
-        try {
-            Connection        connection   = this.getConnection();
+        try (Connection connection = this.getConnection()) {
             String            sqlStatement = "insert into User (username, imagePath, passwordHash) values (?, ?, ?)";
             PreparedStatement pss          = connection.prepareStatement(sqlStatement);
 
@@ -209,7 +185,8 @@ public class UserRepository extends AbstractRepository<User>
 
     /**
      * Save a User in the DB.<br>
-     * If User.id is set, this method will perform an update to an existing user. Otherwise a new User will be inserted.
+     * If User.id is set, this method will perform an update to an existing user. Otherwise, a new
+     * User will be inserted.
      *
      * @param user a User entity
      * @throws CouldNotSaveException if any SQL errors occurred.
@@ -222,13 +199,12 @@ public class UserRepository extends AbstractRepository<User>
             return;
         }
 
-        try {
-            String
-                    sqlStatement
-                    = "update User set username = ?, imagePath = ?, passwordHash = ?, lastLogin = ? where id = ?";
+        try (Connection connection = this.getConnection()) {
+            String sqlStatement = "UPDATE User "
+                                  + "SET username = ?, imagePath = ?, passwordHash = ?, lastLogin = ? "
+                                  + "WHERE id = ?";
 
-            Connection        connection = this.getConnection();
-            PreparedStatement pss        = connection.prepareStatement(sqlStatement);
+            PreparedStatement pss = connection.prepareStatement(sqlStatement);
 
             pss.setString(1, user.username);
             pss.setString(2, user.imagePath);
@@ -257,11 +233,8 @@ public class UserRepository extends AbstractRepository<User>
     @Override
     public void delete(User user) throws CouldNotDeleteException
     {
-        try {
-            Connection connection = this.getConnection();
-
-            String            sqlStatement = "delete from User where id = ?";
-            PreparedStatement pss          = connection.prepareStatement(sqlStatement);
+        try (Connection connection = this.getConnection()) {
+            PreparedStatement pss = connection.prepareStatement("DELETE FROM User WHERE id = ?");
             pss.setInt(1, user.id);
             int rowCount = pss.executeUpdate();
 

@@ -18,9 +18,9 @@ public class HistorieRepository extends AbstractRepository<Historie>
 {
     public Historie getById(Long id) throws EntityNotFoundException
     {
-        try {
-            Connection connection = this.getConnection();
+        Historie historie;
 
+        try (Connection connection = this.getConnection()) {
             QueryBuilder queryBuilder = (QueryBuilder) ObjectManager.create(QueryBuilder.class);
             queryBuilder.SELECT.add("*");
             queryBuilder.FROM = "Historie";
@@ -32,17 +32,16 @@ public class HistorieRepository extends AbstractRepository<Historie>
             ResultSet resultSet = statement.executeQuery();
             resultSet.next();
 
-            Historie historie = this.mapResultSetToHistorie(resultSet);
+            historie = this.mapResultSetToHistorie(resultSet);
 
             resultSet.close();
             statement.close();
-            connection.close();
-
-            return historie;
         } catch (SQLException e) {
             this.log("HistorieRepository.getById(): " + e.getSQLState() + " " + e.getMessage());
             throw new EntityNotFoundException("Historie");
         }
+
+        return historie;
     }
 
     @Override
@@ -50,9 +49,7 @@ public class HistorieRepository extends AbstractRepository<Historie>
     {
         ArrayList<Historie> allHistories = new ArrayList<>();
 
-        try {
-            Connection connection = this.getConnection();
-
+        try (Connection connection = this.getConnection()) {
             QueryBuilder queryBuilder = searchCriteria.getQueryBuilder();
             queryBuilder.FROM = "Historie";
 
@@ -66,7 +63,6 @@ public class HistorieRepository extends AbstractRepository<Historie>
 
             resultSet.close();
             statement.close();
-            connection.close();
         } catch (SQLException e) {
             this.log("HistorieRepository.getList(): " + e.getMessage());
             throw new EntityNotFoundException("Historie");
@@ -78,9 +74,7 @@ public class HistorieRepository extends AbstractRepository<Historie>
     @Override
     public void save(Historie historie) throws CouldNotSaveException
     {
-        try {
-            Connection connection = this.getConnection();
-
+        try (Connection connection = this.getConnection()) {
             String
                     sqlStatement
                     = "insert into Historie (currentLoggedIn, postsPerSecond, requestsPerSecond, loginsPerSecond, currentlyRegisteredUsers, trendingHashtags) values (?, ?, ?, ?, ?, ?)";
@@ -104,7 +98,6 @@ public class HistorieRepository extends AbstractRepository<Historie>
 
             resultSet.close();
             statement.close();
-            connection.close();
 
             if (rowCount == 0) {
                 throw new CouldNotSaveException("Historie");
@@ -121,9 +114,7 @@ public class HistorieRepository extends AbstractRepository<Historie>
             throw new CouldNotDeleteException("Historie with ID null");
         }
 
-        try {
-            Connection connection = this.getConnection();
-
+        try (Connection connection = this.getConnection()) {
             String            sqlStatement = "delete from Historie where id = ?";
             PreparedStatement statement    = connection.prepareStatement(sqlStatement);
 
@@ -132,7 +123,6 @@ public class HistorieRepository extends AbstractRepository<Historie>
             int rowCount = statement.executeUpdate();
 
             statement.close();
-            connection.close();
 
             if (rowCount == 0) {
                 throw new CouldNotDeleteException("Historie with ID " + historie.id);
