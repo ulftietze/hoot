@@ -1,6 +1,6 @@
 package hoot.front.Servlets;
 
-import hoot.model.entities.Historie;
+import hoot.model.entities.History;
 import hoot.model.monitoring.Gnuplotter;
 import hoot.system.Annotation.AuthenticationRequired;
 import hoot.system.ObjectManager.ObjectManager;
@@ -29,28 +29,42 @@ public class TestServlet extends HttpServlet
         out.println("<title>JDBC Test</title> </head>");
         out.println("<body>");
 
-        ArrayList<Historie> historyList = new ArrayList<>();
+        ArrayList<History> historyList = new ArrayList<>();
 
         for (int i = 0; i < 59; ++i) {
-            Historie h = (Historie) ObjectManager.create(Historie.class);
-            h.timestamp                = LocalDateTime.of(2022, 3, 4, 10, 51, i);
+            History h = (History) ObjectManager.create(History.class);
+
+            h.id = (long) i;
+
+            h.timestamp = LocalDateTime.of(2022, 3, 4, 10, 51, i);
+
+            h.currentLoggedIn          = ThreadLocalRandom.current().nextInt(15, 30 + 1);
             h.currentlyRegisteredUsers = ThreadLocalRandom.current().nextInt(80, 100 + 1);
-            h.loginsPerSecond          = ThreadLocalRandom.current().nextFloat() * 15;
-            h.requestsPerSecond        = ThreadLocalRandom.current().nextFloat() * 50;
-            h.postsPerSecond           = ThreadLocalRandom.current().nextFloat() * 5;
-            h.currentLoggedIn          = ThreadLocalRandom.current().nextInt(15, 30);
+            h.memoryMax                = 1024;
+            h.memoryTotal              = 1000;
+            h.memoryFree               = ThreadLocalRandom.current().nextInt(100, 900 + 1);
+            h.memoryUsed               = h.memoryTotal - h.memoryFree;
+            h.threadCount              = ThreadLocalRandom.current().nextInt(1, 20 + 1);
+            h.threadCountTotal         = 5 * i;
+
+            h.loginsPerSixHours         = 50 + ThreadLocalRandom.current().nextFloat() * 50;
+            h.registrationsPerSixHours  = 10 + ThreadLocalRandom.current().nextFloat() * 10;
+            h.postsPerMinute            = 20 + ThreadLocalRandom.current().nextFloat() * 15;
+            h.requestsPerSecond         = 75 + ThreadLocalRandom.current().nextFloat() * 50;
+            h.requestsLoggedInPerSecond = 5 + ThreadLocalRandom.current().nextFloat() * 10;
+
+            h.systemLoadAverage = ThreadLocalRandom.current().nextDouble() * 4;
+            h.systemCPULoad     = ThreadLocalRandom.current().nextDouble() * 1;
+            h.processCPULoad    = ThreadLocalRandom.current().nextDouble() * 1;
+
             historyList.add(h);
         }
 
         // The Image will sometimes stay the same, even if the numbers change.
         // This is because the browser will cache the generated image and might not notice that it has changed after reloading.
         // We cannot do anything about this (without JS and force reload)!
-        String[] urls = Gnuplotter.createPNGUrlsFromHistories(historyList);
-
-        for (String url : urls) {
-            out.println("<br>");
-            out.println("<img src=\"" + url + "\" alt=\"Graph\"> ");
-        }
+        String url = Gnuplotter.createStatisticsGraph(historyList);
+        out.println("<img src=\"" + url + "\" alt=\"Graph\"> ");
 
         out.println("</body>");
         out.println("</html>");

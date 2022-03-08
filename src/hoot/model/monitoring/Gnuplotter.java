@@ -1,6 +1,6 @@
 package hoot.model.monitoring;
 
-import hoot.model.entities.Historie;
+import hoot.model.entities.History;
 import hoot.system.Filesystem.FileHandler;
 import hoot.system.Filesystem.MediaFileHandler;
 import hoot.system.Logger.LoggerInterface;
@@ -17,7 +17,7 @@ public class Gnuplotter
     private static final String tmpFile     = "tmp.txt";
     private static       int    graphsSaved = 0;
 
-    public static synchronized String[] createPNGUrlsFromHistories(ArrayList<Historie> input)
+    public static synchronized String createStatisticsGraph(ArrayList<History> input)
     {
         if (input == null) {
             return null;
@@ -30,25 +30,18 @@ public class Gnuplotter
         String            filepath    = fileHandler.save(data, tmpPath, tmpFile);
 
         ProcessBuilder getPlotResultCurrent = (ProcessBuilder) ObjectManager.create(ProcessBuilder.class);
-        ProcessBuilder getPlotResultPerSec  = (ProcessBuilder) ObjectManager.create(ProcessBuilder.class);
 
         getPlotResultCurrent.command("/bin/bash", "-c", Gnuplotter.getGnuplotCallCurrent(filepath));
-        getPlotResultPerSec.command("/bin/bash", "-c", Gnuplotter.getGnuplotCallPerSec(filepath));
 
         try {
             String b64ResultCurrent = Gnuplotter.getOutputStringFromProcess(getPlotResultCurrent.start());
-            String b64ResultPerSec  = Gnuplotter.getOutputStringFromProcess(getPlotResultPerSec.start());
 
-            fileHandler.delete(tmpPath, tmpFile);
-
-            return new String[]{
-                    Gnuplotter.saveBase64Image(b64ResultCurrent),
-                    Gnuplotter.saveBase64Image(b64ResultPerSec)
-            };
+            return Gnuplotter.saveBase64Image(b64ResultCurrent);
         } catch (IOException e) {
             Gnuplotter.log("Could not create Historie-Graph: " + e.getMessage());
-            fileHandler.delete(tmpPath, tmpFile);
             return null;
+        } finally {
+            fileHandler.delete(tmpPath, tmpFile);
         }
     }
 
@@ -67,24 +60,20 @@ public class Gnuplotter
         return output.toString();
     }
 
-    private static ArrayList<String> parseInputToData(ArrayList<Historie> input)
+    private static ArrayList<String> parseInputToData(ArrayList<History> input)
     {
         ArrayList<String> result = new ArrayList<>();
 
-        for (Historie historie : input) {
+        for (History historie : input) {
             String line = "";
 
             line += (historie.timestamp.toString());
             line += ("\t");
-            line += (historie.currentLoggedIn.toString());
+            line += (historie.loginsPerSixHours.toString());
             line += ("\t");
-            line += (historie.currentlyRegisteredUsers.toString());
+            line += (historie.registrationsPerSixHours.toString());
             line += ("\t");
-            line += (historie.postsPerSecond.toString());
-            line += ("\t");
-            line += (historie.requestsPerSecond.toString());
-            line += ("\t");
-            line += (historie.loginsPerSecond.toString());
+            line += (historie.postsPerMinute.toString());
 
             result.add(line);
         }
@@ -104,13 +93,19 @@ public class Gnuplotter
         plotCallCurrent.append("plot \"");
         plotCallCurrent.append(dataPath);
         plotCallCurrent.append("\" u 1:2 ");
-        plotCallCurrent.append("t \"currentLoggedIn\" ");
+        plotCallCurrent.append("t \"loginsPerSixHours\" ");
         plotCallCurrent.append("w lines, ");
 
         plotCallCurrent.append("\"");
         plotCallCurrent.append(dataPath);
         plotCallCurrent.append("\" u 1:3 ");
-        plotCallCurrent.append("t \"currentlyRegisteredUsers\" ");
+        plotCallCurrent.append("t \"registrationsPerSixHours\" ");
+        plotCallCurrent.append("w lines, ");
+
+        plotCallCurrent.append("\"");
+        plotCallCurrent.append(dataPath);
+        plotCallCurrent.append("\" u 1:4 ");
+        plotCallCurrent.append("t \"postsPerMinute\" ");
         plotCallCurrent.append("w lines");
 
         plotCallCurrent.append("'");
@@ -125,6 +120,7 @@ public class Gnuplotter
 
         plotCallPerSec.append("gnuplot -e '");
         plotCallPerSec.append("set terminal png size 1024,576; ");
+        plotCallPerSec.append("set output " + MediaFileHandler.mediaPath + " ; ");
         plotCallPerSec.append("set xdata time; ");
         plotCallPerSec.append("set timefmt \"%Y-%m-%dT%H:%M:%S\"; ");
 
@@ -147,7 +143,6 @@ public class Gnuplotter
         plotCallPerSec.append("w lines");
 
         plotCallPerSec.append("'");
-        plotCallPerSec.append(" | base64");
 
         return plotCallPerSec.toString();
     }
@@ -156,7 +151,7 @@ public class Gnuplotter
     {
         MediaFileHandler fileHandler = (MediaFileHandler) ObjectManager.create(MediaFileHandler.class);
 
-        fileHandler.saveMedia(graphsSaved + ".png", "monitoring" + File.separator, base64result);
+        fileHandler.saveBase64Image(graphsSaved + ".png", "monitoring" + File.separator, base64result);
 
         return fileHandler.getImageUrl("monitoring" + File.separator + graphsSaved++ + ".png");
     }

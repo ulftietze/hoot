@@ -49,7 +49,7 @@ public class MediaFileHandler
         String imagePath = this.getMediaFilePath(relativePath + mediaName);
 
         try {
-            Path path = Paths.get(imagePath + mediaName);
+            Path path = Paths.get(imagePath);
             Files.write(path, imageByte);
         } catch (IOException e) {
             this.logger.logException("Saving of File " + imagePath + " failed: " + e.getMessage(), e);
