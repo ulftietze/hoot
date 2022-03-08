@@ -4,6 +4,7 @@ import hoot.system.Filesystem.MediaFileHandler;
 import hoot.system.ObjectManager.ObjectManager;
 import hoot.system.Serializer.RequestSerializer;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -12,6 +13,16 @@ import java.io.PrintWriter;
 
 public abstract class AbstractApiServlet extends HttpServlet
 {
+    private MediaFileHandler mediaFileHandler;
+
+    @Override
+    public void init() throws ServletException
+    {
+        super.init();
+
+        this.mediaFileHandler = (MediaFileHandler) ObjectManager.get(MediaFileHandler.class);
+    }
+
     /**
      * TODO: Documentation
      *
@@ -52,22 +63,23 @@ public abstract class AbstractApiServlet extends HttpServlet
         return requestSerializer.serialize(toSerialize);
     }
 
-    protected void saveImage(String relativeFilename, String base64E)
+    protected void saveImage(String filepath, String base64E)
     {
-        if (relativeFilename == null || relativeFilename.equals("") || base64E == null || base64E.equals("")) {
+        if (filepath == null || filepath.equals("") || base64E == null || base64E.equals("")) {
             return;
         }
-        String imageName;
+
         String relativePath;
-        if (relativeFilename.contains("/")) {
-            imageName    = relativeFilename.substring(0, relativeFilename.length() -1).substring(relativeFilename.lastIndexOf("/") + 1);
-            relativePath = relativeFilename.substring(0, relativeFilename.lastIndexOf("/")).substring(1);
+        String imageName;
+
+        if (filepath.contains("/")) {
+            relativePath = filepath.substring(0, filepath.lastIndexOf("/")).substring(1);
+            imageName    = filepath.substring(0, filepath.length() - 1).substring(filepath.lastIndexOf("/") + 1);
         } else {
-            imageName = relativeFilename.substring(0, relativeFilename.length() - 1 ).substring(1);
             relativePath = null;
+            imageName    = filepath.substring(0, filepath.length() - 1).substring(1);
         }
 
-        MediaFileHandler mediaFileHandler = (MediaFileHandler) ObjectManager.get(MediaFileHandler.class);
-        mediaFileHandler.saveMedia(imageName, relativePath, base64E);
+        this.mediaFileHandler.saveBase64Image(imageName, relativePath, base64E);
     }
 }

@@ -13,14 +13,18 @@ import java.util.Base64.Decoder;
 
 public class MediaFileHandler
 {
-    public static String mediaPath = "media/";
+    public final static String mediaPath = "media/";
+
     private final String webrootOnFilesystem;
     private final String contextUriPath;
+
+    private final LoggerInterface logger;
 
     public MediaFileHandler(String webrootOnFilesystem, String contextUriPath)
     {
         this.webrootOnFilesystem = webrootOnFilesystem;
         this.contextUriPath      = contextUriPath;
+        this.logger              = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
     }
 
     /**
@@ -30,18 +34,10 @@ public class MediaFileHandler
      * @param relativePath is the relative path without the mediaName.
      * @param base64E      is the media in Base64 encoded.
      */
-    public void saveMedia(String mediaName, String relativePath, String base64E)
+    public void saveBase64Image(String mediaName, String relativePath, String base64E)
     {
-        LoggerInterface logger = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
-
-        String imagePath;
-        File   directory;
-        if (relativePath != null) {
-            imagePath = this.webrootOnFilesystem + MediaFileHandler.mediaPath + relativePath;
-            directory = new File(imagePath);
-            directory.mkdirs();
-        } else {
-            imagePath = this.webrootOnFilesystem + MediaFileHandler.mediaPath;
+        if (relativePath != null && !relativePath.equals("")) {
+            new File(this.getMediaFilePath(relativePath)).mkdirs();
         }
 
         String[] parts       = base64E.split(",");
@@ -50,12 +46,13 @@ public class MediaFileHandler
         Decoder decoder   = Base64.getMimeDecoder();
         byte[]  imageByte = decoder.decode(imageString);
 
+        String imagePath = this.getMediaFilePath(relativePath + mediaName);
+
         try {
             Path path = Paths.get(imagePath + mediaName);
             Files.write(path, imageByte);
         } catch (IOException e) {
-
-            logger.log("Saving of File " + imagePath + mediaName + " failed: " + e.getMessage());
+            this.logger.logException("Saving of File " + imagePath + " failed: " + e.getMessage(), e);
         }
     }
 
@@ -67,10 +64,7 @@ public class MediaFileHandler
 
     public void deleteMedia(String relativePath)
     {
-
-        String imagePath = this.webrootOnFilesystem + MediaFileHandler.mediaPath + relativePath;
-        File   file      = new File(imagePath);
-        file.delete();
+        new File(this.getMediaFilePath(relativePath)).delete();
     }
 
     /**
@@ -82,5 +76,10 @@ public class MediaFileHandler
     public String getImageUrl(String relativePath)
     {
         return this.contextUriPath + File.separator + MediaFileHandler.mediaPath + File.separator + relativePath;
+    }
+
+    private String getMediaFilePath(String relativePath)
+    {
+        return this.webrootOnFilesystem + MediaFileHandler.mediaPath + relativePath;
     }
 }
