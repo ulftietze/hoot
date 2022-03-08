@@ -5,6 +5,7 @@ import hoot.front.Servlets.Api.V1.AbstractApiServlet;
 import hoot.front.Servlets.Api.V1.Authentication.LoginApiServlet;
 import hoot.model.entities.Follower;
 import hoot.model.entities.User;
+import hoot.model.query.api.IsValidUserSession;
 import hoot.model.repositories.FollowerRepository;
 import hoot.system.Annotation.AuthenticationRequired;
 import hoot.system.Exception.CouldNotSaveException;
@@ -27,7 +28,7 @@ public class MeFollowApiServlet extends AbstractApiServlet
         Integer userIdToFollow = node.asInt();
         Integer currentUserId = (Integer) request
                 .getSession(true)
-                .getAttribute(LoginApiServlet.SESSION_USER_IDENTIFIER);
+                .getAttribute(IsValidUserSession.SESSION_USER_IDENTIFIER);
 
         FollowerRepository repository     = (FollowerRepository) ObjectManager.get(FollowerRepository.class);
         Follower           followerEntity = (Follower) ObjectManager.create(Follower.class);

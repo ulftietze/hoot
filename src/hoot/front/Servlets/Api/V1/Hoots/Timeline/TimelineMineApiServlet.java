@@ -3,6 +3,7 @@ package hoot.front.Servlets.Api.V1.Hoots.Timeline;
 import hoot.front.Servlets.Api.V1.AbstractApiServlet;
 import hoot.front.Servlets.Api.V1.Authentication.LoginApiServlet;
 import hoot.model.entities.Hoot;
+import hoot.model.query.api.IsValidUserSession;
 import hoot.model.repositories.HootRepository;
 import hoot.model.search.hoot.TimelineSearchCriteria;
 import hoot.system.Annotation.AuthenticationRequired;
@@ -40,7 +41,7 @@ public class TimelineMineApiServlet extends AbstractApiServlet
         String  lastPost = request.getParameter("lastPostId");
         String  quantity = request.getParameter("quantity");
         String  tags     = request.getParameter("tags");
-        Integer userId   = (Integer) request.getSession(true).getAttribute(LoginApiServlet.SESSION_USER_IDENTIFIER);
+        Integer userId   = (Integer) request.getSession(true).getAttribute(IsValidUserSession.SESSION_USER_IDENTIFIER);
 
         TimelineSearchCriteria searchCriteria = this.createSearchCriteriaClass();
 

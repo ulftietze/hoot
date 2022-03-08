@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import hoot.front.Servlets.Api.V1.AbstractApiServlet;
 import hoot.front.Servlets.Api.V1.Authentication.LoginApiServlet;
 import hoot.model.entities.*;
+import hoot.model.query.api.IsValidUserSession;
 import hoot.model.repositories.ReactionRepository;
 import hoot.system.Annotation.AuthenticationRequired;
 import hoot.system.Exception.CouldNotDeleteException;
@@ -57,7 +58,7 @@ public class MeReactionApiServlet extends AbstractApiServlet
 
         reaction.user    = (User) ObjectManager.create(User.class);
         reaction.hoot    = this.getHootByType(reactionBody.get("hootType").asText());
-        reaction.user.id = (Integer) request.getSession(true).getAttribute(LoginApiServlet.SESSION_USER_IDENTIFIER);
+        reaction.user.id = (Integer) request.getSession(true).getAttribute(IsValidUserSession.SESSION_USER_IDENTIFIER);
         reaction.hoot.id = reactionBody.get("hootId").asInt();
 
         if (reactionBody.get("interaction") != null) {

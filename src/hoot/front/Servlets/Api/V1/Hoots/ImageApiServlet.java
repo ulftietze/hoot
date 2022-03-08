@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import hoot.front.Servlets.Api.V1.Authentication.LoginApiServlet;
 import hoot.model.entities.Image;
 import hoot.model.entities.User;
+import hoot.model.query.api.IsValidUserSession;
 import hoot.model.repositories.HootRepository;
 import hoot.system.Annotation.AuthenticationRequired;
 import hoot.system.Exception.CouldNotSaveException;
@@ -54,7 +55,7 @@ public class ImageApiServlet extends AbstractHootApiServlet
         this.saveImage(imagePath, base64Image);
 
         User user = (User) ObjectManager.create(User.class);
-        user.id     = (Integer) request.getSession(true).getAttribute(LoginApiServlet.SESSION_USER_IDENTIFIER);
+        user.id     = (Integer) request.getSession(true).getAttribute(IsValidUserSession.SESSION_USER_IDENTIFIER);
         entity.user = user;
 
         return entity;
