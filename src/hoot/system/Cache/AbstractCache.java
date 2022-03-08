@@ -28,6 +28,8 @@ public abstract class AbstractCache<Type>
 
     public abstract void put(Type type);
 
+    public abstract void purge(Type type);
+
     protected synchronized Type getTypeFromCacheObject(CacheObject cacheObject)
     {
         if (cacheObject != null) {

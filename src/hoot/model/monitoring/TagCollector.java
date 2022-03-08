@@ -31,6 +31,7 @@ public class TagCollector extends Thread implements CollectorInterface
     {
         this.tagRepository = (TagRepository) ObjectManager.get(TagRepository.class);
         this.logger        = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
+        this.mostUsedTags = new ArrayList<>();
     }
 
     @Override

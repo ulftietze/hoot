@@ -14,10 +14,21 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class UserRepository extends AbstractRepository<User>
 {
+    private final UserCache userCache;
+
+    private final FollowerRepository followerRepository;
+
+    public UserRepository()
+    {
+        super();
+
+        this.followerRepository = (FollowerRepository) ObjectManager.get(FollowerRepository.class);
+        this.userCache          = (UserCache) ObjectManager.get(UserCache.class);
+    }
+
     public Integer getAllUsersCount()
     {
         try (Connection connection = this.getConnection()) {
@@ -53,10 +64,10 @@ public class UserRepository extends AbstractRepository<User>
      */
     public User getById(int id) throws EntityNotFoundException
     {
-        UserCache userCache  = (UserCache) ObjectManager.get(UserCache.class);
-        User      cachedUser = userCache.get(id);
-        if (cachedUser != null) {
-            return cachedUser;
+        User user = this.userCache.get(id);
+
+        if (user != null) {
+            return user;
         }
 
         try (Connection connection = this.getConnection()) {
@@ -72,16 +83,15 @@ public class UserRepository extends AbstractRepository<User>
 
             rs.next(); // will throw SQLException if result set is empty
 
-            User user = this.mapResultSetToUser(rs);
+            user = this.mapResultSetToUser(rs);
 
             rs.close();
             pss.close();
-            connection.close();
-
-            return user;
         } catch (SQLException e) {
             throw new EntityNotFoundException("User with ID: " + id);
         }
+
+        return user;
     }
 
     /**
@@ -93,8 +103,7 @@ public class UserRepository extends AbstractRepository<User>
      */
     public User getByUsername(String username) throws EntityNotFoundException
     {
-        UserCache userCache  = (UserCache) ObjectManager.get(UserCache.class);
-        User      user = userCache.get(username);
+        User user = this.userCache.get(username);
 
         if (user != null) {
             return user;
@@ -204,10 +213,9 @@ public class UserRepository extends AbstractRepository<User>
             pss.setString(3, user.passwordHash);
             pss.setTimestamp(4, this.getSQLTimestampFromLocalDateTime(user.lastLogin));
             pss.setInt(5, user.id);
-            int rowCount = pss.executeUpdate();
 
+            int rowCount = pss.executeUpdate();
             pss.close();
-            connection.close();
 
             if (rowCount == 0) {
                 throw new SQLException("User with username " + user.username + " was not saved.");
@@ -215,6 +223,8 @@ public class UserRepository extends AbstractRepository<User>
         } catch (SQLException e) {
             throw new CouldNotSaveException("User with username " + user.username);
         }
+
+        this.userCache.purge(user);
     }
 
     /**
@@ -229,10 +239,9 @@ public class UserRepository extends AbstractRepository<User>
         try (Connection connection = this.getConnection()) {
             PreparedStatement pss = connection.prepareStatement("DELETE FROM User WHERE id = ?");
             pss.setInt(1, user.id);
-            int rowCount = pss.executeUpdate();
 
+            int rowCount = pss.executeUpdate();
             pss.close();
-            connection.close();
 
             if (rowCount == 0) {
                 throw new CouldNotDeleteException("User with username " + user.username);
@@ -240,16 +249,16 @@ public class UserRepository extends AbstractRepository<User>
         } catch (SQLException e) {
             throw new CouldNotDeleteException("User with username " + user.username);
         }
+
+        this.userCache.purge(user);
     }
 
     private User mapResultSetToUser(ResultSet rs) throws SQLException
     {
-        UserCache userCache = (UserCache) ObjectManager.get(UserCache.class);
-        User      user      = (User) ObjectManager.create(User.class);
-
+        User user = (User) ObjectManager.create(User.class);
         user.id = rs.getInt("id");
 
-        User searchedUser = userCache.get(user.id);
+        User searchedUser = this.userCache.get(user.id);
         if (searchedUser != null) {
             user = searchedUser;
         }
@@ -261,13 +270,12 @@ public class UserRepository extends AbstractRepository<User>
         user.lastLogin    = this.getLocalDateTimeFromSQLTimestamp(rs.getTimestamp("lastLogin"));
 
         try {
-            FollowerRepository fr = (FollowerRepository) ObjectManager.get(FollowerRepository.class);
-            user.followerCount = fr.getFollowerCountForUser(user.id);
+            user.followerCount = this.followerRepository.getFollowerCountForUser(user.id);
         } catch (EntityNotFoundException ignore) {
         }
 
         if (searchedUser != null) {
-            userCache.put(user);
+            this.userCache.put(user);
         }
 
         return user;

@@ -64,6 +64,7 @@ public class HistoryService implements ServiceInterface
                             + "Available Processors: " + workload.get("Available Processors") + "\n"
                             + "System Load Average: " + workload.get("System Load Average") + "\n"
                             + "Process CPU Load: " + workload.get("Process CPU Load") + "\n"
+                            + "System CPU Load: " + workload.get("System CPU Load") + "\n"
                             + "Most recent tags: "
                             + ((ArrayList<Tag>) mostUsedTags.get("popularTags")).stream().map(t -> t.tag).collect(Collectors.joining(",")) + "\n"
             );
