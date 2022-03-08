@@ -1,4 +1,4 @@
-package hoot.model.monitoring.consumer;
+package hoot.model.monitoring;
 
 import hoot.model.entities.Tag;
 import hoot.model.repositories.TagRepository;

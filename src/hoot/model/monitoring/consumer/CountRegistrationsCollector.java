@@ -13,6 +13,9 @@ import hoot.system.Queue.QueueManager;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 public class CountRegistrationsCollector extends Thread implements CollectorInterface, ConsumerInterface
 {
@@ -42,6 +45,10 @@ public class CountRegistrationsCollector extends Thread implements CollectorInte
     @Override
     public void run()
     {
+        ScheduledFuture<?> cleanUpScheduleTask = this
+                .createScheduledExecutorService()
+                .scheduleAtFixedRate(this::cleanup, 1, 1, TimeUnit.SECONDS);
+
         while (this.running) {
             User    registeredUser = (User) this.queueManager.take(RegistrationPublisher.QUEUE_ID);
             Instant now            = Instant.now();
@@ -60,6 +67,8 @@ public class CountRegistrationsCollector extends Thread implements CollectorInte
             this.registrationsInPeriod.get(now).add(registeredUser);
             this.currentlyRegisteredUsers++;
         }
+
+        cleanUpScheduleTask.cancel(true);
     }
 
     @Override
@@ -71,13 +80,10 @@ public class CountRegistrationsCollector extends Thread implements CollectorInte
     @Override
     public CollectorResult collect() throws CollectorException
     {
-        Instant ofMinutes = Instant.now().minus(Duration.ofHours(PERIOD_REGISTRATIONS_MINUTES));
-        this.registrationsInPeriod.headMap(ofMinutes, false).clear();
-
         return new CollectorResult()
         {{
-            put("CurrentlyRegisteredUser", currentlyRegisteredUsers);
-            put("RegistrationsPerPeriod", userRegisteredInPeriod.size());
+            put("Currently Registered User", currentlyRegisteredUsers);
+            put("Registrations in Period", userRegisteredInPeriod.size());
         }};
     }
 
@@ -85,5 +91,16 @@ public class CountRegistrationsCollector extends Thread implements CollectorInte
     public void stopRun()
     {
         this.running = false;
+    }
+
+    private void cleanup()
+    {
+        Instant ofMinutes = Instant.now().minus(Duration.ofHours(PERIOD_REGISTRATIONS_MINUTES));
+        this.registrationsInPeriod.headMap(ofMinutes, false).clear();
+    }
+
+    private ScheduledExecutorService createScheduledExecutorService()
+    {
+        return (ScheduledExecutorService) ObjectManager.create(ScheduledExecutorService.class);
     }
 }

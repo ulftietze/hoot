@@ -16,10 +16,10 @@ public class TagsPostedInIntervalSearchCriteria implements SearchCriteriaInterfa
     public QueryBuilder getQueryBuilder() throws SQLException
     {
         QueryBuilder queryBuilder = (QueryBuilder) ObjectManager.create(QueryBuilder.class);
-        queryBuilder.addJoin("Hoots h ON h.id = ht.hoot");
-        queryBuilder.addWhere("h.modified > ?", this.lastModifiedInHours);
-        queryBuilder.GROUP_BY.add("h.tag");
-        queryBuilder.ORDER_BY.add("COUNT(h.tag)");
+        queryBuilder.addJoin("INNER JOIN Hoot h ON h.id = ht.hoot");
+        queryBuilder.addWhere("h.modified > (NOW() - INTERVAL ? HOUR)", this.lastModifiedInHours);
+        queryBuilder.GROUP_BY.add("ht.tag");
+        queryBuilder.ORDER_BY.add("COUNT(ht.tag)");
         queryBuilder.LIMIT = quantity;
 
         return queryBuilder;

@@ -13,34 +13,37 @@ import hoot.system.Queue.QueueManager;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 public class CountLoginsCollector extends Thread implements CollectorInterface, ConsumerInterface
 {
-    public final static  String COLLECTOR_NAME                     = "CountLogins";
-    private final static long   PERIOD_LOGINS_SINCE_HOURS          = 2;
-    private final static long   PERIOD_CURRENTLY_LOGGED_IN_MINUTES = 1;
+    public final static  String COLLECTOR_NAME            = "CountLogins";
+    private final static long   PERIOD_LOGINS_SINCE_HOURS = 24;
 
     private final QueueManager                           queueManager;
     private final NavigableMap<Instant, ArrayList<User>> loginsInPeriod;
     private final NavigableMap<Integer, Instant>         userLoggedInInPeriod;
-    private final NavigableMap<Instant, ArrayList<User>> curLoggedIn;
-    private final NavigableMap<Integer, Instant>         userCurLoggedIn;
     private final LoggerInterface                        logger;
-    private       boolean                                running = true;
+
+    private boolean running = true;
 
     public CountLoginsCollector()
     {
         this.queueManager         = (QueueManager) ObjectManager.get(QueueManager.class);
         this.loginsInPeriod       = Collections.synchronizedNavigableMap(new TreeMap<>());
-        this.userCurLoggedIn      = Collections.synchronizedNavigableMap(new TreeMap<>());
         this.userLoggedInInPeriod = Collections.synchronizedNavigableMap(new TreeMap<>());
-        this.curLoggedIn          = Collections.synchronizedNavigableMap(new TreeMap<>());
         this.logger               = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
     }
 
     @Override
     public void run()
     {
+        ScheduledFuture<?> cleanUpScheduleTask = this
+                .createScheduledExecutorService()
+                .scheduleAtFixedRate(this::cleanup, 1, 1, TimeUnit.SECONDS);
+
         while (this.running) {
             User    loggedInUser = (User) this.queueManager.take(LoginPublisher.QUEUE_ID);
             Instant now          = Instant.now();
@@ -48,12 +51,6 @@ public class CountLoginsCollector extends Thread implements CollectorInterface, 
             if (loggedInUser == null) {
                 continue;
             }
-
-            this.userCurLoggedIn.computeIfPresent(loggedInUser.id, (k, v) -> {
-                this.curLoggedIn.get(v).removeIf(user -> Objects.equals(user.id, k));
-                return now;
-            });
-            this.userCurLoggedIn.computeIfAbsent(loggedInUser.id, k -> now);
 
             this.userLoggedInInPeriod.computeIfPresent(loggedInUser.id, (k, v) -> {
                 this.loginsInPeriod.get(v).removeIf(user -> Objects.equals(user.id, k));
@@ -63,9 +60,9 @@ public class CountLoginsCollector extends Thread implements CollectorInterface, 
 
             this.loginsInPeriod.computeIfAbsent(now, k -> new ArrayList<>());
             this.loginsInPeriod.get(now).add(loggedInUser);
-            this.curLoggedIn.computeIfAbsent(now, k -> new ArrayList<>());
-            this.curLoggedIn.get(now).add(loggedInUser);
         }
+
+        cleanUpScheduleTask.cancel(true);
     }
 
     @Override
@@ -77,22 +74,9 @@ public class CountLoginsCollector extends Thread implements CollectorInterface, 
     @Override
     public CollectorResult collect() throws CollectorException
     {
-        Instant ofMinutes = Instant.now().minus(Duration.ofMinutes(PERIOD_CURRENTLY_LOGGED_IN_MINUTES));
-        Instant ofHours   = Instant.now().minus(Duration.ofHours(PERIOD_LOGINS_SINCE_HOURS));
-
-        Map<Instant, ArrayList<User>> currentlyLoggedIn = this.curLoggedIn.headMap(ofMinutes, true);
-        currentlyLoggedIn.forEach((instant, users) -> users.forEach(user -> this.userCurLoggedIn.remove(user.id)));
-        currentlyLoggedIn.clear();
-
-        Map<Instant, ArrayList<User>> loginInPeriod = this.loginsInPeriod.headMap(ofHours, true);
-        loginInPeriod.forEach((instant, users) -> users.forEach(user -> this.userLoggedInInPeriod.remove(user.id)));
-        loginInPeriod.clear();
-
         return new CollectorResult()
         {{
             put("LoginsPerPeriod", userLoggedInInPeriod.size());
-            put("CurrentlyLoggedIn", userCurLoggedIn.size());
-            put("CurrentlyLoggedInUsers", curLoggedIn);
         }};
     }
 
@@ -100,5 +84,19 @@ public class CountLoginsCollector extends Thread implements CollectorInterface, 
     public void stopRun()
     {
         this.running = false;
+    }
+
+    private void cleanup()
+    {
+        Instant ofHours = Instant.now().minus(Duration.ofHours(PERIOD_LOGINS_SINCE_HOURS));
+
+        Map<Instant, ArrayList<User>> loginInPeriod = this.loginsInPeriod.headMap(ofHours, true);
+        loginInPeriod.forEach((instant, users) -> users.forEach(user -> this.userLoggedInInPeriod.remove(user.id)));
+        loginInPeriod.clear();
+    }
+
+    private ScheduledExecutorService createScheduledExecutorService()
+    {
+        return (ScheduledExecutorService) ObjectManager.create(ScheduledExecutorService.class);
     }
 }
