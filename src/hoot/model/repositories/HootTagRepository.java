@@ -35,14 +35,13 @@ public class HootTagRepository extends AbstractRepository<HootTags>
 
         TagRepository tagRepository = (TagRepository) ObjectManager.get(TagRepository.class);
 
-        try {
+        try (Connection connection = this.getConnection()) {
             this.delete(hootTags);
 
             if (hootTags.tags.isEmpty()) {
                 return;
             }
 
-            Connection        connection = this.getConnection();
             ArrayList<String> parameters = new ArrayList<>();
 
             String statement = "INSERT INTO HootTags (hoot, tag) VALUES ";
@@ -61,11 +60,10 @@ public class HootTagRepository extends AbstractRepository<HootTags>
             }
 
             QueryLoggerInterface logger = (QueryLoggerInterface) ObjectManager.get(QueryLoggerInterface.class);
-            logger.log(statement + " [parameters=" + parameters.toString() + "]");
+            logger.log(statement + " [parameters=" + parameters + "]");
 
             pss.executeUpdate();
             pss.close();
-            connection.close();
         } catch (SQLException e) {
             this.log(e.getMessage());
             throw new CouldNotSaveException("HootTag for Hoot " + hootTags.hoot.id);
@@ -79,16 +77,13 @@ public class HootTagRepository extends AbstractRepository<HootTags>
             throw new CouldNotDeleteException("HootTags for null Hoot");
         }
 
-        try {
-            Connection connection = this.getConnection();
-
+        try (Connection connection = this.getConnection()) {
             String            statement = "DELETE FROM HootTags where hoot = ?";
             PreparedStatement pss       = connection.prepareStatement(statement);
             pss.setInt(1, hootTags.hoot.id);
 
             pss.executeUpdate();
             pss.close();
-            connection.close();
         } catch (SQLException e) {
             this.log(e.getMessage());
             throw new CouldNotDeleteException("HootTag for Hoot " + hootTags.hoot.id);

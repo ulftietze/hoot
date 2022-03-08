@@ -24,7 +24,7 @@ public class FollowerRepository extends AbstractRepository<Follower>
 
         int followerCount = 0;
 
-        try {
+        try (Connection connection = this.getConnection()) {
             QueryBuilder queryBuilder = (QueryBuilder) ObjectManager.get(QueryBuilder.class, true);
 
             queryBuilder.SELECT.add("COUNT(user)");
@@ -32,16 +32,14 @@ public class FollowerRepository extends AbstractRepository<Follower>
             queryBuilder.WHERE.add("follows = ?");
             queryBuilder.PARAMETERS.add(userID.toString());
 
-            Connection        connection        = this.getConnection();
             PreparedStatement preparedStatement = queryBuilder.build(connection);
             ResultSet         resultSet         = preparedStatement.executeQuery();
 
-            resultSet.close();
-            preparedStatement.close();
-            connection.close();
-
             resultSet.next();
             followerCount = resultSet.getInt(1);
+
+            resultSet.close();
+            preparedStatement.close();
         } catch (SQLException e) {
             this.log("FollowerCount could not be retrieved: " + e.getMessage());
         }
@@ -54,13 +52,12 @@ public class FollowerRepository extends AbstractRepository<Follower>
     {
         ArrayList<Follower> followerList = new ArrayList<>();
 
-        try {
+        try (Connection connection = this.getConnection()) {
             QueryBuilder queryBuilder = searchCriteria.getQueryBuilder();
 
             queryBuilder.SELECT.add("*");
             queryBuilder.FROM = "Follower";
 
-            Connection        connection = this.getConnection();
             PreparedStatement statement  = queryBuilder.build(connection);
             ResultSet         resultSet  = statement.executeQuery();
 
@@ -75,7 +72,6 @@ public class FollowerRepository extends AbstractRepository<Follower>
 
             resultSet.close();
             statement.close();
-            connection.close();
         } catch (SQLException e) {
             this.log("FollowerRepository.getList(): " + e.getMessage());
         }
@@ -90,8 +86,7 @@ public class FollowerRepository extends AbstractRepository<Follower>
             throw new CouldNotSaveException("Follower (ID null)");
         }
 
-        try {
-            Connection        connection   = this.getConnection();
+        try (Connection connection = this.getConnection()) {
             String            sqlStatement = "insert into Follower (user, follows) values (?, ?)";
             PreparedStatement pss          = connection.prepareStatement(sqlStatement);
 
@@ -101,7 +96,6 @@ public class FollowerRepository extends AbstractRepository<Follower>
             int rowCount = pss.executeUpdate();
 
             pss.close();
-            connection.close();
 
             if (rowCount == 0) {
                 throw new CouldNotSaveException(
@@ -120,8 +114,7 @@ public class FollowerRepository extends AbstractRepository<Follower>
             throw new CouldNotDeleteException("Follower (ID null)");
         }
 
-        try {
-            Connection        connection   = this.getConnection();
+        try (Connection connection = this.getConnection()) {
             String            sqlStatement = "delete from Follower where user = ? and follows = ?";
             PreparedStatement pss          = connection.prepareStatement(sqlStatement);
 
@@ -131,7 +124,6 @@ public class FollowerRepository extends AbstractRepository<Follower>
             int rowCount = pss.executeUpdate();
 
             pss.close();
-            connection.close();
 
             if (rowCount == 0) {
                 throw new CouldNotDeleteException(

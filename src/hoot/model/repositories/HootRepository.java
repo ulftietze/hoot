@@ -25,44 +25,43 @@ public class HootRepository extends AbstractRepository<Hoot>
             throw new EntityNotFoundException("Hoot with ID null");
         }
 
-        try {
+        Hoot hoot;
+
+        try (Connection connection = this.getConnection()) {
             QueryBuilder queryBuilder = (QueryBuilder) ObjectManager.create(QueryBuilder.class);
             this.prepareQueryBuilder(queryBuilder);
             queryBuilder.WHERE.add("h.id = ?");
             queryBuilder.PARAMETERS.add(id.toString());
 
-            Connection        connection = this.getConnection();
             PreparedStatement statement  = queryBuilder.build(connection);
             ResultSet         resultSet  = statement.executeQuery();
 
             resultSet.next();
 
-            Hoot hoot = this.getHoot(resultSet);
+            hoot = this.getHoot(resultSet);
 
             resultSet.close();
             statement.close();
-            connection.close();
-
-            return hoot;
         } catch (SQLException e) {
             this.log("Hoot.getById() + " + e.getMessage());
             throw new EntityNotFoundException("Hoot with ID " + id);
         }
+
+        return hoot;
     }
 
     @Override
     public ArrayList<Hoot> getList(SearchCriteriaInterface searchCriteria) throws EntityNotFoundException
     {
-        try {
+        ArrayList<Hoot> allHoots = new ArrayList<>();
+
+        try (Connection connection = this.getConnection()) {
             QueryBuilder queryBuilder = searchCriteria.getQueryBuilder();
 
             this.prepareQueryBuilder(queryBuilder);
 
-            Connection        connection = this.getConnection();
             PreparedStatement statement  = queryBuilder.build(connection);
             ResultSet         resultSet  = statement.executeQuery();
-
-            ArrayList<Hoot> allHoots = new ArrayList<>();
 
             while (resultSet.next()) {
                 allHoots.add(this.getHoot(resultSet));
@@ -70,20 +69,16 @@ public class HootRepository extends AbstractRepository<Hoot>
 
             resultSet.close();
             statement.close();
-            connection.close();
-
-            return allHoots;
         } catch (SQLException e) {
             this.log("Could not load list of Hoots: " + e.getMessage());
-            throw new EntityNotFoundException("HootList");
         }
+
+        return allHoots;
     }
 
     private void create(Hoot hoot) throws CouldNotSaveException
     {
-        try {
-            Connection connection = this.getConnection();
-
+        try (Connection connection = this.getConnection()) {
             String hootStatement = "insert into Hoot (user, hootType) values (?, ?)";
             PreparedStatement hootPss = connection.prepareStatement(
                     hootStatement,
@@ -200,9 +195,7 @@ public class HootRepository extends AbstractRepository<Hoot>
             }
         }
 
-        try {
-            Connection connection = this.getConnection();
-
+        try (Connection connection = this.getConnection()) {
             switch (hoot.hootType) {
                 case Post:
                     Post post = (Post) hoot;
@@ -284,9 +277,7 @@ public class HootRepository extends AbstractRepository<Hoot>
             throw new CouldNotDeleteException("Hoot with ID null");
         }
 
-        try {
-            Connection connection = this.getConnection();
-
+        try (Connection connection = this.getConnection()) {
             String            sqlStatement = "delete from Hoot where id = ?";
             PreparedStatement pss          = connection.prepareStatement(sqlStatement);
             pss.setInt(1, hoot.id);
@@ -297,7 +288,6 @@ public class HootRepository extends AbstractRepository<Hoot>
             }
 
             pss.close();
-            connection.close();
 
             if (hoot.hootType == HootType.Image) {
                 // TODO: Delete Image from FileSystem when an Image Hoot is deleted
@@ -310,12 +300,9 @@ public class HootRepository extends AbstractRepository<Hoot>
 
     public HootMentions getMentions(Hoot hoot) throws EntityNotFoundException
     {
-        HootMentions hootMentions = (HootMentions) ObjectManager.create(HootMentions.class);
+        var hootMentions   = (HootMentions) ObjectManager.create(HootMentions.class);
         hootMentions.hoot = hoot;
-
-        MentionSearchCriteria
-                searchCriteria
-                = (MentionSearchCriteria) ObjectManager.create(MentionSearchCriteria.class);
+        var searchCriteria = (MentionSearchCriteria) ObjectManager.create(MentionSearchCriteria.class);
         searchCriteria.hoot = hoot;
 
         MentionRepository repository = (MentionRepository) ObjectManager.get(MentionRepository.class);
@@ -361,7 +348,7 @@ public class HootRepository extends AbstractRepository<Hoot>
         queryBuilder.GROUP_BY.add("h.id");
     }
 
-    private Hoot getHoot(ResultSet resultSet) throws SQLException, EntityNotFoundException
+    private Hoot getHoot(ResultSet resultSet) throws SQLException
     {
         UserRepository userRepository = (UserRepository) ObjectManager.get(UserRepository.class);
 

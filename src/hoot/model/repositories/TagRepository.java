@@ -12,23 +12,22 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class TagRepository extends AbstractRepository<Tag>
 {
     @Override
     public ArrayList<Tag> getList(SearchCriteriaInterface searchCriteria) throws EntityNotFoundException
     {
-        try {
-            ArrayList<Tag> tags         = new ArrayList<>();
+        ArrayList<Tag> tags = new ArrayList<>();
+
+        try (Connection connection = this.getConnection()) {
             QueryBuilder   queryBuilder = searchCriteria.getQueryBuilder();
 
             queryBuilder.SELECT.add("tag");
             queryBuilder.FROM = "HootTags ht";
 
-            Connection        connection = this.getConnection();
-            PreparedStatement statement  = queryBuilder.build(connection);
-            ResultSet         resultSet  = statement.executeQuery();
+            PreparedStatement statement = queryBuilder.build(connection);
+            ResultSet         resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
                 Tag tag = new Tag();
@@ -38,13 +37,11 @@ public class TagRepository extends AbstractRepository<Tag>
 
             resultSet.close();
             statement.close();
-            connection.close();
-
-            return tags;
         } catch (SQLException e) {
             this.log("TagRepository.getList(): " + e.getMessage());
-            return new ArrayList<>();
         }
+
+        return tags;
     }
 
     /**
@@ -56,8 +53,7 @@ public class TagRepository extends AbstractRepository<Tag>
     @Override
     public void save(Tag tag) throws CouldNotSaveException
     {
-        try {
-            Connection        connection   = this.getConnection();
+        try (Connection connection = this.getConnection()) {
             String            sqlStatement = "INSERT INTO Tag values (?) ON DUPLICATE KEY UPDATE tag = tag";
             PreparedStatement statement    = connection.prepareStatement(sqlStatement);
 
@@ -70,7 +66,6 @@ public class TagRepository extends AbstractRepository<Tag>
                 For this Reason, we do not throw a CouldNotSaveException if the row count is not 1. */
 
             statement.close();
-            connection.close();
         } catch (SQLException e) {
             this.log("Could not save Tag " + tag.tag);
             throw new CouldNotSaveException("Tag " + tag.tag);
@@ -86,8 +81,7 @@ public class TagRepository extends AbstractRepository<Tag>
     @Override
     public void delete(Tag tag) throws CouldNotDeleteException
     {
-        try {
-            Connection        connection   = this.getConnection();
+        try (Connection connection = this.getConnection()) {
             String            sqlStatement = "delete from Tag where tag = ?";
             PreparedStatement statement    = connection.prepareStatement(sqlStatement);
 
@@ -96,7 +90,6 @@ public class TagRepository extends AbstractRepository<Tag>
             int rowCount = statement.executeUpdate();
 
             statement.close();
-            connection.close();
 
             if (rowCount == 0) {
                 throw new CouldNotDeleteException("Tag " + tag.tag);
