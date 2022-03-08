@@ -6,11 +6,23 @@ class Historie {
     -id: Integer
     +timestamp: DateTime
     +currentLoggedIn: Integer
-    +postsPerSecond: Float /'Durchschnitt seit letztem Timestamp'/
+    +loginsPerPeriod: Float
+    +registrationsPerPeriod: Float
+    +postsPerMinute: Float /'Durchschnitt seit letztem Timestamp'/
     +requestsPerSecond: Float
-    +loginsPerSecond: Float
+    +requestsLoggedInPerSecond: Float
     +currentlyRegisteredUsers: Integer
     +trendingHashtags: String
+    +Available Processors: int
+    +System Load Average: double
+    +System CPU Load: double
+    +Process CPU Load: double
+    +Memory Max: int
+    +Memory Total: int
+    +Memory free: int
+    +Memory used: int
+    +Thread Count: int
+    +Thread Total Count: int
 }
 
 enum Interaction {

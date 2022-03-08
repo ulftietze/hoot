@@ -80,7 +80,6 @@ public class UserRepository extends AbstractRepository<User>
 
             return user;
         } catch (SQLException e) {
-            this.log(e.getMessage());
             throw new EntityNotFoundException("User with ID: " + id);
         }
     }
@@ -116,7 +115,6 @@ public class UserRepository extends AbstractRepository<User>
             rs.close();
             pss.close();
         } catch (SQLException e) {
-            this.log(e.getMessage());
             throw new EntityNotFoundException("User with username: " + username);
         }
 
@@ -173,12 +171,7 @@ public class UserRepository extends AbstractRepository<User>
             if (rowCount == 0) {
                 throw new CouldNotSaveException("new User with username " + user.username);
             }
-        } catch (EntityNotFoundException e) {
-            this.log(e.getMessage());
-            this.log("Just inserted a User but could not find it afterwards! This should never happen.");
-            throw new CouldNotSaveException("new User with username " + user.username + " (disappeared after insert)");
         } catch (SQLException e) {
-            this.log(e.getMessage());
             throw new CouldNotSaveException("new User with username " + user.username);
         }
     }
@@ -217,10 +210,10 @@ public class UserRepository extends AbstractRepository<User>
             connection.close();
 
             if (rowCount == 0) {
-                throw new CouldNotSaveException("User with username " + user.username);
+                throw new SQLException("User with username " + user.username + " was not saved.");
             }
         } catch (SQLException e) {
-            this.log(e.getMessage());
+            throw new CouldNotSaveException("User with username " + user.username);
         }
     }
 
@@ -245,7 +238,6 @@ public class UserRepository extends AbstractRepository<User>
                 throw new CouldNotDeleteException("User with username " + user.username);
             }
         } catch (SQLException e) {
-            this.log(e.getMessage());
             throw new CouldNotDeleteException("User with username " + user.username);
         }
     }

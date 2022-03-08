@@ -104,6 +104,7 @@ public class RequestsCollector extends Thread implements CollectorInterface, Con
             put("Currently Logged In", userCurLoggedIn.size());
             put("Currently Logged In Users", curLoggedIn);
             put("Requests Per Second", requestsLastSecond.get());
+            // TODO: Collect Requests per Second logged in
         }};
     }
 

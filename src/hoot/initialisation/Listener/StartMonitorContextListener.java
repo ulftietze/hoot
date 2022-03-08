@@ -51,7 +51,7 @@ public class StartMonitorContextListener implements ServletContextListener
         HistoryService historyService = (HistoryService) ObjectManager.get(HistoryService.class);
         this.historyScheduleAtFixedRate = this
                 .createScheduledExecutorService()
-                .scheduleAtFixedRate(historyService::execute, 10, 10, TimeUnit.SECONDS);
+                .scheduleAtFixedRate(historyService::execute, 10, 1, TimeUnit.SECONDS);
     }
 
     @Override
