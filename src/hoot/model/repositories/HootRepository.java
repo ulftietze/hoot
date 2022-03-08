@@ -9,6 +9,7 @@ import hoot.system.Database.QueryBuilder;
 import hoot.system.Exception.CouldNotDeleteException;
 import hoot.system.Exception.CouldNotSaveException;
 import hoot.system.Exception.EntityNotFoundException;
+import hoot.system.Filesystem.MediaFileHandler;
 import hoot.system.ObjectManager.ObjectManager;
 
 import java.sql.Connection;
@@ -290,7 +291,9 @@ public class HootRepository extends AbstractRepository<Hoot>
             pss.close();
 
             if (hoot.hootType == HootType.Image) {
-                // TODO: Delete Image from FileSystem when an Image Hoot is deleted
+                Image            image            = (Image) hoot;
+                MediaFileHandler mediaFileHandler = (MediaFileHandler) ObjectManager.get(MediaFileHandler.class);
+                mediaFileHandler.deleteMedia(image.imagePath);
             }
         } catch (SQLException e) {
             this.log("Hoot.delete(): " + e.getMessage());
