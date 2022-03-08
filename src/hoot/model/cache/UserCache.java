@@ -35,17 +35,24 @@ public class UserCache extends AbstractCache<User>
             return;
         }
 
-        CacheObject cacheObject = this.idLookupMap.get(user.id);
-        if (cacheObject != null) {
-            this.timedDeleteMap.get(cacheObject.getDestroyTimestamp()).remove(cacheObject);
-            this.removeReferences(cacheObject.getObject());
-        }
+        this.purge(user);
 
-        cacheObject = new CacheObject(user);
+        CacheObject cacheObject = new CacheObject(user);
         this.putInTimedDeleteMap(cacheObject);
 
         this.idLookupMap.put(user.id, cacheObject);
         this.usernameLookupMap.put(user.username, cacheObject);
+    }
+
+    @Override
+    public void purge(User user)
+    {
+        CacheObject cacheObject = this.idLookupMap.get(user.id);
+
+        if (cacheObject != null) {
+            this.timedDeleteMap.get(cacheObject.getDestroyTimestamp()).remove(cacheObject);
+            this.removeReferences(cacheObject.getObject());
+        }
     }
 
     @Override
