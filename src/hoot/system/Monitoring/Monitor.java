@@ -38,16 +38,7 @@ public class Monitor extends Thread
     @Override
     public void run()
     {
-        long last = System.nanoTime();
-
         while (this.running) {
-            long now = System.nanoTime();
-
-            // This may be flexibel and configurable
-            if (now - last < ONE_SEC) {
-                continue;
-            }
-
             for (CollectorInterface collector : this.collectorList) {
                 String collectorName = collector.getCollectorName();
                 try {
@@ -60,7 +51,11 @@ public class Monitor extends Thread
                 }
             }
 
-            last = now;
+            try {
+                // This may be flexibel and configurable
+                this.wait(1000);
+            } catch (InterruptedException ignore) {
+            }
         }
     }
 
