@@ -1,13 +1,13 @@
 package hoot.front.Service;
 
-import hoot.model.entities.Historie;
+import hoot.model.entities.History;
 import hoot.model.entities.Tag;
 import hoot.model.monitoring.SystemWorkloadCollector;
 import hoot.model.monitoring.consumer.CountLoginsCollector;
 import hoot.model.monitoring.consumer.CountRegistrationsCollector;
 import hoot.model.monitoring.TagCollector;
 import hoot.model.monitoring.consumer.RequestsCollector;
-import hoot.model.repositories.HistorieRepository;
+import hoot.model.repositories.HistoryRepository;
 import hoot.system.Logger.LoggerInterface;
 import hoot.system.Monitoring.CollectorResult;
 import hoot.system.Monitoring.Monitor;
@@ -16,7 +16,6 @@ import hoot.system.ObjectManager.ObjectManager;
 import hoot.system.Service.ServiceInterface;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -24,14 +23,14 @@ public class HistoryService implements ServiceInterface
 {
     private final Monitor monitor;
 
-    private final HistorieRepository historyRepository;
+    private final HistoryRepository historyRepository;
 
     private final LoggerInterface logger;
 
     public HistoryService()
     {
         this.monitor           = (Monitor) ObjectManager.get(Monitor.class);
-        this.historyRepository = (HistorieRepository) ObjectManager.get(HistorieRepository.class);
+        this.historyRepository = (HistoryRepository) ObjectManager.get(HistoryRepository.class);
         this.logger            = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
     }
 
@@ -39,7 +38,7 @@ public class HistoryService implements ServiceInterface
     public void execute()
     {
         try {
-            Historie    entity      = (Historie) ObjectManager.create(Historie.class);
+            History     entity      = (History) ObjectManager.create(History.class);
             MonitorData monitorData = this.monitor.getMonitorData();
 
             CollectorResult logins        = monitorData.get(CountLoginsCollector.COLLECTOR_NAME);
@@ -80,7 +79,7 @@ public class HistoryService implements ServiceInterface
         }
     }
 
-    private void mapLoginsToEntity(Map<String, Object> loginData, Historie entity)
+    private void mapLoginsToEntity(Map<String, Object> loginData, History entity)
     {
         if (loginData == null) {
             return;
@@ -89,7 +88,7 @@ public class HistoryService implements ServiceInterface
         entity.currentLoggedIn = (Integer) loginData.get("CurrentlyLoggedIn");
     }
 
-    private void mapRegistrationsToEntity(Map<String, Object> registrationData, Historie entity)
+    private void mapRegistrationsToEntity(Map<String, Object> registrationData, History entity)
     {
         if (registrationData == null) {
             return;

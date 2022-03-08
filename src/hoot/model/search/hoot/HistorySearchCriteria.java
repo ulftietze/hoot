@@ -6,7 +6,7 @@ import hoot.system.ObjectManager.ObjectManager;
 
 import java.sql.SQLException;
 
-public class HistorieSearchCriteria implements SearchCriteriaInterface
+public class HistorySearchCriteria implements SearchCriteriaInterface
 {
     @Override
     public QueryBuilder getQueryBuilder() throws SQLException

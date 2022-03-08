@@ -1,12 +1,10 @@
 package hoot.front.Servlets;
 
-import hoot.model.entities.Historie;
+import hoot.model.entities.History;
 import hoot.model.entities.Tag;
-import hoot.model.entities.User;
-import hoot.model.repositories.FollowerRepository;
-import hoot.model.repositories.HistorieRepository;
-import hoot.model.repositories.UserRepository;
+import hoot.model.repositories.HistoryRepository;
 import hoot.system.Annotation.AuthenticationRequired;
+import hoot.system.Exception.CouldNotSaveException;
 import hoot.system.Exception.EntityNotFoundException;
 import hoot.system.ObjectManager.ObjectManager;
 
@@ -55,30 +53,48 @@ public class TestServlet extends HttpServlet
             }
         }*/
 
-        HistorieRepository repository = (HistorieRepository) ObjectManager.create(HistorieRepository.class);
+        HistoryRepository repository = (HistoryRepository) ObjectManager.create(HistoryRepository.class);
 
-        for (long i = 1; i < 3; ++i) {
+        History h = new History();
+        h.memoryUsed = 1337;
+
+        try {
+            repository.save(h);
+        } catch (CouldNotSaveException e) {
+            e.printStackTrace();
+        }
+
+        out.println(h.id + " " + h.timestamp + "<br><br><br>");
+
+        h.currentLoggedIn = 9999;
+
+        try {
+            repository.save(h);
+        } catch (CouldNotSaveException e) {
+            e.printStackTrace();
+        }
+
+        for (long i = 1; i < 10; ++i) {
             try {
-                out.println("Historie: " + i + "<br>\uD83D\uDC08\n<br>");
+                out.println("Historie: " + i);
 
-                Historie historie = repository.getById(i);
+                History history = repository.getById(i);
 
                 out.println(
-                        "ID: " + historie.id + "<br>" +
-                        "timestamp: " + historie.timestamp + "<br>" +
-                        "currentLoggedIn: " + historie.currentLoggedIn + "<br>" +
-                        "postsPerSecond: " + historie.postsPerSecond + "<br>" +
-                        "requestsPerSecond: " + historie.requestsPerSecond + "<br>" +
-                        "loginsPerSecond: " + historie.loginsPerSecond + "<br>" +
-                        "currentlyRegisteredUsers: " + historie.currentlyRegisteredUsers + "<br>"
+                        "ID: " + history.id + "<br>" +
+                        "timestamp: " + history.timestamp + "<br>" +
+                        "currentLoggedIn: " + history.currentLoggedIn + "<br>" +
+                        "requestsPerSecond: " + history.requestsPerSecond + "<br>" +
+                        "currentlyRegisteredUsers: " + history.currentlyRegisteredUsers + "<br>"
                 );
 
                 out.println("Tags: ");
-                if (historie.trendingHashtags != null) {
-                    for (Tag tag : historie.trendingHashtags) {
+                if (history.trendingHashtags != null) {
+                    for (Tag tag : history.trendingHashtags) {
                         out.println(tag.tag + " ");
                     }
                 }
+                out.println("<br>");
                 out.println("<br>");
             } catch (EntityNotFoundException e) {
                 out.println("DB connection failed or Historie not found.<br>");
