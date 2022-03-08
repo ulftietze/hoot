@@ -3,6 +3,7 @@ package hoot.front.Servlets.Api.V1.Authentication;
 import hoot.front.Servlets.Api.V1.AbstractApiServlet;
 import hoot.model.entities.User;
 import hoot.model.entities.authentication.Registration;
+import hoot.model.queue.publisher.RegistrationPublisher;
 import hoot.model.repositories.UserRepository;
 import hoot.system.Exception.CouldNotSaveException;
 import hoot.system.ObjectManager.ObjectManager;
@@ -18,6 +19,16 @@ import java.security.GeneralSecurityException;
 @WebServlet("/api/V1/register")
 public class RegisterApiServlet extends AbstractApiServlet
 {
+    private RegistrationPublisher registrationPublisher;
+
+    @Override
+    public void init() throws ServletException
+    {
+        super.init();
+
+        this.registrationPublisher = (RegistrationPublisher) ObjectManager.get(RegistrationPublisher.class);
+    }
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
     {
         Registration register = (Registration) this.deserializeJsonRequestBody(request, Registration.class);
@@ -33,6 +44,7 @@ public class RegisterApiServlet extends AbstractApiServlet
 
             repository.save(entity);
 
+            this.registrationPublisher.publish(entity);
             this.sendResponse(response, HttpServletResponse.SC_CREATED, this.serialize("Registered"));
         } catch (GeneralSecurityException | CouldNotSaveException e) {
             int httpStatus = HttpServletResponse.SC_CONFLICT;

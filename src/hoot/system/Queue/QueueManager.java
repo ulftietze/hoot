@@ -21,7 +21,12 @@ public class QueueManager
     public void add(String queueName, Object data)
     {
         this.queues.computeIfAbsent(queueName, k -> new LinkedBlockingQueue<>(20000));
-        this.queues.get(queueName).add(data);
+
+        try {
+            this.queues.get(queueName).put(data);
+        } catch (InterruptedException e) {
+            this.logger.logException("Could not put to Queue: " + e.getMessage(), e);
+        }
     }
 
     public Object take(String queueName)

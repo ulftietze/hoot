@@ -11,6 +11,7 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashMap;
 
 @WebFilter(filterName = "AuthorizationFilter", urlPatterns = {"/api/V1/*"})
 public class AuthorizationFilter implements Filter
@@ -44,7 +45,11 @@ public class AuthorizationFilter implements Filter
         HttpServletRequest  httpRequest  = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-        this.requestPublisher.publish(httpRequest);
+        this.requestPublisher.publish(new HashMap<String, Object>()
+        {{
+            put("session", httpRequest.getSession());
+            put("requestURI", httpRequest.getRequestURI());
+        }});
 
         if (this.isUnauthorized(httpRequest)) {
             httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

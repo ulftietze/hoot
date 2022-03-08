@@ -16,6 +16,7 @@ import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class CountRegistrationsCollector extends Thread implements CollectorInterface, ConsumerInterface
 {
@@ -30,7 +31,7 @@ public class CountRegistrationsCollector extends Thread implements CollectorInte
 
     private boolean running = true;
 
-    private Integer currentlyRegisteredUsers;
+    private AtomicInteger currentlyRegisteredUsers;
 
     public CountRegistrationsCollector()
     {
@@ -39,7 +40,7 @@ public class CountRegistrationsCollector extends Thread implements CollectorInte
         this.queueManager             = (QueueManager) ObjectManager.get(QueueManager.class);
         this.registrationsInPeriod    = Collections.synchronizedNavigableMap(new TreeMap<>());
         this.userRegisteredInPeriod   = Collections.synchronizedNavigableMap(new TreeMap<>());
-        this.currentlyRegisteredUsers = userRepository.getAllUsersCount();
+        this.currentlyRegisteredUsers = new AtomicInteger(userRepository.getAllUsersCount());
     }
 
     @Override
@@ -65,7 +66,7 @@ public class CountRegistrationsCollector extends Thread implements CollectorInte
 
             this.registrationsInPeriod.computeIfAbsent(now, k -> new ArrayList<>());
             this.registrationsInPeriod.get(now).add(registeredUser);
-            this.currentlyRegisteredUsers++;
+            this.currentlyRegisteredUsers.incrementAndGet();
         }
 
         cleanUpScheduleTask.cancel(true);

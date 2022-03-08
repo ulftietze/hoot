@@ -45,7 +45,6 @@ public class UserRepository extends AbstractRepository<User>
 
             resultSet.close();
             statement.close();
-            connection.close();
 
             return quantity;
         } catch (SQLException e) {
@@ -172,10 +171,9 @@ public class UserRepository extends AbstractRepository<User>
             pss.setString(1, user.username);
             pss.setString(2, user.imagePath);
             pss.setString(3, user.passwordHash);
-            int rowCount = pss.executeUpdate();
 
+            int rowCount = pss.executeUpdate();
             pss.close();
-            connection.close();
 
             if (rowCount == 0) {
                 throw new CouldNotSaveException("new User with username " + user.username);
@@ -222,9 +220,9 @@ public class UserRepository extends AbstractRepository<User>
             }
         } catch (SQLException e) {
             throw new CouldNotSaveException("User with username " + user.username);
+        } finally {
+            this.userCache.purge(user);
         }
-
-        this.userCache.purge(user);
     }
 
     /**
@@ -248,9 +246,9 @@ public class UserRepository extends AbstractRepository<User>
             }
         } catch (SQLException e) {
             throw new CouldNotDeleteException("User with username " + user.username);
+        } finally {
+            this.userCache.purge(user);
         }
-
-        this.userCache.purge(user);
     }
 
     private User mapResultSetToUser(ResultSet rs) throws SQLException

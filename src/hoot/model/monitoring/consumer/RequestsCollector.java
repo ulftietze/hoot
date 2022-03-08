@@ -13,7 +13,7 @@ import hoot.system.ObjectManager.ObjectManager;
 import hoot.system.Queue.ConsumerInterface;
 import hoot.system.Queue.QueueManager;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
@@ -59,32 +59,38 @@ public class RequestsCollector extends Thread implements CollectorInterface, Con
                 .createScheduledExecutorService()
                 .scheduleAtFixedRate(this::cleanup, 1, 1, TimeUnit.SECONDS);
 
-        while (this.running) {
-            HttpServletRequest request = (HttpServletRequest) this.queueManager.take(HttpRequestPublisher.QUEUE_ID);
-            Instant            now     = Instant.now();
+        try {
+            while (this.running) {
+                var     request = (HashMap<String, Object>) this.queueManager.take(HttpRequestPublisher.QUEUE_ID);
+                Instant now     = Instant.now();
 
-            if (request == null) {
-                continue;
-            }
+                if (request == null) {
+                    continue;
+                }
 
-            this.requestsCurrentSecond.incrementAndGet();
+                String      requestURI = (String) request.get("requestURI");
+                this.logger.log(requestURI);
+                HttpSession session    = (HttpSession) request.get("session");
 
-            if (this.isValidUserSession.execute(request.getSession())) {
-                int userId = (int) request.getSession().getAttribute(IsValidUserSession.SESSION_USER_IDENTIFIER);
-                try {
-                    User loggedInUser = this.userRepository.getById(userId);
+                this.requestsCurrentSecond.incrementAndGet();
 
-                    this.userCurLoggedIn.computeIfPresent(loggedInUser.id, (id, timestamp) -> {
-                        this.curLoggedIn.get(timestamp).removeIf(user -> Objects.equals(user.id, id));
-                        return now;
-                    });
-                    this.userCurLoggedIn.computeIfAbsent(loggedInUser.id, k -> now);
-                } catch (EntityNotFoundException e) {
-                    this.logger.logException("User " + userId + " from Session does not exist", e);
-                    cleanUpScheduleTask.cancel(true);
-                    throw new RuntimeException("User " + userId + " from Session does not exist");
+                if (this.isValidUserSession.execute(session)) {
+                    int userId = (int) session.getAttribute(IsValidUserSession.SESSION_USER_IDENTIFIER);
+                    try {
+                        User loggedInUser = this.userRepository.getById(userId);
+
+                        this.userCurLoggedIn.computeIfPresent(loggedInUser.id, (id, timestamp) -> {
+                            this.curLoggedIn.get(timestamp).removeIf(user -> Objects.equals(user.id, id));
+                            return now;
+                        });
+                        this.userCurLoggedIn.computeIfAbsent(loggedInUser.id, k -> now);
+                    } catch (EntityNotFoundException e) {
+                        this.logger.logException("User " + userId + " from Session does not exist", e);
+                    }
                 }
             }
+        } catch (Exception e) {
+            this.logger.logException("Something really weird happened, and this crashed: " + e.getMessage(), e);
         }
 
         cleanUpScheduleTask.cancel(true);
