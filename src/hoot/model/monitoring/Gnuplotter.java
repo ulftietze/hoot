@@ -55,7 +55,6 @@ public class Gnuplotter
     private static String getOutputStringFromProcess(Process process) throws IOException
     {
         BufferedReader br  = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        BufferedReader br2 = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 
         StringBuilder output = (StringBuilder) ObjectManager.create(StringBuilder.class);
         output.append("data:image/png;base64,");
@@ -63,10 +62,6 @@ public class Gnuplotter
         String tmp;
         while ((tmp = br.readLine()) != null) {
             output.append(tmp);
-        }
-
-        while ((tmp = br2.readLine()) != null) {
-            Gnuplotter.log(tmp);
         }
 
         return output.toString();
