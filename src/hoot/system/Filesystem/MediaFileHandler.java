@@ -37,7 +37,7 @@ public class MediaFileHandler
     public void saveBase64Image(String mediaName, String relativePath, String base64E)
     {
         if (relativePath != null && !relativePath.equals("")) {
-            new File(this.getMediaFilePath(relativePath)).mkdirs();
+            this.createDir(relativePath);
         }
 
         String[] parts       = base64E.split(",");
@@ -78,8 +78,13 @@ public class MediaFileHandler
         return this.contextUriPath + "/" + MediaFileHandler.mediaPath + "/" + relativePath;
     }
 
-    private String getMediaFilePath(String relativePath)
+    public String getMediaFilePath(String relativePath)
     {
         return this.webrootOnFilesystem + MediaFileHandler.mediaPath + File.separator + relativePath;
+    }
+
+    public boolean createDir(String relativePath)
+    {
+        return new File(this.getMediaFilePath(relativePath)).mkdirs();
     }
 }

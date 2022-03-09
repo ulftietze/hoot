@@ -6,159 +6,302 @@ import hoot.system.Filesystem.MediaFileHandler;
 import hoot.system.Logger.LoggerInterface;
 import hoot.system.ObjectManager.ObjectManager;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
+
+interface DataWriter
+{
+    ArrayList<String> writeToLines(ArrayList<History> input);
+}
 
 public class Gnuplotter
 {
-    private static final String tmpFile     = "tmp.txt";
-    private static       int    graphsSaved = 0;
+    private static final String                     tmpFolder   = "tmp";
+    private static final String                     tmpPath     = tmpFolder + File.separator;
+    private static final String                     graphFolder = "graphs";
+    private static final HashMap<GraphType, String> urlMap      = new HashMap<>();
 
-    public static synchronized String createStatisticsGraph(ArrayList<History> input)
+    public static synchronized String getGraphUrl(GraphType graphtype)
+    {
+        return urlMap.get(graphtype);
+    }
+
+    public static String createGraph(GraphType graphType, ArrayList<History> input)
+    {
+        switch (graphType) {
+            case Statistics:
+                return Gnuplotter.createStatisticsGraph(input);
+            case Thread:
+                return Gnuplotter.createThreadGraph(input);
+            case Memory:
+                return Gnuplotter.createMemoryGraph(input);
+            case CPULoad:
+                return Gnuplotter.createCPULoadGraph(input);
+            case SystemLoad:
+                return Gnuplotter.createSystemLoadGraph(input);
+            case Requests:
+                return Gnuplotter.createRequestsGraph(input);
+            case CurrentLoggedIn:
+                return Gnuplotter.createCurrentLoggedInGraph(input);
+        }
+        return null;
+    }
+
+    private static synchronized String createStatisticsGraph(ArrayList<History> input)
+    {
+        DataWriter dataWriter = (histories) -> {
+            ArrayList<String> result = new ArrayList<>();
+            for (History history : histories) {
+                String line = "";
+
+                line += history.timestamp.toString();
+                line += "\t";
+                line += history.loginsPerSixHours.toString();
+                line += "\t";
+                line += history.registrationsPerSixHours.toString();
+                line += "\t";
+                line += history.postsPerMinute.toString();
+
+                result.add(line);
+            }
+            return result;
+        };
+
+        String[] gnuplotDirectives = {
+                "u 1:2 t \"loginsPerSixHours\" w lines, ",
+                "u 1:3 t \"registrationsPerSixHours\" w lines, ",
+                "u 1:4 t \"postsPerMinute\" w lines"
+        };
+
+        return Gnuplotter.createGraphWithGnuplot(GraphType.Statistics, input, dataWriter, gnuplotDirectives);
+    }
+
+    private static String createThreadGraph(ArrayList<History> input)
+    {
+        DataWriter dataWriter = (histories) -> {
+            ArrayList<String> result = new ArrayList<>();
+            for (History history : histories) {
+                String line = "";
+
+                line += history.timestamp.toString();
+                line += "\t";
+                line += history.threadCount.toString();
+                line += "\t";
+                line += history.threadCountTotal.toString();
+
+                result.add(line);
+            }
+            return result;
+        };
+
+        String[] gnuplotDirectives = {
+                "u 1:2 t \"threadCount\" w lines, ",
+                "u 1:3 t \"threadCountTotal\" w lines",
+                };
+
+        return Gnuplotter.createGraphWithGnuplot(GraphType.Thread, input, dataWriter, gnuplotDirectives);
+    }
+
+    private static String createMemoryGraph(ArrayList<History> input)
+    {
+        DataWriter dataWriter = (histories) -> {
+            ArrayList<String> result = new ArrayList<>();
+            for (History history : histories) {
+                String line = "";
+
+                line += history.timestamp.toString();
+                line += "\t";
+                line += history.memoryMax.toString();
+                line += "\t";
+                line += history.memoryTotal.toString();
+                line += "\t";
+                line += history.memoryUsed.toString();
+                line += "\t";
+                line += history.memoryFree.toString();
+
+                result.add(line);
+            }
+            return result;
+        };
+
+        String[] gnuplotDirectives = {
+                "u 1:2 t \"memoryMax\" w lines, ",
+                "u 1:3 t \"memoryTotal\" w lines, ",
+                "u 1:4 t \"memoryUsed\" w lines, ",
+                "u 1:5 t \"memoryFree\" w lines",
+                };
+
+        return Gnuplotter.createGraphWithGnuplot(GraphType.Memory, input, dataWriter, gnuplotDirectives);
+    }
+
+    private static String createCPULoadGraph(ArrayList<History> input)
+    {
+        DataWriter dataWriter = (histories) -> {
+            ArrayList<String> result = new ArrayList<>();
+            for (History history : histories) {
+                String line = "";
+
+                line += history.timestamp.toString();
+                line += "\t";
+                line += history.systemCPULoad.toString();
+                line += "\t";
+                line += history.processCPULoad.toString();
+
+                result.add(line);
+            }
+            return result;
+        };
+
+        String[] gnuplotDirectives = {
+                "u 1:2 t \"systemCPULoad\" w lines, ",
+                "u 1:3 t \"processCPULoad\" w lines",
+                };
+
+        return Gnuplotter.createGraphWithGnuplot(GraphType.CPULoad, input, dataWriter, gnuplotDirectives);
+    }
+
+    private static String createSystemLoadGraph(ArrayList<History> input)
+    {
+        DataWriter dataWriter = (histories) -> {
+            ArrayList<String> result = new ArrayList<>();
+            for (History history : histories) {
+                String line = "";
+
+                line += history.timestamp.toString();
+                line += "\t";
+                line += history.systemLoadAverage.toString();
+
+                result.add(line);
+            }
+            return result;
+        };
+
+        String[] gnuplotDirectives = {
+                "u 1:2 t \"systemLoadAverage\" w lines",
+                };
+
+        return Gnuplotter.createGraphWithGnuplot(GraphType.SystemLoad, input, dataWriter, gnuplotDirectives);
+    }
+
+    private static String createRequestsGraph(ArrayList<History> input)
+    {
+        DataWriter dataWriter = (histories) -> {
+            ArrayList<String> result = new ArrayList<>();
+            for (History history : histories) {
+                String line = "";
+
+                line += history.timestamp.toString();
+                line += "\t";
+                line += history.requestsPerSecond.toString();
+                line += "\t";
+                line += history.requestsLoggedInPerSecond.toString();
+
+                result.add(line);
+            }
+            return result;
+        };
+
+        String[] gnuplotDirectives = {
+                "u 1:2 t \"requestsPerSecond\" w lines, ",
+                "u 1:3 t \"requestsLoggedInPerSecond\" w lines",
+                };
+
+        return Gnuplotter.createGraphWithGnuplot(GraphType.Requests, input, dataWriter, gnuplotDirectives);
+    }
+
+    private static String createCurrentLoggedInGraph(ArrayList<History> input)
+    {
+        DataWriter dataWriter = (histories) -> {
+            ArrayList<String> result = new ArrayList<>();
+            for (History history : histories) {
+                String line = "";
+
+                line += history.timestamp.toString();
+                line += "\t";
+                line += history.currentLoggedIn.toString();
+
+                result.add(line);
+            }
+            return result;
+        };
+
+        String[] gnuplotDirectives = {
+                "u 1:2 t \"currentLoggedIn\" w lines",
+                };
+
+        return Gnuplotter.createGraphWithGnuplot(GraphType.CurrentLoggedIn, input, dataWriter, gnuplotDirectives);
+    }
+
+    private synchronized static String createGraphWithGnuplot(
+            final GraphType graphType, final ArrayList<History> input, DataWriter dataWriter, String[] gnuplotDirectives
+    )
     {
         if (input == null) {
             return null;
         }
 
-        final String tmpPath = "tmp";
+        FileHandler      fileHandler      = (FileHandler) ObjectManager.create(FileHandler.class);
+        ProcessBuilder   plotProcess      = (ProcessBuilder) ObjectManager.create(ProcessBuilder.class);
+        StringBuilder    plotCall         = (StringBuilder) ObjectManager.create(StringBuilder.class);
+        MediaFileHandler mediaFileHandler = (MediaFileHandler) ObjectManager.create(MediaFileHandler.class);
 
-        ArrayList<String> data        = Gnuplotter.parseInputToData(input);
-        FileHandler       fileHandler = (FileHandler) ObjectManager.create(FileHandler.class);
-        String            filepath    = fileHandler.save(data, tmpPath, tmpFile);
+        final String      tmpDataFile        = graphType.toString() + ".txt";
+        ArrayList<String> data               = dataWriter.writeToLines(input);
+        final String      dataFileSystemPath = fileHandler.save(data, tmpFolder, tmpDataFile);
+        final String graphFileSystemPath = mediaFileHandler.getMediaFilePath(
+                graphFolder + File.separator + graphType + ".png");
 
-        ProcessBuilder getPlotResultCurrent = (ProcessBuilder) ObjectManager.create(ProcessBuilder.class);
+        plotCall
+                .append("gnuplot -e '")
+                .append("set terminal png size 1024,576; ")
+                .append("set output \"")
+                .append(graphFileSystemPath)
+                .append("\"; ")
+                .append("set xdata time; ")
+                .append("set timefmt \"%Y-%m-%dT%H:%M:%S\"; ");
 
-        getPlotResultCurrent.command("/bin/bash", "-c", Gnuplotter.getGnuplotCallCurrent(filepath));
+        for (int i = 0; i < gnuplotDirectives.length; ++i) {
+            if (i == 0) {
+                plotCall.append("plot ");
+            }
+            plotCall.append("\"").append(dataFileSystemPath).append("\" ");
+            plotCall.append(gnuplotDirectives[i]);
+        }
+        plotCall.append("'");
+
+        plotProcess.command("/bin/bash", "-c", plotCall.toString());
+
+        mediaFileHandler.createDir(graphFolder);
 
         try {
-            String b64ResultCurrent = Gnuplotter.getOutputStringFromProcess(getPlotResultCurrent.start());
+            plotProcess.start().waitFor();
 
-            return Gnuplotter.saveBase64Image(b64ResultCurrent);
+            String url = mediaFileHandler.getImageUrl(graphFolder + "/" + graphType + ".png");
+
+            Gnuplotter.urlMap.put(graphType, url);
+
+            return url;
         } catch (IOException e) {
-            Gnuplotter.log("Could not create Historie-Graph: " + e.getMessage());
+            Gnuplotter.log("Gnuplot Process execution failed: " + e.getMessage());
+            return null;
+        } catch (InterruptedException e) {
+            Gnuplotter.log("Gnuplot Process failed to terminate: " + e.getMessage());
             return null;
         } finally {
-            fileHandler.delete(tmpPath, tmpFile);
+            fileHandler.delete(tmpPath, tmpDataFile);
         }
     }
 
-    private static String getOutputStringFromProcess(Process process) throws IOException
-    {
-        BufferedReader br  = new BufferedReader(new InputStreamReader(process.getInputStream()));
-
-        StringBuilder output = (StringBuilder) ObjectManager.create(StringBuilder.class);
-        output.append("data:image/png;base64,");
-
-        String tmp;
-        while ((tmp = br.readLine()) != null) {
-            output.append(tmp);
-        }
-
-        return output.toString();
-    }
-
-    private static ArrayList<String> parseInputToData(ArrayList<History> input)
-    {
-        ArrayList<String> result = new ArrayList<>();
-
-        for (History historie : input) {
-            String line = "";
-
-            line += (historie.timestamp.toString());
-            line += ("\t");
-            line += (historie.loginsPerSixHours.toString());
-            line += ("\t");
-            line += (historie.registrationsPerSixHours.toString());
-            line += ("\t");
-            line += (historie.postsPerMinute.toString());
-
-            result.add(line);
-        }
-
-        return result;
-    }
-
-    private static String getGnuplotCallCurrent(String dataPath)
-    {
-        StringBuilder plotCallCurrent = (StringBuilder) ObjectManager.create(StringBuilder.class);
-
-        plotCallCurrent.append("gnuplot -e '");
-        plotCallCurrent.append("set terminal png size 1024,576; ");
-        plotCallCurrent.append("set xdata time; ");
-        plotCallCurrent.append("set timefmt \"%Y-%m-%dT%H:%M:%S\"; ");
-
-        plotCallCurrent.append("plot \"");
-        plotCallCurrent.append(dataPath);
-        plotCallCurrent.append("\" u 1:2 ");
-        plotCallCurrent.append("t \"loginsPerSixHours\" ");
-        plotCallCurrent.append("w lines, ");
-
-        plotCallCurrent.append("\"");
-        plotCallCurrent.append(dataPath);
-        plotCallCurrent.append("\" u 1:3 ");
-        plotCallCurrent.append("t \"registrationsPerSixHours\" ");
-        plotCallCurrent.append("w lines, ");
-
-        plotCallCurrent.append("\"");
-        plotCallCurrent.append(dataPath);
-        plotCallCurrent.append("\" u 1:4 ");
-        plotCallCurrent.append("t \"postsPerMinute\" ");
-        plotCallCurrent.append("w lines");
-
-        plotCallCurrent.append("'");
-        plotCallCurrent.append(" | base64");
-
-        return plotCallCurrent.toString();
-    }
-
-    private static String getGnuplotCallPerSec(String dataPath)
-    {
-        StringBuilder plotCallPerSec = (StringBuilder) ObjectManager.create(StringBuilder.class);
-
-        plotCallPerSec.append("gnuplot -e '");
-        plotCallPerSec.append("set terminal png size 1024,576; ");
-        plotCallPerSec.append("set output " + MediaFileHandler.mediaPath + " ; ");
-        plotCallPerSec.append("set xdata time; ");
-        plotCallPerSec.append("set timefmt \"%Y-%m-%dT%H:%M:%S\"; ");
-
-        plotCallPerSec.append("plot \"");
-        plotCallPerSec.append(dataPath);
-        plotCallPerSec.append("\" u 1:4 ");
-        plotCallPerSec.append("t \"postsPerSecond\" ");
-        plotCallPerSec.append("w lines, ");
-
-        plotCallPerSec.append("\"");
-        plotCallPerSec.append(dataPath);
-        plotCallPerSec.append("\" u 1:5 ");
-        plotCallPerSec.append("t \"requestsPerSecond\" ");
-        plotCallPerSec.append("w lines, ");
-
-        plotCallPerSec.append("\"");
-        plotCallPerSec.append(dataPath);
-        plotCallPerSec.append("\" u 1:6 ");
-        plotCallPerSec.append("t \"loginsPerSecond\" ");
-        plotCallPerSec.append("w lines");
-
-        plotCallPerSec.append("'");
-
-        return plotCallPerSec.toString();
-    }
-
-    private static String saveBase64Image(String base64result)
-    {
-        MediaFileHandler fileHandler = (MediaFileHandler) ObjectManager.create(MediaFileHandler.class);
-
-        fileHandler.saveBase64Image(graphsSaved + ".png", "monitoring" + File.separator, base64result);
-
-        return fileHandler.getImageUrl("monitoring" + File.separator + graphsSaved++ + ".png");
-    }
-
-    protected static synchronized void log(String input)
+    private static synchronized void log(String input)
     {
         LoggerInterface logger = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
         logger.log(input);
+    }
+
+    public enum GraphType
+    {
+        Statistics, Thread, Memory, CPULoad, SystemLoad, Requests, CurrentLoggedIn
     }
 }

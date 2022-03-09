@@ -63,8 +63,14 @@ public class TestServlet extends HttpServlet
         // The Image will sometimes stay the same, even if the numbers change.
         // This is because the browser will cache the generated image and might not notice that it has changed after reloading.
         // We cannot do anything about this (without JS and force reload)!
-        String url = Gnuplotter.createStatisticsGraph(historyList);
-        out.println("<img src=\"" + url + "\" alt=\"Graph\"> ");
+
+        for (Gnuplotter.GraphType graphType : Gnuplotter.GraphType.values()) {
+            String url = Gnuplotter.getGraphUrl(graphType);
+            if (url == null) {
+                url = Gnuplotter.createGraph(graphType, historyList);
+            }
+            out.println("<img src=\"" + url + "\" alt=\"Graph\"> ");
+        }
 
         out.println("</body>");
         out.println("</html>");
