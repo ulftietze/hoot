@@ -78,7 +78,7 @@ public class Gnuplotter
         return Gnuplotter.createGraphWithGnuplot(GraphType.Statistics, input, dataWriter, gnuplotDirectives);
     }
 
-    private static String createThreadGraph(ArrayList<History> input)
+    private static synchronized String createThreadGraph(ArrayList<History> input)
     {
         DataWriter dataWriter = (histories) -> {
             ArrayList<String> result = new ArrayList<>();
@@ -104,7 +104,7 @@ public class Gnuplotter
         return Gnuplotter.createGraphWithGnuplot(GraphType.Thread, input, dataWriter, gnuplotDirectives);
     }
 
-    private static String createMemoryGraph(ArrayList<History> input)
+    private static synchronized String createMemoryGraph(ArrayList<History> input)
     {
         DataWriter dataWriter = (histories) -> {
             ArrayList<String> result = new ArrayList<>();
@@ -136,7 +136,7 @@ public class Gnuplotter
         return Gnuplotter.createGraphWithGnuplot(GraphType.Memory, input, dataWriter, gnuplotDirectives);
     }
 
-    private static String createCPULoadGraph(ArrayList<History> input)
+    private static synchronized String createCPULoadGraph(ArrayList<History> input)
     {
         DataWriter dataWriter = (histories) -> {
             ArrayList<String> result = new ArrayList<>();
@@ -162,7 +162,7 @@ public class Gnuplotter
         return Gnuplotter.createGraphWithGnuplot(GraphType.CPULoad, input, dataWriter, gnuplotDirectives);
     }
 
-    private static String createSystemLoadGraph(ArrayList<History> input)
+    private static synchronized String createSystemLoadGraph(ArrayList<History> input)
     {
         DataWriter dataWriter = (histories) -> {
             ArrayList<String> result = new ArrayList<>();
@@ -185,7 +185,7 @@ public class Gnuplotter
         return Gnuplotter.createGraphWithGnuplot(GraphType.SystemLoad, input, dataWriter, gnuplotDirectives);
     }
 
-    private static String createRequestsGraph(ArrayList<History> input)
+    private static synchronized String createRequestsGraph(ArrayList<History> input)
     {
         DataWriter dataWriter = (histories) -> {
             ArrayList<String> result = new ArrayList<>();
@@ -211,7 +211,7 @@ public class Gnuplotter
         return Gnuplotter.createGraphWithGnuplot(GraphType.Requests, input, dataWriter, gnuplotDirectives);
     }
 
-    private static String createCurrentLoggedInGraph(ArrayList<History> input)
+    private static synchronized String createCurrentLoggedInGraph(ArrayList<History> input)
     {
         DataWriter dataWriter = (histories) -> {
             ArrayList<String> result = new ArrayList<>();
@@ -234,7 +234,7 @@ public class Gnuplotter
         return Gnuplotter.createGraphWithGnuplot(GraphType.CurrentLoggedIn, input, dataWriter, gnuplotDirectives);
     }
 
-    private synchronized static String createGraphWithGnuplot(
+    private static synchronized String createGraphWithGnuplot(
             final GraphType graphType, final ArrayList<History> input, DataWriter dataWriter, String[] gnuplotDirectives
     )
     {
