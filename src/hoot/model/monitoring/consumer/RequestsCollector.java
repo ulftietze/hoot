@@ -59,8 +59,8 @@ public class RequestsCollector extends Thread implements CollectorInterface, Con
                 .createScheduledExecutorService()
                 .scheduleAtFixedRate(this::cleanup, 1, 1, TimeUnit.SECONDS);
 
-        try {
-            while (this.running) {
+        while (this.running) {
+            try {
                 var     request = (HashMap<String, Object>) this.queueManager.take(HttpRequestPublisher.QUEUE_ID);
                 Instant now     = Instant.now();
 
@@ -68,11 +68,9 @@ public class RequestsCollector extends Thread implements CollectorInterface, Con
                     continue;
                 }
 
-                String      requestURI = (String) request.get("requestURI");
-                this.logger.log(requestURI);
-                HttpSession session    = (HttpSession) request.get("session");
-
                 this.requestsCurrentSecond.incrementAndGet();
+
+                HttpSession session = (HttpSession) request.get("session");
 
                 if (this.isValidUserSession.execute(session)) {
                     int userId = (int) session.getAttribute(IsValidUserSession.SESSION_USER_IDENTIFIER);
@@ -88,9 +86,9 @@ public class RequestsCollector extends Thread implements CollectorInterface, Con
                         this.logger.logException("User " + userId + " from Session does not exist", e);
                     }
                 }
+            } catch (Throwable e) {
+                this.logger.logException("Something really weird happened, and this crashed: " + e.getMessage(), e);
             }
-        } catch (Exception e) {
-            this.logger.logException("Something really weird happened, and this crashed: " + e.getMessage(), e);
         }
 
         cleanUpScheduleTask.cancel(true);

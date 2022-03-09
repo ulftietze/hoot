@@ -4,6 +4,7 @@ import hoot.model.entities.User;
 import hoot.model.queue.publisher.RegistrationPublisher;
 import hoot.model.repositories.UserRepository;
 import hoot.system.Exception.CollectorException;
+import hoot.system.Logger.LoggerInterface;
 import hoot.system.Monitoring.CollectorInterface;
 import hoot.system.Monitoring.CollectorResult;
 import hoot.system.ObjectManager.ObjectManager;
@@ -29,9 +30,11 @@ public class CountRegistrationsCollector extends Thread implements CollectorInte
 
     private final NavigableMap<Integer, Instant> userRegisteredInPeriod;
 
-    private boolean running = true;
+    private final LoggerInterface logger;
 
-    private AtomicInteger currentlyRegisteredUsers;
+    private final AtomicInteger currentlyRegisteredUsers;
+
+    private boolean running = true;
 
     public CountRegistrationsCollector()
     {
@@ -41,6 +44,7 @@ public class CountRegistrationsCollector extends Thread implements CollectorInte
         this.registrationsInPeriod    = Collections.synchronizedNavigableMap(new TreeMap<>());
         this.userRegisteredInPeriod   = Collections.synchronizedNavigableMap(new TreeMap<>());
         this.currentlyRegisteredUsers = new AtomicInteger(userRepository.getAllUsersCount());
+        this.logger                   = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
     }
 
     @Override
@@ -51,22 +55,27 @@ public class CountRegistrationsCollector extends Thread implements CollectorInte
                 .scheduleAtFixedRate(this::cleanup, 1, 1, TimeUnit.SECONDS);
 
         while (this.running) {
-            User    registeredUser = (User) this.queueManager.take(RegistrationPublisher.QUEUE_ID);
-            Instant now            = Instant.now();
+            try {
+                User    registeredUser = (User) this.queueManager.take(RegistrationPublisher.QUEUE_ID);
+                Instant now            = Instant.now();
 
-            if (registeredUser == null) {
-                continue;
+                if (registeredUser == null) {
+                    continue;
+                }
+
+                this.currentlyRegisteredUsers.incrementAndGet();
+
+                this.userRegisteredInPeriod.computeIfPresent(registeredUser.id, (k, v) -> {
+                    this.registrationsInPeriod.get(v).removeIf(user -> Objects.equals(user.id, k));
+                    return now;
+                });
+                this.userRegisteredInPeriod.computeIfAbsent(registeredUser.id, k -> now);
+
+                this.registrationsInPeriod.computeIfAbsent(now, k -> new ArrayList<>());
+                this.registrationsInPeriod.get(now).add(registeredUser);
+            } catch (Throwable e) {
+                this.logger.logException("Something really weird happened, and this crashed: " + e.getMessage(), e);
             }
-
-            this.userRegisteredInPeriod.computeIfPresent(registeredUser.id, (k, v) -> {
-                this.registrationsInPeriod.get(v).removeIf(user -> Objects.equals(user.id, k));
-                return now;
-            });
-            this.userRegisteredInPeriod.computeIfAbsent(registeredUser.id, k -> now);
-
-            this.registrationsInPeriod.computeIfAbsent(now, k -> new ArrayList<>());
-            this.registrationsInPeriod.get(now).add(registeredUser);
-            this.currentlyRegisteredUsers.incrementAndGet();
         }
 
         cleanUpScheduleTask.cancel(true);
@@ -97,7 +106,10 @@ public class CountRegistrationsCollector extends Thread implements CollectorInte
     private void cleanup()
     {
         Instant ofMinutes = Instant.now().minus(Duration.ofHours(PERIOD_REGISTRATIONS_MINUTES));
-        this.registrationsInPeriod.headMap(ofMinutes, false).clear();
+
+        Map<Instant, ArrayList<User>> inPeriod = this.registrationsInPeriod.headMap(ofMinutes, true);
+        inPeriod.forEach((instant, users) -> users.forEach(user -> this.userRegisteredInPeriod.remove(user.id)));
+        inPeriod.clear();
     }
 
     private ScheduledExecutorService createScheduledExecutorService()

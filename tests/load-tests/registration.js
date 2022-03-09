@@ -2,9 +2,9 @@ import http from 'k6/http';
 import { check } from 'k6';
 
 export let options = {
-    vus       : '5',
+    vus       : '10',
     duration  : '120s',
-    iterations: '50000',
+    iterations: '30000',
 };
 
 export default function() {
@@ -19,7 +19,7 @@ export default function() {
         headers: {'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8'},
     });
 
-    console.log(res.json());
+    //console.log(res.json());
     check(res, {'status is 201': (r) => r.status === 201});
 }
 

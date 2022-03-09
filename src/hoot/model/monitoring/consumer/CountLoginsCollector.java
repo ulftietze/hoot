@@ -45,23 +45,26 @@ public class CountLoginsCollector extends Thread implements CollectorInterface, 
                 .scheduleAtFixedRate(this::cleanup, 1, 1, TimeUnit.SECONDS);
 
         while (this.running) {
-            User    loggedInUser = (User) this.queueManager.take(LoginPublisher.QUEUE_ID);
-            Instant now          = Instant.now();
+            try {
+                User    loggedInUser = (User) this.queueManager.take(LoginPublisher.QUEUE_ID);
+                Instant now          = Instant.now();
 
-            if (loggedInUser == null) {
-                continue;
+                if (loggedInUser == null) {
+                    continue;
+                }
+
+                this.loginsInPeriod.computeIfAbsent(now, k -> new ArrayList<>());
+                this.loginsInPeriod.get(now).add(loggedInUser);
+
+                this.userLoggedInInPeriod.computeIfPresent(loggedInUser.id, (k, v) -> {
+                    this.loginsInPeriod.get(v).removeIf(user -> Objects.equals(user.id, k));
+                    return now;
+                });
+                this.userLoggedInInPeriod.computeIfAbsent(loggedInUser.id, k -> now);
+            } catch (Throwable e) {
+                this.logger.logException("Something really weird happened, and this crashed: " + e.getMessage(), e);
             }
-
-            this.userLoggedInInPeriod.computeIfPresent(loggedInUser.id, (k, v) -> {
-                this.loginsInPeriod.get(v).removeIf(user -> Objects.equals(user.id, k));
-                return now;
-            });
-            this.userLoggedInInPeriod.computeIfAbsent(loggedInUser.id, k -> now);
-
-            this.loginsInPeriod.computeIfAbsent(now, k -> new ArrayList<>());
-            this.loginsInPeriod.get(now).add(loggedInUser);
         }
-
         cleanUpScheduleTask.cancel(true);
     }
 

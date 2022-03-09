@@ -66,20 +66,20 @@ public class StartMonitorContextListener implements ServletContextListener
         RequestsCollector           requestsCollector      = this.getRequestCollector();
         Monitor                     monitor                = (Monitor) ObjectManager.get(Monitor.class);
 
-        monitor.stopRun();
+        requestsCollector.stopRun();
         loginsCollector.stopRun();
         registrationsCollector.stopRun();
         tagCollector.stopRun();
-        requestsCollector.stopRun();
+        monitor.stopRun();
 
-        monitor.interrupt();
+        requestsCollector.interrupt();
         loginsCollector.interrupt();
         registrationsCollector.interrupt();
         tagCollector.interrupt();
-        requestsCollector.interrupt();
+        monitor.interrupt();
 
         try {
-            Thread.sleep(2000L);
+            Thread.sleep(1000L);
         } catch (InterruptedException e) {
             sce.getServletContext().log("Could not wait: " + e.getMessage());
         }

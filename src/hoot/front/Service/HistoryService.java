@@ -69,6 +69,8 @@ public class HistoryService implements ServiceInterface
                             + ((ArrayList<Tag>) mostUsedTags.get("popularTags")).stream().map(t -> t.tag).collect(Collectors.joining(",")) + "\n"
             );
 
+            System.gc();
+
             //try {
             //    historyRepository.save(entity);
             //} catch (CouldNotSaveException e) {
