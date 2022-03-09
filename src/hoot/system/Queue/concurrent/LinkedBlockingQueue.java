@@ -191,8 +191,8 @@ public class LinkedBlockingQueue<E> extends AbstractQueue<E>
     {
         // assert takeLock.isHeldByCurrentThread();
         // assert head.item == null;
-        hoot.system.Queue.concurrent.LinkedBlockingQueue.Node<E> h     = head;
-        hoot.system.Queue.concurrent.LinkedBlockingQueue.Node<E> first = h.next;
+        Node<E> h     = head;
+        Node<E> first = h.next;
         h.next = h; // help GC
         head   = first;
         E x = first.item;

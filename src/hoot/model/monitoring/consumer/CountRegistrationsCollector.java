@@ -28,7 +28,7 @@ public class CountRegistrationsCollector extends Thread implements CollectorInte
 
     private final NavigableMap<Instant, ArrayList<User>> registrationsInPeriod;
 
-    private final NavigableMap<Integer, Instant> userRegisteredInPeriod;
+    private final NavigableMap<String, Instant> userRegisteredInPeriod;
 
     private final LoggerInterface logger;
 
@@ -65,11 +65,11 @@ public class CountRegistrationsCollector extends Thread implements CollectorInte
 
                 this.currentlyRegisteredUsers.incrementAndGet();
 
-                this.userRegisteredInPeriod.computeIfPresent(registeredUser.id, (k, v) -> {
-                    this.registrationsInPeriod.get(v).removeIf(user -> Objects.equals(user.id, k));
+                this.userRegisteredInPeriod.computeIfPresent(registeredUser.username, (k, v) -> {
+                    this.registrationsInPeriod.get(v).removeIf(user -> Objects.equals(user.username, k));
                     return now;
                 });
-                this.userRegisteredInPeriod.computeIfAbsent(registeredUser.id, k -> now);
+                this.userRegisteredInPeriod.computeIfAbsent(registeredUser.username, k -> now);
 
                 this.registrationsInPeriod.computeIfAbsent(now, k -> new ArrayList<>());
                 this.registrationsInPeriod.get(now).add(registeredUser);
@@ -108,7 +108,7 @@ public class CountRegistrationsCollector extends Thread implements CollectorInte
         Instant ofMinutes = Instant.now().minus(Duration.ofHours(PERIOD_REGISTRATIONS_MINUTES));
 
         Map<Instant, ArrayList<User>> inPeriod = this.registrationsInPeriod.headMap(ofMinutes, true);
-        inPeriod.forEach((instant, users) -> users.forEach(user -> this.userRegisteredInPeriod.remove(user.id)));
+        inPeriod.forEach((instant, users) -> users.forEach(user -> this.userRegisteredInPeriod.remove(user.username)));
         inPeriod.clear();
     }
 

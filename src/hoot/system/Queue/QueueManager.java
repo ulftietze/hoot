@@ -10,23 +10,19 @@ import java.util.TreeMap;
 
 public class QueueManager
 {
-    private final NavigableMap<String, LinkedBlockingQueue<Object>>
-            queues
-            = Collections.synchronizedNavigableMap(new TreeMap<>());
+    private final NavigableMap<String, LinkedBlockingQueue<Object>> queues;
 
     private final LoggerInterface logger;
 
     public QueueManager()
     {
+        this.queues = Collections.synchronizedNavigableMap(new TreeMap<>());
         this.logger = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
     }
 
     public void add(String queueName, Object data)
     {
         this.queues.computeIfAbsent(queueName, k -> new LinkedBlockingQueue<>(20000));
-
-        //var q = this.queues.get(queueName);
-        //this.logger.log("[ADD QueueName " + queueName + "] Size: " + q.size() + " // Capacity: " + q.remainingCapacity());
 
         try {
             this.queues.get(queueName).put(data);
@@ -38,9 +34,6 @@ public class QueueManager
     public Object take(String queueName)
     {
         this.queues.computeIfAbsent(queueName, k -> new LinkedBlockingQueue<>(20000));
-
-        //var q = this.queues.get(queueName);
-        //this.logger.log("[TAKE QueueName " + queueName + "] Size: " + q.size() + " // Capacity: " + q.remainingCapacity());
 
         try {
             return this.queues.get(queueName).take();

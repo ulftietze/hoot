@@ -2,9 +2,9 @@ import http from 'k6/http';
 import { check } from 'k6';
 
 export let options = {
-    vus       : '10',
-    duration  : '120s',
-    iterations: '30000',
+    vus       : '50',
+    //duration  : '120s',
+    iterations: '300000',
 };
 
 export default function() {
