@@ -36,7 +36,9 @@ public class MediaFileHandler
      */
     public void saveBase64Image(String mediaName, String relativePath, String base64E)
     {
-        if (relativePath != null && !relativePath.equals("")) {
+        relativePath = relativePath != null ? relativePath : "";
+
+        if (!relativePath.equals("")) {
             this.createDir(relativePath);
         }
 
@@ -46,7 +48,7 @@ public class MediaFileHandler
         Decoder decoder   = Base64.getMimeDecoder();
         byte[]  imageByte = decoder.decode(imageString);
 
-        String imagePath = this.getMediaFilePath(relativePath + mediaName);
+        String imagePath = this.getMediaFilePath(relativePath + File.separator + mediaName);
 
         try {
             Path path = Paths.get(imagePath);
