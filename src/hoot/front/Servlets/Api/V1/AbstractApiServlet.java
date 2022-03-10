@@ -73,7 +73,7 @@ public abstract class AbstractApiServlet extends HttpServlet
         String imageName;
 
         if (filepath.contains("/")) {
-            relativePath = filepath.substring(0, filepath.lastIndexOf("/")).substring(1);
+            relativePath = filepath.substring(1, filepath.lastIndexOf("/"));
             imageName    = filepath.substring(0, filepath.length() - 1).substring(filepath.lastIndexOf("/") + 1);
         } else {
             relativePath = null;
@@ -83,3 +83,4 @@ public abstract class AbstractApiServlet extends HttpServlet
         this.mediaFileHandler.saveBase64Image(imageName, relativePath, base64E);
     }
 }
+
