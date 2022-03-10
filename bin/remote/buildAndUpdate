@@ -39,3 +39,4 @@ curl -s -n -T $name.war "https://informatik.hs-bremerhaven.de/$manager/text/depl
 #curl -s https://informatik.hs-bremerhaven.de/$name/hello|html2text
 
 sudo -u tomcat ln -s $REMOTE_PATH/media /var/lib/tomcat9/webapps/${name}/media
+chmod go+w $REMOTE_PATH/media
