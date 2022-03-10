@@ -245,7 +245,7 @@ public class Gnuplotter
         FileHandler      fileHandler      = (FileHandler) ObjectManager.create(FileHandler.class);
         ProcessBuilder   plotProcess      = (ProcessBuilder) ObjectManager.create(ProcessBuilder.class);
         StringBuilder    plotCall         = (StringBuilder) ObjectManager.create(StringBuilder.class);
-        MediaFileHandler mediaFileHandler = (MediaFileHandler) ObjectManager.create(MediaFileHandler.class);
+        MediaFileHandler mediaFileHandler = (MediaFileHandler) ObjectManager.get(MediaFileHandler.class);
 
         final String      tmpDataFile        = graphType.toString() + ".txt";
         ArrayList<String> data               = dataWriter.writeToLines(input);
