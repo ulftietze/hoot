@@ -13,7 +13,7 @@ import java.util.Base64.Decoder;
 
 public class MediaFileHandler
 {
-    public final static String mediaPath = "media/";
+    public final static String mediaPath = "media";
 
     private final String webrootOnFilesystem;
     private final String contextUriPath;
@@ -37,7 +37,7 @@ public class MediaFileHandler
     public void saveBase64Image(String mediaName, String relativePath, String base64E)
     {
         if (relativePath != null && !relativePath.equals("")) {
-            new File(this.getMediaFilePath(relativePath)).mkdirs();
+            this.createDir(relativePath);
         }
 
         String[] parts       = base64E.split(",");
@@ -49,7 +49,7 @@ public class MediaFileHandler
         String imagePath = this.getMediaFilePath(relativePath + mediaName);
 
         try {
-            Path path = Paths.get(imagePath + mediaName);
+            Path path = Paths.get(imagePath);
             Files.write(path, imageByte);
         } catch (IOException e) {
             this.logger.logException("Saving of File " + imagePath + " failed: " + e.getMessage(), e);
@@ -75,11 +75,16 @@ public class MediaFileHandler
      */
     public String getImageUrl(String relativePath)
     {
-        return this.contextUriPath + File.separator + MediaFileHandler.mediaPath + File.separator + relativePath;
+        return this.contextUriPath + "/" + MediaFileHandler.mediaPath + "/" + relativePath;
     }
 
-    private String getMediaFilePath(String relativePath)
+    public String getMediaFilePath(String relativePath)
     {
-        return this.webrootOnFilesystem + MediaFileHandler.mediaPath + relativePath;
+        return this.webrootOnFilesystem + MediaFileHandler.mediaPath + File.separator + relativePath;
+    }
+
+    public boolean createDir(String relativePath)
+    {
+        return new File(this.getMediaFilePath(relativePath)).mkdirs();
     }
 }

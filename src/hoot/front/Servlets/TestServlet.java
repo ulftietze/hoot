@@ -1,11 +1,8 @@
 package hoot.front.Servlets;
 
 import hoot.model.entities.History;
-import hoot.model.entities.Tag;
-import hoot.model.repositories.HistoryRepository;
+import hoot.model.monitoring.Gnuplotter;
 import hoot.system.Annotation.AuthenticationRequired;
-import hoot.system.Exception.CouldNotSaveException;
-import hoot.system.Exception.EntityNotFoundException;
 import hoot.system.ObjectManager.ObjectManager;
 
 import javax.servlet.annotation.WebServlet;
@@ -14,6 +11,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.concurrent.ThreadLocalRandom;
 
 @AuthenticationRequired(authenticationRequired = false)
 @WebServlet("/test")
@@ -21,84 +21,55 @@ public class TestServlet extends HttpServlet
 {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException
     {
-        PrintWriter out = response.getWriter();
         response.setContentType("text/html");
 
-        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
         out.println("<!doctype html><html>");
         out.println("<head> <meta charset='utf-8'>");
         out.println("<title>JDBC Test</title> </head>");
         out.println("<body>");
 
-        /*UserRepository     ur = (UserRepository) ObjectManager.get(UserRepository.class);
+        ArrayList<History> historyList = new ArrayList<>();
 
-        for (int i = 0; i < 4; ++i) {
-            try {
-                out.println("User " + i + "<br>");
+        for (int i = 0; i < 59; ++i) {
+            History h = (History) ObjectManager.create(History.class);
 
-                User user = ur.getById(i);
+            h.id = (long) i;
 
-                out.println(
-                        "ID: " + user.id + "<br>" +
-                        "Username: " + user.username + "<br>" +
-                        "ImagePath: " + user.imagePath + "<br>" +
-                        "PasswordHash: " + user.passwordHash + "<br>" +
-                        "lastLogin: " + user.lastLogin + "<br>" +
-                        "created: " + user.created + "<br>" +
-                        "followerCount: " + user.followerCount + "<br>"
-                );
-                out.println("<br>");
-            } catch (EntityNotFoundException e) {
-                out.println("DB connection failed or User not found.<br>");
-            }
-        }*/
+            h.timestamp = LocalDateTime.of(2022, 3, 4, 10, 51, i);
 
-        HistoryRepository repository = (HistoryRepository) ObjectManager.create(HistoryRepository.class);
+            h.currentLoggedIn          = ThreadLocalRandom.current().nextInt(15, 30 + 1);
+            h.currentlyRegisteredUsers = ThreadLocalRandom.current().nextInt(80, 100 + 1);
+            h.memoryMax                = 1024;
+            h.memoryTotal              = 1000;
+            h.memoryFree               = ThreadLocalRandom.current().nextInt(100, 900 + 1);
+            h.memoryUsed               = h.memoryTotal - h.memoryFree;
+            h.threadCount              = ThreadLocalRandom.current().nextInt(1, 20 + 1);
+            h.threadCountTotal         = 5 * i;
 
-        History h = new History();
-        h.memoryUsed = 1337;
+            h.loginsPerSixHours         = 50 + ThreadLocalRandom.current().nextFloat() * 50;
+            h.registrationsPerSixHours  = 10 + ThreadLocalRandom.current().nextFloat() * 10;
+            h.postsPerMinute            = 20 + ThreadLocalRandom.current().nextFloat() * 15;
+            h.requestsPerSecond         = 75 + ThreadLocalRandom.current().nextFloat() * 50;
+            h.requestsLoggedInPerSecond = 5 + ThreadLocalRandom.current().nextFloat() * 10;
 
-        try {
-            repository.save(h);
-        } catch (CouldNotSaveException e) {
-            e.printStackTrace();
+            h.systemLoadAverage = ThreadLocalRandom.current().nextDouble() * 4;
+            h.systemCPULoad     = ThreadLocalRandom.current().nextDouble() * 1;
+            h.processCPULoad    = ThreadLocalRandom.current().nextDouble() * 1;
+
+            historyList.add(h);
         }
 
-        out.println(h.id + " " + h.timestamp + "<br><br><br>");
+        // The Image will sometimes stay the same, even if the numbers change.
+        // This is because the browser will cache the generated image and might not notice that it has changed after reloading.
+        // We cannot do anything about this (without JS and force reload)!
 
-        h.currentLoggedIn = 9999;
-
-        try {
-            repository.save(h);
-        } catch (CouldNotSaveException e) {
-            e.printStackTrace();
-        }
-
-        for (long i = 1; i < 10; ++i) {
-            try {
-                out.println("Historie: " + i);
-
-                History history = repository.getById(i);
-
-                out.println(
-                        "ID: " + history.id + "<br>" +
-                        "timestamp: " + history.timestamp + "<br>" +
-                        "currentLoggedIn: " + history.currentLoggedIn + "<br>" +
-                        "requestsPerSecond: " + history.requestsPerSecond + "<br>" +
-                        "currentlyRegisteredUsers: " + history.currentlyRegisteredUsers + "<br>"
-                );
-
-                out.println("Tags: ");
-                if (history.trendingHashtags != null) {
-                    for (Tag tag : history.trendingHashtags) {
-                        out.println(tag.tag + " ");
-                    }
-                }
-                out.println("<br>");
-                out.println("<br>");
-            } catch (EntityNotFoundException e) {
-                out.println("DB connection failed or Historie not found.<br>");
+        for (Gnuplotter.GraphType graphType : Gnuplotter.GraphType.values()) {
+            String url = Gnuplotter.getGraphUrl(graphType);
+            if (url == null) {
+                url = Gnuplotter.createGraph(graphType, historyList);
             }
+            out.println("<img src=\"" + url + "\" alt=\"Graph\"> ");
         }
 
         out.println("</body>");
