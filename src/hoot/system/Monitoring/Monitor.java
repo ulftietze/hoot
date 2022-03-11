@@ -5,9 +5,6 @@ import hoot.system.Logger.LoggerInterface;
 import hoot.system.ObjectManager.ObjectManager;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 public class Monitor extends Thread
 {
@@ -53,7 +50,7 @@ public class Monitor extends Thread
 
             try {
                 // This may be flexibel and configurable
-                this.wait(1000);
+                Thread.sleep(1000);
             } catch (InterruptedException ignore) {
             }
         }

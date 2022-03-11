@@ -2,6 +2,7 @@ package hoot.model.repositories;
 
 import hoot.model.cache.UserCache;
 import hoot.model.entities.User;
+import hoot.model.search.DefaultSearchCriteria;
 import hoot.model.search.SearchCriteriaInterface;
 import hoot.system.Database.QueryBuilder;
 import hoot.system.Exception.CouldNotDeleteException;
@@ -27,32 +28,6 @@ public class UserRepository extends AbstractRepository<User>
 
         this.followerRepository = (FollowerRepository) ObjectManager.get(FollowerRepository.class);
         this.userCache          = (UserCache) ObjectManager.get(UserCache.class);
-    }
-
-    public Integer getAllUsersCount()
-    {
-        try (Connection connection = this.getConnection()) {
-            QueryBuilder queryBuilder = (QueryBuilder) ObjectManager.create(QueryBuilder.class);
-            queryBuilder.SELECT.add("count(*) AS quantity");
-            queryBuilder.FROM = "User";
-
-            PreparedStatement statement = queryBuilder.build(connection);
-            ResultSet resultSet         = statement.executeQuery();
-
-            resultSet.next();
-
-            int quantity = resultSet.getInt("quantity");
-
-            resultSet.close();
-            statement.close();
-            connection.close();
-
-            return quantity;
-        } catch (SQLException e) {
-            this.log(e.getMessage());
-        }
-
-        return 0;
     }
 
     /**
@@ -163,6 +138,38 @@ public class UserRepository extends AbstractRepository<User>
         return users;
     }
 
+    public Integer getUserQuantity()
+    {
+        DefaultSearchCriteria criteria = (DefaultSearchCriteria) ObjectManager.create(DefaultSearchCriteria.class);
+
+        return this.getUserQuantityBySearchCriteria(criteria);
+    }
+
+    public Integer getUserQuantityBySearchCriteria(SearchCriteriaInterface searchCriteriaInterface)
+    {
+        try (Connection connection = this.getConnection()) {
+            QueryBuilder queryBuilder = searchCriteriaInterface.getQueryBuilder();
+            queryBuilder.SELECT.add("count(*) AS quantity");
+            queryBuilder.FROM = "User";
+
+            PreparedStatement statement = queryBuilder.build(connection);
+            ResultSet resultSet         = statement.executeQuery();
+
+            resultSet.next();
+
+            int quantity = resultSet.getInt("quantity");
+
+            resultSet.close();
+            statement.close();
+
+            return quantity;
+        } catch (SQLException e) {
+            this.log(e.getMessage());
+        }
+
+        return 0;
+    }
+
     private void create(User user) throws CouldNotSaveException
     {
         try (Connection connection = this.getConnection()) {
@@ -172,10 +179,9 @@ public class UserRepository extends AbstractRepository<User>
             pss.setString(1, user.username);
             pss.setString(2, user.imagePath);
             pss.setString(3, user.passwordHash);
-            int rowCount = pss.executeUpdate();
 
+            int rowCount = pss.executeUpdate();
             pss.close();
-            connection.close();
 
             if (rowCount == 0) {
                 throw new CouldNotSaveException("new User with username " + user.username);
@@ -222,9 +228,9 @@ public class UserRepository extends AbstractRepository<User>
             }
         } catch (SQLException e) {
             throw new CouldNotSaveException("User with username " + user.username);
+        } finally {
+            this.userCache.purge(user);
         }
-
-        this.userCache.purge(user);
     }
 
     /**
@@ -248,9 +254,9 @@ public class UserRepository extends AbstractRepository<User>
             }
         } catch (SQLException e) {
             throw new CouldNotDeleteException("User with username " + user.username);
+        } finally {
+            this.userCache.purge(user);
         }
-
-        this.userCache.purge(user);
     }
 
     private User mapResultSetToUser(ResultSet rs) throws SQLException

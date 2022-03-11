@@ -10,16 +10,22 @@ public class UserSearchCriteria implements SearchCriteriaInterface
 {
     public ArrayList<Integer> userIds = new ArrayList<>();
 
+    public Integer createdAtSinceMinutes = null;
+
     @Override
     public QueryBuilder getQueryBuilder() throws SQLException
     {
-        QueryBuilder qb = (QueryBuilder) ObjectManager.create(QueryBuilder.class);
+        QueryBuilder queryBuilder = (QueryBuilder) ObjectManager.create(QueryBuilder.class);
 
         if (this.userIds.size() > 0) {
-            qb.WHERE.add("userId IN (?)");
-            qb.PARAMETERS.add(userIds.toString());
+            queryBuilder.WHERE.add("userId IN (?)");
+            queryBuilder.PARAMETERS.add(userIds.toString());
         }
 
-        return qb;
+        if (createdAtSinceMinutes != null) {
+            queryBuilder.addWhere("created > (NOW() - INTERVAL ? MINUTE)", this.createdAtSinceMinutes);
+        }
+
+        return queryBuilder;
     }
 }

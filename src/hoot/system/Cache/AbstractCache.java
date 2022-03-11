@@ -30,6 +30,8 @@ public abstract class AbstractCache<Type>
 
     public abstract void purge(Type type);
 
+    public abstract Integer getSize();
+
     protected synchronized Type getTypeFromCacheObject(CacheObject cacheObject)
     {
         if (cacheObject != null) {

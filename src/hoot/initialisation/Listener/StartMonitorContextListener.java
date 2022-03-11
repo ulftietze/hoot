@@ -1,6 +1,8 @@
 package hoot.initialisation.Listener;
 
 import hoot.front.Service.HistoryService;
+import hoot.model.monitoring.CacheSizeCollector;
+import hoot.model.monitoring.QueueSizeCollector;
 import hoot.model.monitoring.SystemWorkloadCollector;
 import hoot.model.monitoring.TagCollector;
 import hoot.model.monitoring.consumer.CountLoginsCollector;
@@ -21,6 +23,8 @@ public class StartMonitorContextListener implements ServletContextListener
 {
     private ScheduledFuture<?> historyScheduleAtFixedRate;
 
+    private boolean initialized = false;
+
     public void contextInitialized(ServletContextEvent contextEvent)
     {
         contextEvent.getServletContext().log("init StartMonitorContextListener");
@@ -31,8 +35,10 @@ public class StartMonitorContextListener implements ServletContextListener
         SystemWorkloadCollector     systemWorkloadCollector = this.getSystemWorkloadCollector();
         TagCollector                tagCollector            = this.getHashtagCollector();
         RequestsCollector           requestsCollector       = this.getRequestCollector();
+        QueueSizeCollector          queueSizeCollector      = this.getQueueSizeCollector();
+        CacheSizeCollector          cacheSizeCollector      = this.getCacheSizeCollector();
 
-        // Start Collector when a thread
+        // Start Collector when a thread/consumer
         loginsCollector.start();
         registrationsCollector.start();
         tagCollector.start();
@@ -42,9 +48,11 @@ public class StartMonitorContextListener implements ServletContextListener
         Monitor monitor = (Monitor) ObjectManager.get(Monitor.class);
         monitor.addCollector(loginsCollector);
         monitor.addCollector(registrationsCollector);
-        monitor.addCollector(systemWorkloadCollector);
-        monitor.addCollector(tagCollector);
         monitor.addCollector(requestsCollector);
+        monitor.addCollector(tagCollector);
+        monitor.addCollector(systemWorkloadCollector);
+        monitor.addCollector(queueSizeCollector);
+        monitor.addCollector(cacheSizeCollector);
         monitor.start();
 
         // Initialize recurring task to collect monitor data
@@ -52,11 +60,17 @@ public class StartMonitorContextListener implements ServletContextListener
         this.historyScheduleAtFixedRate = this
                 .createScheduledExecutorService()
                 .scheduleAtFixedRate(historyService::execute, 10, 1, TimeUnit.SECONDS);
+
+        this.initialized = true;
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent sce)
     {
+        if (!initialized) {
+            return;
+        }
+
         this.historyScheduleAtFixedRate.cancel(true);
 
         // Get Collectors
@@ -66,20 +80,20 @@ public class StartMonitorContextListener implements ServletContextListener
         RequestsCollector           requestsCollector      = this.getRequestCollector();
         Monitor                     monitor                = (Monitor) ObjectManager.get(Monitor.class);
 
-        monitor.stopRun();
+        requestsCollector.stopRun();
         loginsCollector.stopRun();
         registrationsCollector.stopRun();
         tagCollector.stopRun();
-        requestsCollector.stopRun();
+        monitor.stopRun();
 
-        monitor.interrupt();
+        requestsCollector.interrupt();
         loginsCollector.interrupt();
         registrationsCollector.interrupt();
         tagCollector.interrupt();
-        requestsCollector.interrupt();
+        monitor.interrupt();
 
         try {
-            Thread.sleep(2000L);
+            Thread.sleep(1000L);
         } catch (InterruptedException e) {
             sce.getServletContext().log("Could not wait: " + e.getMessage());
         }
@@ -113,5 +127,15 @@ public class StartMonitorContextListener implements ServletContextListener
     private ScheduledExecutorService createScheduledExecutorService()
     {
         return (ScheduledExecutorService) ObjectManager.create(ScheduledExecutorService.class);
+    }
+
+    private QueueSizeCollector getQueueSizeCollector()
+    {
+        return (QueueSizeCollector) ObjectManager.get(QueueSizeCollector.class);
+    }
+
+    private CacheSizeCollector getCacheSizeCollector()
+    {
+        return (CacheSizeCollector) ObjectManager.get(CacheSizeCollector.class);
     }
 }

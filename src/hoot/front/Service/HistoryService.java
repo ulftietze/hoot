@@ -2,10 +2,12 @@ package hoot.front.Service;
 
 import hoot.model.entities.History;
 import hoot.model.entities.Tag;
+import hoot.model.monitoring.CacheSizeCollector;
+import hoot.model.monitoring.QueueSizeCollector;
 import hoot.model.monitoring.SystemWorkloadCollector;
+import hoot.model.monitoring.TagCollector;
 import hoot.model.monitoring.consumer.CountLoginsCollector;
 import hoot.model.monitoring.consumer.CountRegistrationsCollector;
-import hoot.model.monitoring.TagCollector;
 import hoot.model.monitoring.consumer.RequestsCollector;
 import hoot.model.repositories.HistoryRepository;
 import hoot.system.Logger.LoggerInterface;
@@ -13,6 +15,7 @@ import hoot.system.Monitoring.CollectorResult;
 import hoot.system.Monitoring.Monitor;
 import hoot.system.Monitoring.MonitorData;
 import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.Serializer.Serializer;
 import hoot.system.Service.ServiceInterface;
 
 import java.util.ArrayList;
@@ -25,12 +28,15 @@ public class HistoryService implements ServiceInterface
 
     private final HistoryRepository historyRepository;
 
+    private final Serializer serializer;
+
     private final LoggerInterface logger;
 
     public HistoryService()
     {
         this.monitor           = (Monitor) ObjectManager.get(Monitor.class);
         this.historyRepository = (HistoryRepository) ObjectManager.get(HistoryRepository.class);
+        this.serializer        = (Serializer) ObjectManager.get(Serializer.class);
         this.logger            = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
     }
 
@@ -46,6 +52,8 @@ public class HistoryService implements ServiceInterface
             CollectorResult workload      = monitorData.get(SystemWorkloadCollector.COLLECTOR_NAME);
             CollectorResult requests      = monitorData.get(RequestsCollector.COLLECTOR_NAME);
             CollectorResult mostUsedTags  = monitorData.get(TagCollector.COLLECTOR_NAME);
+            CollectorResult queueSizes    = monitorData.get(QueueSizeCollector.COLLECTOR_NAME);
+            CollectorResult cacheSizes    = monitorData.get(CacheSizeCollector.COLLECTOR_NAME);
 
             this.logger.log("\n"
                             + "LoginsPerPeriod: " + logins.get("LoginsPerPeriod") + "\n"
@@ -53,10 +61,12 @@ public class HistoryService implements ServiceInterface
                             + "Registrations in Period: " + registrations.get("Registrations in Period") + "\n"
                             + "Currently Logged In: " + requests.get("Currently Logged In") + "\n"
                             + "Requests Per Second: " + requests.get("Requests Per Second") + "\n"
-                            + "Memory used: " + ((long)workload.get("Memory Used") / 1024 / 1024) + "MiB\n"
-                            + "Memory total: " + ((long)workload.get("Memory Total") / 1024 / 1024) + "MiB\n"
-                            + "Memory max: " + ((long)workload.get("Memory Max") / 1024 / 1024) + "MiB\n"
-                            + "Memory free: " + ((long)workload.get("Memory Free") / 1024 / 1024) + "MiB\n"
+                            + "Queue Sizes: " + this.serializer.serialize(queueSizes) + "\n"
+                            + "Cache Sizes: " + this.serializer.serialize(cacheSizes) + "\n"
+                            + "Memory used: " + ((long) workload.get("Memory Used") / 1024 / 1024) + "MiB\n"
+                            + "Memory total: " + ((long) workload.get("Memory Total") / 1024 / 1024) + "MiB\n"
+                            + "Memory max: " + ((long) workload.get("Memory Max") / 1024 / 1024) + "MiB\n"
+                            + "Memory free: " + ((long) workload.get("Memory Free") / 1024 / 1024) + "MiB\n"
                             + "Memory Heap Usage: " + workload.get("Memory Heap Usage") + "\n"
                             + "Memory NonHeap Usage: " + workload.get("Memory NonHeap Usage") + "\n"
                             + "Thread Count: " + workload.get("Thread Count") + "\n"
@@ -66,8 +76,13 @@ public class HistoryService implements ServiceInterface
                             + "Process CPU Load: " + workload.get("Process CPU Load") + "\n"
                             + "System CPU Load: " + workload.get("System CPU Load") + "\n"
                             + "Most recent tags: "
-                            + ((ArrayList<Tag>) mostUsedTags.get("popularTags")).stream().map(t -> t.tag).collect(Collectors.joining(",")) + "\n"
+                            + ((ArrayList<Tag>) mostUsedTags.get("popularTags"))
+                                    .stream()
+                                    .map(t -> t.tag)
+                                    .collect(Collectors.joining(",")) + "\n"
             );
+
+            //System.gc();
 
             //try {
             //    historyRepository.save(entity);

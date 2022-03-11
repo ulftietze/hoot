@@ -4,18 +4,19 @@ import hoot.model.query.api.IsAuthenticationRequired;
 import hoot.model.query.api.IsValidUserSession;
 import hoot.model.queue.publisher.HttpRequestPublisher;
 import hoot.system.ObjectManager.ObjectManager;
-import hoot.system.Serializer.RequestSerializer;
+import hoot.system.Serializer.Serializer;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashMap;
 
-@WebFilter(filterName = "AuthorizationFilter", urlPatterns = {"/api/V1/*"})
+@WebFilter(filterName = "AuthorizationFilter", urlPatterns = {"/*"})
 public class AuthorizationFilter implements Filter
 {
-    private RequestSerializer requestSerializer;
+    private Serializer serializer;
 
     private IsAuthenticationRequired isAuthenticationRequired;
 
@@ -25,7 +26,7 @@ public class AuthorizationFilter implements Filter
 
     public void init(FilterConfig config)
     {
-        this.requestSerializer        = (RequestSerializer) ObjectManager.get(RequestSerializer.class);
+        this.serializer               = (Serializer) ObjectManager.get(Serializer.class);
         this.isValidUserSession       = (IsValidUserSession) ObjectManager.get(IsValidUserSession.class);
         this.isAuthenticationRequired = (IsAuthenticationRequired) ObjectManager.get(IsAuthenticationRequired.class);
         this.requestPublisher         = (HttpRequestPublisher) ObjectManager.get(HttpRequestPublisher.class);
@@ -44,11 +45,15 @@ public class AuthorizationFilter implements Filter
         HttpServletRequest  httpRequest  = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-        this.requestPublisher.publish(httpRequest);
+        this.requestPublisher.publish(new HashMap<String, Object>()
+        {{
+            put("session", httpRequest.getSession(false));
+            put("requestURI", httpRequest.getRequestURI());
+        }});
 
         if (this.isUnauthorized(httpRequest)) {
             httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            httpResponse.getWriter().print(this.requestSerializer.serialize("Unauthorized"));
+            httpResponse.getWriter().print(this.serializer.serialize("Unauthorized"));
             return;
         }
 
@@ -61,6 +66,6 @@ public class AuthorizationFilter implements Filter
         String  httpMethod  = httpRequest.getMethod();
         boolean isRequired  = this.isAuthenticationRequired.execute(servletName, httpMethod);
 
-        return isRequired && !this.isValidUserSession.execute(httpRequest.getSession());
+        return isRequired && !this.isValidUserSession.execute(httpRequest.getSession(false));
     }
 }

@@ -2,26 +2,31 @@ package hoot.system.Queue;
 
 import hoot.system.Logger.LoggerInterface;
 import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.Queue.concurrent.LinkedBlockingQueue;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.*;
 
 public class QueueManager
 {
-    private final Map<String, LinkedBlockingQueue<Object>> queues = new HashMap<>();
+    private final NavigableMap<String, LinkedBlockingQueue<Object>> queues;
 
     private final LoggerInterface logger;
 
     public QueueManager()
     {
+        this.queues = Collections.synchronizedNavigableMap(new TreeMap<>());
         this.logger = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
     }
 
     public void add(String queueName, Object data)
     {
         this.queues.computeIfAbsent(queueName, k -> new LinkedBlockingQueue<>(20000));
-        this.queues.get(queueName).add(data);
+
+        try {
+            this.queues.get(queueName).put(data);
+        } catch (InterruptedException e) {
+            this.logger.logException("Could not put to Queue: " + e.getMessage(), e);
+        }
     }
 
     public Object take(String queueName)
@@ -34,5 +39,14 @@ public class QueueManager
             this.logger.log(e.getMessage());
             return null;
         }
+    }
+
+    public Map<String, Integer> getQueueSizes()
+    {
+        HashMap<String, Integer> queueSizes = new HashMap<>();
+
+        this.queues.forEach((name, queue) -> queueSizes.put(name, queue.size()));
+
+        return queueSizes;
     }
 }

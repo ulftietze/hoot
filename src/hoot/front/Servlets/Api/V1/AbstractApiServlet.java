@@ -2,7 +2,7 @@ package hoot.front.Servlets.Api.V1;
 
 import hoot.system.Filesystem.MediaFileHandler;
 import hoot.system.ObjectManager.ObjectManager;
-import hoot.system.Serializer.RequestSerializer;
+import hoot.system.Serializer.Serializer;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -49,8 +49,8 @@ public abstract class AbstractApiServlet extends HttpServlet
      */
     protected Object deserializeJsonRequestBody(HttpServletRequest request, Class<?> targetDTO) throws IOException
     {
-        RequestSerializer requestSerializer = (RequestSerializer) ObjectManager.get(RequestSerializer.class);
-        return requestSerializer.deserializeJsonRequestBody(request, targetDTO);
+        Serializer serializer = (Serializer) ObjectManager.get(Serializer.class);
+        return serializer.deserializeJsonRequestBody(request, targetDTO);
     }
 
     /**
@@ -59,8 +59,8 @@ public abstract class AbstractApiServlet extends HttpServlet
      */
     protected String serialize(Object toSerialize)
     {
-        RequestSerializer requestSerializer = (RequestSerializer) ObjectManager.get(RequestSerializer.class);
-        return requestSerializer.serialize(toSerialize);
+        Serializer serializer = (Serializer) ObjectManager.get(Serializer.class);
+        return serializer.serialize(toSerialize);
     }
 
     protected void saveImage(String filepath, String base64E)
