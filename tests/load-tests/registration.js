@@ -1,14 +1,13 @@
 import http from 'k6/http';
-import { check } from 'k6';
+import {check} from 'k6';
 
 export let options = {
-    vus       : '50',
+    vus       : '1',
     //duration  : '120s',
-    iterations: '300000',
+    iterations: '1',
 };
-
 export default function() {
-    const url = 'https://informatik.hs-bremerhaven.de/docker-swe3-21-team-d-java/api/V1/register';
+    const url = `https://informatik.hs-bremerhaven.de/${__ENV.USER}-java/api/V1/register`;
     let data  = {
         username: uuidv4(),
         password: 'test123',
