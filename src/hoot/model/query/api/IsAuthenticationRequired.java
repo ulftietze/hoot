@@ -1,6 +1,8 @@
 package hoot.model.query.api;
 
 import hoot.system.Annotation.AuthenticationRequired;
+import hoot.system.Logger.LoggerInterface;
+import hoot.system.ObjectManager.ObjectManager;
 
 import javax.servlet.ServletException;
 
@@ -35,6 +37,13 @@ public class IsAuthenticationRequired
      */
     public boolean execute(String servletName, String httpMethod) throws ServletException
     {
+        LoggerInterface logger = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
+        logger.log(servletName);
+
+        if (servletName == null || servletName.equals("default")) {
+            return false;
+        }
+
         boolean authenticationRequired;
         String  servletMethod = this.getServletMethod(httpMethod);
 
