@@ -1,0 +1,22 @@
+[
+  { "username": "testUser1", "password": "qwerty" },
+  { "username": "testUser2", "password": "qwerty" },
+  { "username": "testUser3", "password": "qwerty" },
+  { "username": "testUser4", "password": "qwerty" },
+  { "username": "testUser5", "password": "qwerty" },
+  { "username": "testUser6", "password": "qwerty" },
+  { "username": "testUser7", "password": "qwerty" },
+  { "username": "testUser8", "password": "qwerty" },
+  { "username": "testUser9", "password": "qwerty" },
+  { "username": "testUser10", "password": "qwerty" },
+  { "username": "testUser11", "password": "qwerty" },
+  { "username": "testUser12", "password": "qwerty" },
+  { "username": "testUser13", "password": "qwerty" },
+  { "username": "testUser14", "password": "qwerty" },
+  { "username": "testUser15", "password": "qwerty" },
+  { "username": "testUser16", "password": "qwerty" },
+  { "username": "testUser17", "password": "qwerty" },
+  { "username": "testUser18", "password": "qwerty" },
+  { "username": "testUser19", "password": "qwerty" },
+  { "username": "testUser20", "password": "qwerty" }
+]
