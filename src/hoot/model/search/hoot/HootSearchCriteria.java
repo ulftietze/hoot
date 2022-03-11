@@ -24,7 +24,7 @@ public class HootSearchCriteria implements SearchCriteriaInterface
         queryBuilder.LIMIT = defaultPageSize;
 
         if (userId != null) {
-            queryBuilder.WHERE.add("userId = ?");
+            queryBuilder.WHERE.add("h.user = ?");
             queryBuilder.PARAMETERS.add(userId.toString());
         }
 

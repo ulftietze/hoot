@@ -36,6 +36,7 @@ public class TimelineSearchCriteria implements SearchCriteriaInterface
 
         qb.addWhereIn("h.user", followIds);
         qb.addWhereIn("t.tag", tags);
+        qb.ORDER_BY.add("h.id DESC");
 
         if (this.lastPostId != null) {
             // IDs are incremental, so this is easier+quicker than a timestamp comparison
