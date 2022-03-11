@@ -37,9 +37,6 @@ public class IsAuthenticationRequired
      */
     public boolean execute(String servletName, String httpMethod) throws ServletException
     {
-        LoggerInterface logger = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
-        logger.log(servletName);
-
         if (servletName == null || servletName.equals("default")) {
             return false;
         }
