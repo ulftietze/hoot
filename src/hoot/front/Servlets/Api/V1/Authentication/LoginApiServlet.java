@@ -23,7 +23,7 @@ public class LoginApiServlet extends AbstractApiServlet
 {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
     {
-        Login    login       = (Login) this.deserializeJsonRequestBody(request, Login.class);
+        Login       login    = (Login) this.deserializeJsonRequestBody(request, Login.class);
         HttpSession session  = request.getSession(true);
         boolean     loggedIn = false;
 
@@ -43,8 +43,8 @@ public class LoginApiServlet extends AbstractApiServlet
 
     private boolean login(HttpSession session, Login login, User user)
     {
-        UserRepository repository = (UserRepository) ObjectManager.get(UserRepository.class);
-        QueueManager queueManager = (QueueManager) ObjectManager.get(QueueManager.class);
+        UserRepository repository   = (UserRepository) ObjectManager.get(UserRepository.class);
+        QueueManager   queueManager = (QueueManager) ObjectManager.get(QueueManager.class);
 
         try {
             user.lastLogin = LocalDateTime.now();

@@ -7,24 +7,37 @@ import hoot.system.ObjectManager.ObjectManager;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
-public class RequestSerializer
+public class Serializer
 {
     private final ObjectMapper objectMapper;
 
-    public RequestSerializer()
+    public Serializer()
     {
         this.objectMapper = (ObjectMapper) ObjectManager.get(ObjectMapper.class);
     }
 
     /**
-     * @param request   The incoming http servlet request
-     * @param targetDTO The Output DTO from which the input body json is serialized
+     * @param request     The incoming http servlet request
+     * @param targetClass The Output DTO from which the input body json is serialized
      * @return Object
      * @throws IOException Thrown while reading input stream
      */
-    public Object deserializeJsonRequestBody(HttpServletRequest request, Class<?> targetDTO) throws IOException
+    public Object deserializeJsonRequestBody(HttpServletRequest request, Class<?> targetClass) throws IOException
     {
-        return this.objectMapper.readValue(request.getReader(), targetDTO);
+        return this.objectMapper.readValue(request.getReader(), targetClass);
+    }
+
+    /**
+     * TODO: Documentation
+     *
+     * @param json
+     * @param targetClass
+     * @return
+     * @throws IOException
+     */
+    public Object deserialize(String json, Class<?> targetClass) throws IOException
+    {
+        return this.objectMapper.readValue(json, targetClass);
     }
 
     /**

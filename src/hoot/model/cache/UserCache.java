@@ -56,6 +56,12 @@ public class UserCache extends AbstractCache<User>
     }
 
     @Override
+    public Integer getSize()
+    {
+        return this.idLookupMap.size();
+    }
+
+    @Override
     protected synchronized void removeReferences(User user)
     {
         this.idLookupMap.remove(user.id);

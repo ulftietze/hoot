@@ -1,6 +1,7 @@
 package hoot.initialisation.Listener;
 
 import hoot.front.Service.HistoryService;
+import hoot.model.monitoring.CacheSizeCollector;
 import hoot.model.monitoring.QueueSizeCollector;
 import hoot.model.monitoring.SystemWorkloadCollector;
 import hoot.model.monitoring.TagCollector;
@@ -35,8 +36,9 @@ public class StartMonitorContextListener implements ServletContextListener
         TagCollector                tagCollector            = this.getHashtagCollector();
         RequestsCollector           requestsCollector       = this.getRequestCollector();
         QueueSizeCollector          queueSizeCollector      = this.getQueueSizeCollector();
+        CacheSizeCollector          cacheSizeCollector      = this.getCacheSizeCollector();
 
-        // Start Collector when a thread
+        // Start Collector when a thread/consumer
         loginsCollector.start();
         registrationsCollector.start();
         tagCollector.start();
@@ -50,6 +52,7 @@ public class StartMonitorContextListener implements ServletContextListener
         monitor.addCollector(tagCollector);
         monitor.addCollector(systemWorkloadCollector);
         monitor.addCollector(queueSizeCollector);
+        monitor.addCollector(cacheSizeCollector);
         monitor.start();
 
         // Initialize recurring task to collect monitor data
@@ -129,5 +132,10 @@ public class StartMonitorContextListener implements ServletContextListener
     private QueueSizeCollector getQueueSizeCollector()
     {
         return (QueueSizeCollector) ObjectManager.get(QueueSizeCollector.class);
+    }
+
+    private CacheSizeCollector getCacheSizeCollector()
+    {
+        return (CacheSizeCollector) ObjectManager.get(CacheSizeCollector.class);
     }
 }
