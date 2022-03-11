@@ -1,8 +1,8 @@
 package hoot.model.monitoring.consumer;
 
-import hoot.model.entities.User;
 import hoot.model.queue.publisher.RegistrationPublisher;
 import hoot.model.repositories.UserRepository;
+import hoot.model.search.UserSearchCriteria;
 import hoot.system.Exception.CollectorException;
 import hoot.system.Logger.LoggerInterface;
 import hoot.system.Monitoring.CollectorInterface;
@@ -11,9 +11,6 @@ import hoot.system.ObjectManager.ObjectManager;
 import hoot.system.Queue.ConsumerInterface;
 import hoot.system.Queue.QueueManager;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -22,13 +19,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class CountRegistrationsCollector extends Thread implements CollectorInterface, ConsumerInterface
 {
     public final static  String COLLECTOR_NAME               = "CountRegistrations";
-    private final static long   PERIOD_REGISTRATIONS_MINUTES = 2;
+    private final static long   PERIOD_REGISTRATIONS_MINUTES = 360;
 
     private final QueueManager queueManager;
 
-    private final NavigableMap<Instant, ArrayList<User>> registrationsInPeriod;
-
-    private final NavigableMap<String, Instant> userRegisteredInPeriod;
+    private final AtomicInteger userRegisteredInPeriod;
 
     private final LoggerInterface logger;
 
@@ -41,44 +36,28 @@ public class CountRegistrationsCollector extends Thread implements CollectorInte
         UserRepository userRepository = (UserRepository) ObjectManager.get(UserRepository.class);
 
         this.queueManager             = (QueueManager) ObjectManager.get(QueueManager.class);
-        this.registrationsInPeriod    = Collections.synchronizedNavigableMap(new TreeMap<>());
-        this.userRegisteredInPeriod   = Collections.synchronizedNavigableMap(new TreeMap<>());
-        this.currentlyRegisteredUsers = new AtomicInteger(userRepository.getAllUsersCount());
+        this.userRegisteredInPeriod   = new AtomicInteger();
+        this.currentlyRegisteredUsers = new AtomicInteger(userRepository.getUserQuantity());
         this.logger                   = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
     }
 
     @Override
     public void run()
     {
-        ScheduledFuture<?> cleanUpScheduleTask = this
+        ScheduledFuture<?> loadAmountOfRegisteredUsersInPeriodTask = this
                 .createScheduledExecutorService()
-                .scheduleAtFixedRate(this::cleanup, 1, 1, TimeUnit.SECONDS);
+                .scheduleAtFixedRate(this::registeredUsersInPeriod, 0, 10, TimeUnit.MINUTES);
 
         while (this.running) {
             try {
-                User    registeredUser = (User) this.queueManager.take(RegistrationPublisher.QUEUE_ID);
-                Instant now            = Instant.now();
-
-                if (registeredUser == null) {
-                    continue;
-                }
-
+                this.queueManager.take(RegistrationPublisher.QUEUE_ID);
                 this.currentlyRegisteredUsers.incrementAndGet();
-
-                this.userRegisteredInPeriod.computeIfPresent(registeredUser.username, (k, v) -> {
-                    this.registrationsInPeriod.get(v).removeIf(user -> Objects.equals(user.username, k));
-                    return now;
-                });
-                this.userRegisteredInPeriod.computeIfAbsent(registeredUser.username, k -> now);
-
-                this.registrationsInPeriod.computeIfAbsent(now, k -> new ArrayList<>());
-                this.registrationsInPeriod.get(now).add(registeredUser);
             } catch (Throwable e) {
                 this.logger.logException("Something really weird happened, and this crashed: " + e.getMessage(), e);
             }
         }
 
-        cleanUpScheduleTask.cancel(true);
+        loadAmountOfRegisteredUsersInPeriodTask.cancel(true);
     }
 
     @Override
@@ -93,7 +72,7 @@ public class CountRegistrationsCollector extends Thread implements CollectorInte
         return new CollectorResult()
         {{
             put("Currently Registered User", currentlyRegisteredUsers);
-            put("Registrations in Period", userRegisteredInPeriod.size());
+            put("Registrations in Period", userRegisteredInPeriod);
         }};
     }
 
@@ -103,13 +82,21 @@ public class CountRegistrationsCollector extends Thread implements CollectorInte
         this.running = false;
     }
 
-    private void cleanup()
+    private void registeredUsersInPeriod()
     {
-        Instant ofMinutes = Instant.now().minus(Duration.ofHours(PERIOD_REGISTRATIONS_MINUTES));
+        try {
+            UserSearchCriteria searchCriteria = (UserSearchCriteria) ObjectManager.create(UserSearchCriteria.class);
+            searchCriteria.createdAtSinceMinutes = Math.toIntExact(PERIOD_REGISTRATIONS_MINUTES);
 
-        Map<Instant, ArrayList<User>> inPeriod = this.registrationsInPeriod.headMap(ofMinutes, true);
-        inPeriod.forEach((instant, users) -> users.forEach(user -> this.userRegisteredInPeriod.remove(user.username)));
-        inPeriod.clear();
+            this.userRegisteredInPeriod.set(this.getUserRepository().getUserQuantityBySearchCriteria(searchCriteria));
+        } catch (Throwable e) {
+            this.logger.logException("[ERROR] Load Amount of new registered users failed: " + e.getMessage(), e);
+        }
+    }
+
+    private UserRepository getUserRepository()
+    {
+        return (UserRepository) ObjectManager.get(UserRepository.class);
     }
 
     private ScheduledExecutorService createScheduledExecutorService()

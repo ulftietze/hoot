@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
 
-@WebFilter(filterName = "AuthorizationFilter", urlPatterns = {"/api/V1/*"})
+@WebFilter(filterName = "AuthorizationFilter", urlPatterns = {"/*"})
 public class AuthorizationFilter implements Filter
 {
     private RequestSerializer requestSerializer;

@@ -2,6 +2,7 @@ package hoot.model.repositories;
 
 import hoot.model.cache.UserCache;
 import hoot.model.entities.User;
+import hoot.model.search.DefaultSearchCriteria;
 import hoot.model.search.SearchCriteriaInterface;
 import hoot.system.Database.QueryBuilder;
 import hoot.system.Exception.CouldNotDeleteException;
@@ -27,31 +28,6 @@ public class UserRepository extends AbstractRepository<User>
 
         this.followerRepository = (FollowerRepository) ObjectManager.get(FollowerRepository.class);
         this.userCache          = (UserCache) ObjectManager.get(UserCache.class);
-    }
-
-    public Integer getAllUsersCount()
-    {
-        try (Connection connection = this.getConnection()) {
-            QueryBuilder queryBuilder = (QueryBuilder) ObjectManager.create(QueryBuilder.class);
-            queryBuilder.SELECT.add("count(*) AS quantity");
-            queryBuilder.FROM = "User";
-
-            PreparedStatement statement = queryBuilder.build(connection);
-            ResultSet resultSet         = statement.executeQuery();
-
-            resultSet.next();
-
-            int quantity = resultSet.getInt("quantity");
-
-            resultSet.close();
-            statement.close();
-
-            return quantity;
-        } catch (SQLException e) {
-            this.log(e.getMessage());
-        }
-
-        return 0;
     }
 
     /**
@@ -160,6 +136,38 @@ public class UserRepository extends AbstractRepository<User>
         }
 
         return users;
+    }
+
+    public Integer getUserQuantity()
+    {
+        DefaultSearchCriteria criteria = (DefaultSearchCriteria) ObjectManager.create(DefaultSearchCriteria.class);
+
+        return this.getUserQuantityBySearchCriteria(criteria);
+    }
+
+    public Integer getUserQuantityBySearchCriteria(SearchCriteriaInterface searchCriteriaInterface)
+    {
+        try (Connection connection = this.getConnection()) {
+            QueryBuilder queryBuilder = searchCriteriaInterface.getQueryBuilder();
+            queryBuilder.SELECT.add("count(*) AS quantity");
+            queryBuilder.FROM = "User";
+
+            PreparedStatement statement = queryBuilder.build(connection);
+            ResultSet resultSet         = statement.executeQuery();
+
+            resultSet.next();
+
+            int quantity = resultSet.getInt("quantity");
+
+            resultSet.close();
+            statement.close();
+
+            return quantity;
+        } catch (SQLException e) {
+            this.log(e.getMessage());
+        }
+
+        return 0;
     }
 
     private void create(User user) throws CouldNotSaveException

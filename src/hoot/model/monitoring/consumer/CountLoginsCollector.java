@@ -65,6 +65,7 @@ public class CountLoginsCollector extends Thread implements CollectorInterface, 
                 this.logger.logException("Something really weird happened, and this crashed: " + e.getMessage(), e);
             }
         }
+
         cleanUpScheduleTask.cancel(true);
     }
 

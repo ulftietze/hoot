@@ -22,8 +22,5 @@ public class HelloWorldServlet extends HttpServlet
         out.println("<title>webapp</title> </head>");
         out.println("<body>Hello World</body>");
         out.println("</html>");
-
-        ServletContext context = getServletContext();
-        context.log("simple logging");
     }
 }

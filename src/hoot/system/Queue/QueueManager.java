@@ -4,9 +4,7 @@ import hoot.system.Logger.LoggerInterface;
 import hoot.system.ObjectManager.ObjectManager;
 import hoot.system.Queue.concurrent.LinkedBlockingQueue;
 
-import java.util.Collections;
-import java.util.NavigableMap;
-import java.util.TreeMap;
+import java.util.*;
 
 public class QueueManager
 {
@@ -41,5 +39,14 @@ public class QueueManager
             this.logger.log(e.getMessage());
             return null;
         }
+    }
+
+    public Map<String, Integer> getQueueSizes()
+    {
+        HashMap<String, Integer> queueSizes = new HashMap<>();
+
+        this.queues.forEach((name, queue) -> queueSizes.put(name, queue.size()));
+
+        return queueSizes;
     }
 }

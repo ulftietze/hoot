@@ -2,10 +2,11 @@ package hoot.front.Service;
 
 import hoot.model.entities.History;
 import hoot.model.entities.Tag;
+import hoot.model.monitoring.QueueSizeCollector;
 import hoot.model.monitoring.SystemWorkloadCollector;
+import hoot.model.monitoring.TagCollector;
 import hoot.model.monitoring.consumer.CountLoginsCollector;
 import hoot.model.monitoring.consumer.CountRegistrationsCollector;
-import hoot.model.monitoring.TagCollector;
 import hoot.model.monitoring.consumer.RequestsCollector;
 import hoot.model.repositories.HistoryRepository;
 import hoot.system.Logger.LoggerInterface;
@@ -46,6 +47,7 @@ public class HistoryService implements ServiceInterface
             CollectorResult workload      = monitorData.get(SystemWorkloadCollector.COLLECTOR_NAME);
             CollectorResult requests      = monitorData.get(RequestsCollector.COLLECTOR_NAME);
             CollectorResult mostUsedTags  = monitorData.get(TagCollector.COLLECTOR_NAME);
+            CollectorResult queueSizes    = monitorData.get(QueueSizeCollector.COLLECTOR_NAME);
 
             this.logger.log("\n"
                             + "LoginsPerPeriod: " + logins.get("LoginsPerPeriod") + "\n"
@@ -53,10 +55,11 @@ public class HistoryService implements ServiceInterface
                             + "Registrations in Period: " + registrations.get("Registrations in Period") + "\n"
                             + "Currently Logged In: " + requests.get("Currently Logged In") + "\n"
                             + "Requests Per Second: " + requests.get("Requests Per Second") + "\n"
-                            + "Memory used: " + ((long)workload.get("Memory Used") / 1024 / 1024) + "MiB\n"
-                            + "Memory total: " + ((long)workload.get("Memory Total") / 1024 / 1024) + "MiB\n"
-                            + "Memory max: " + ((long)workload.get("Memory Max") / 1024 / 1024) + "MiB\n"
-                            + "Memory free: " + ((long)workload.get("Memory Free") / 1024 / 1024) + "MiB\n"
+                            + "Queue Sizes: " + queueSizes.toString() + "\n"
+                            + "Memory used: " + ((long) workload.get("Memory Used") / 1024 / 1024) + "MiB\n"
+                            + "Memory total: " + ((long) workload.get("Memory Total") / 1024 / 1024) + "MiB\n"
+                            + "Memory max: " + ((long) workload.get("Memory Max") / 1024 / 1024) + "MiB\n"
+                            + "Memory free: " + ((long) workload.get("Memory Free") / 1024 / 1024) + "MiB\n"
                             + "Memory Heap Usage: " + workload.get("Memory Heap Usage") + "\n"
                             + "Memory NonHeap Usage: " + workload.get("Memory NonHeap Usage") + "\n"
                             + "Thread Count: " + workload.get("Thread Count") + "\n"
@@ -66,10 +69,13 @@ public class HistoryService implements ServiceInterface
                             + "Process CPU Load: " + workload.get("Process CPU Load") + "\n"
                             + "System CPU Load: " + workload.get("System CPU Load") + "\n"
                             + "Most recent tags: "
-                            + ((ArrayList<Tag>) mostUsedTags.get("popularTags")).stream().map(t -> t.tag).collect(Collectors.joining(",")) + "\n"
+                            + ((ArrayList<Tag>) mostUsedTags.get("popularTags"))
+                                    .stream()
+                                    .map(t -> t.tag)
+                                    .collect(Collectors.joining(",")) + "\n"
             );
 
-            System.gc();
+            //System.gc();
 
             //try {
             //    historyRepository.save(entity);

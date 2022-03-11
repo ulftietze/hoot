@@ -8,7 +8,7 @@ export let options = {
 };
 
 export default function() {
-    const url = 'https://informatik.hs-bremerhaven.de/docker-utietze-java/api/V1/register';
+    const url = 'https://informatik.hs-bremerhaven.de/docker-swe3-21-team-d-java/api/V1/register';
     let data  = {
         username: uuidv4(),
         password: 'test123',

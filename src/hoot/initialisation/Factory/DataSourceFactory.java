@@ -11,6 +11,13 @@ import javax.sql.DataSource;
 
 public class DataSourceFactory implements FactoryInterface<DataSource>
 {
+    private final LoggerInterface logger;
+
+    public DataSourceFactory()
+    {
+        this.logger = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
+    }
+
     @Override
     public DataSource create()
     {
@@ -19,9 +26,8 @@ public class DataSourceFactory implements FactoryInterface<DataSource>
             Context envCtx  = (Context) initCtx.lookup("java:/comp/env");
 
             return (DataSource) envCtx.lookup("jdbc/mariadb");
-        } catch (NamingException ignore) {
-            LoggerInterface logger = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
-            logger.log("Could not load Database Connection.");
+        } catch (NamingException e) {
+            this.logger.logException("Could not load Database Connection: " + e.getMessage(), e);
         }
 
         return null;
