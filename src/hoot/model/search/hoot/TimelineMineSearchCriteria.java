@@ -12,7 +12,7 @@ import hoot.system.ObjectManager.ObjectManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-public class TimelineSearchCriteria implements SearchCriteriaInterface
+public class TimelineMineSearchCriteria implements SearchCriteriaInterface
 {
     private final FollowerRepository followerRepository;
     public        Integer            timelineForUserId = null;
@@ -21,7 +21,7 @@ public class TimelineSearchCriteria implements SearchCriteriaInterface
     public        Integer            lastPostId        = null;
     public        boolean            withComments      = false;
 
-    public TimelineSearchCriteria()
+    public TimelineMineSearchCriteria()
     {
         this.followerRepository = (FollowerRepository) ObjectManager.get(FollowerRepository.class);
     }
@@ -29,28 +29,29 @@ public class TimelineSearchCriteria implements SearchCriteriaInterface
     @Override
     public QueryBuilder getQueryBuilder() throws SQLException
     {
-        QueryBuilder qb = (QueryBuilder) ObjectManager.create(QueryBuilder.class);
+        QueryBuilder queryBuilder = (QueryBuilder) ObjectManager.create(QueryBuilder.class);
 
         ArrayList<Integer> followIds = new ArrayList<>();
         this.getFollowerForUserId(this.timelineForUserId).forEach(follower -> followIds.add(follower.follows.id));
 
-        qb.addWhereIn("h.user", followIds);
-        qb.addWhereIn("t.tag", tags);
+        queryBuilder.addWhereIn("h.user", followIds);
+        queryBuilder.addWhereIn("t.tag", tags);
 
         if (this.lastPostId != null) {
             // IDs are incremental, so this is easier+quicker than a timestamp comparison
-            qb.WHERE.add("h.id < ?");
-            qb.PARAMETERS.add(lastPostId.toString());
+            queryBuilder.WHERE.add("h.id < ?");
+            queryBuilder.PARAMETERS.add(lastPostId.toString());
         }
 
         if (!withComments) {
-            qb.WHERE.add("h.hootType != ?");
-            qb.PARAMETERS.add(HootType.Comment.toString());
+            queryBuilder.WHERE.add("h.hootType != ?");
+            queryBuilder.PARAMETERS.add(HootType.Comment.toString());
         }
 
-        qb.LIMIT = this.defaultPageSize;
+        queryBuilder.ORDER_BY.add("h.id DESC");
+        queryBuilder.LIMIT = this.defaultPageSize;
 
-        return qb;
+        return queryBuilder;
     }
 
     private ArrayList<Follower> getFollowerForUserId(Integer userId) throws EntityNotFoundException
