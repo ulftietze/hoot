@@ -1,0 +1,41 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+collections Publisher
+entity Queue
+collections CollectorConsumers
+
+create collections CollectorResults
+CollectorConsumers -> CollectorResults: create()
+
+
+
+loop
+Publisher -> Publisher: waitForMessageToPublish()
+Publisher -> Queue: putMessageInQueue()
+Queue --> Publisher
+end
+
+participant Monitor
+create ":MonitorData"
+Monitor -> ":MonitorData": create()
+par Loops are executed parallel
+loop
+CollectorConsumers -> Queue: take()
+Queue --> CollectorConsumers
+activate CollectorConsumers
+CollectorConsumers -> CollectorConsumers: prepareResultData()
+CollectorConsumers -> CollectorResults: updateResult()
+deactivate CollectorConsumers
+end
+
+else
+
+loop
+Monitor -> CollectorResults: collect()
+CollectorResults --> Monitor
+Monitor -> ":MonitorData": update()
+end
+end
+
+@enduml
