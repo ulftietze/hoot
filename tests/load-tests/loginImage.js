@@ -9,7 +9,7 @@ export let options = {
 }
 export default function()
 {
-    let urlLogin = 'https://informatik.hs-bremerhaven.de/docker-jwaldenmaier-java/api/V1/login'
+    let urlLogin = `https://informatik.hs-bremerhaven.de/${__ENV.USER}-java/api/V1/login`
     let dataLogin = {
         username: "1ba67273-bfe3-41b0-bd1b-5823f8a5008a",
         password: "string"
@@ -18,7 +18,7 @@ export default function()
         headers: { 'Accept': '*/*', 'Content-Type': 'application/json; charset=UTF-8' }
     }
 
-    let urlImage = 'https://informatik.hs-bremerhaven.de/docker-jwaldenmaier-java/api/V1/hoot/image'
+    let urlImage = `https://informatik.hs-bremerhaven.de/${__ENV.USER}-java/api/V1/hoot/image`
     let dataImage = {
         content: "test123",
         imageFilename: "test1.png",

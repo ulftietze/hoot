@@ -1,0 +1,5 @@
+#!/bin/bash
+
+export $(echo $(cat .env | sed 's/#.*//g' | sed 's/\r//g' | xargs) | envsubst)
+
+ssh "$REMOTE_USER"@"$REMOTE_HOST" "cd $REMOTE_PATH && k6 run -e USER=$REMOTE_USER -e PATH=$REMOTE_PATH ./tests/load-tests/$1"
