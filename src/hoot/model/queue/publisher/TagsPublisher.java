@@ -18,6 +18,6 @@ public class TagsPublisher implements PublisherInterface
     @Override
     public void publish(Object queueData)
     {
-        this.queueManager.add(QUEUE_ID, queueData);
+        new Thread(() -> this.queueManager.add(QUEUE_ID, queueData)).start();
     }
 }
