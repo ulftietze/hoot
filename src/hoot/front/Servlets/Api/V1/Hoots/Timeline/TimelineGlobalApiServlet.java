@@ -3,7 +3,8 @@ package hoot.front.Servlets.Api.V1.Hoots.Timeline;
 import hoot.front.Servlets.Api.V1.AbstractApiServlet;
 import hoot.model.entities.Hoot;
 import hoot.model.repositories.HootRepository;
-import hoot.model.search.hoot.TimelineSearchCriteria;
+import hoot.model.search.SearchCriteriaInterface;
+import hoot.model.search.hoot.TimelineGlobalSearchCriteria;
 import hoot.system.Exception.EntityNotFoundException;
 import hoot.system.ObjectManager.ObjectManager;
 
@@ -20,8 +21,8 @@ public class TimelineGlobalApiServlet extends AbstractApiServlet
 {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
     {
-        HootRepository         repository     = (HootRepository) ObjectManager.get(HootRepository.class);
-        TimelineSearchCriteria searchCriteria = this.createSearchCriteriaFromRequest(request);
+        HootRepository          repository     = (HootRepository) ObjectManager.get(HootRepository.class);
+        SearchCriteriaInterface searchCriteria = this.createSearchCriteriaFromRequest(request);
 
         try {
             ArrayList<Hoot> hoots = repository.getList(searchCriteria);
@@ -32,27 +33,26 @@ public class TimelineGlobalApiServlet extends AbstractApiServlet
         }
     }
 
-    private TimelineSearchCriteria createSearchCriteriaFromRequest(HttpServletRequest request)
+    private SearchCriteriaInterface createSearchCriteriaFromRequest(HttpServletRequest request)
     {
-        String  lastPost = request.getParameter("lastPostId");
-        String  quantity = request.getParameter("quantity");
-        String  tags     = request.getParameter("tags");
+        String lastPost = request.getParameter("lastPostId");
+        String quantity = request.getParameter("quantity");
+        String tags     = request.getParameter("tags");
 
-        TimelineSearchCriteria searchCriteria = this.createSearchCriteriaClass();
+        TimelineGlobalSearchCriteria searchCriteria = this.createTimelineSearchCriteriaClass();
 
         if (tags != null && !tags.equals("")) {
             searchCriteria.tags.addAll(Arrays.asList(tags.split(",")));
         }
 
         searchCriteria.lastPostId      = lastPost != null && !lastPost.equals("") ? Integer.valueOf(lastPost) : null;
-        searchCriteria.defaultPageSize   = quantity != null && !quantity.equals("") ? Integer.valueOf(quantity) : null;
-
+        searchCriteria.defaultPageSize = quantity != null && !quantity.equals("") ? Integer.valueOf(quantity) : null;
 
         return searchCriteria;
     }
 
-    private TimelineSearchCriteria createSearchCriteriaClass()
+    private TimelineGlobalSearchCriteria createTimelineSearchCriteriaClass()
     {
-        return (TimelineSearchCriteria) ObjectManager.create(TimelineSearchCriteria.class);
+        return (TimelineGlobalSearchCriteria) ObjectManager.create(TimelineGlobalSearchCriteria.class);
     }
 }
