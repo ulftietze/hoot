@@ -2,7 +2,10 @@ package hoot.front.Servlets;
 
 import hoot.model.entities.History;
 import hoot.model.monitoring.Gnuplotter;
+import hoot.model.repositories.HistoryRepository;
+import hoot.model.search.hoot.HistorySearchCriteria;
 import hoot.system.Annotation.AuthenticationRequired;
+import hoot.system.Exception.EntityNotFoundException;
 import hoot.system.ObjectManager.ObjectManager;
 
 import javax.servlet.annotation.WebServlet;
@@ -13,12 +16,14 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.HashMap;
 
 @AuthenticationRequired(authenticationRequired = false)
 @WebServlet("/test")
 public class TestServlet extends HttpServlet
 {
+    private HashMap<Gnuplotter.GraphType, LocalDateTime> generatedGraphMap = new HashMap<>();
+
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException
     {
         response.setContentType("text/html");
@@ -29,47 +34,31 @@ public class TestServlet extends HttpServlet
         out.println("<title>JDBC Test</title> </head>");
         out.println("<body>");
 
-        ArrayList<History> historyList = new ArrayList<>();
+        HistoryRepository historyRepository = (HistoryRepository) ObjectManager.get(HistoryRepository.class);
 
-        for (int i = 0; i < 59; ++i) {
-            History h = (History) ObjectManager.create(History.class);
+        HistorySearchCriteria historySearchCriteria = (HistorySearchCriteria) ObjectManager.get(HistorySearchCriteria.class);
 
-            h.id = (long) i;
-
-            h.timestamp = LocalDateTime.of(2022, 3, 4, 10, 51, i);
-
-            h.currentLoggedIn          = ThreadLocalRandom.current().nextInt(15, 30 + 1);
-            h.currentlyRegisteredUsers = ThreadLocalRandom.current().nextInt(80, 100 + 1);
-            h.memoryMax                = 1024;
-            h.memoryTotal              = 1000;
-            h.memoryFree               = ThreadLocalRandom.current().nextInt(100, 900 + 1);
-            h.memoryUsed               = h.memoryTotal - h.memoryFree;
-            h.threadCount              = ThreadLocalRandom.current().nextInt(1, 20 + 1);
-            h.threadCountTotal         = 5 * i;
-
-            h.loginsPerSixHours         = 50 + ThreadLocalRandom.current().nextFloat() * 50;
-            h.registrationsPerSixHours  = 10 + ThreadLocalRandom.current().nextFloat() * 10;
-            h.postsPerMinute            = 20 + ThreadLocalRandom.current().nextFloat() * 15;
-            h.requestsPerSecond         = 75 + ThreadLocalRandom.current().nextFloat() * 50;
-            h.requestsLoggedInPerSecond = 5 + ThreadLocalRandom.current().nextFloat() * 10;
-
-            h.systemLoadAverage = ThreadLocalRandom.current().nextDouble() * 4;
-            h.systemCPULoad     = ThreadLocalRandom.current().nextDouble() * 1;
-            h.processCPULoad    = ThreadLocalRandom.current().nextDouble() * 1;
-
-            historyList.add(h);
+        ArrayList<History> historyList = null;
+        
+        try {
+            historyList = historyRepository.getList(historySearchCriteria);
+        } catch (EntityNotFoundException e) {
+            out.println("Could not get List of History Objects");
         }
 
         // The Image will sometimes stay the same, even if the numbers change.
         // This is because the browser will cache the generated image and might not notice that it has changed after reloading.
         // We cannot do anything about this (without JS and force reload)!
 
-        for (Gnuplotter.GraphType graphType : Gnuplotter.GraphType.values()) {
-            String url = Gnuplotter.getGraphUrl(graphType);
-            if (url == null) {
-                url = Gnuplotter.createGraph(graphType, historyList);
+        if (historyList != null) {
+            for (Gnuplotter.GraphType graphType : Gnuplotter.GraphType.values()) {
+                String url = Gnuplotter.getGraphUrl(graphType);
+                if (url == null || this.generatedGraphMap.get(graphType).isBefore(LocalDateTime.now().minusMinutes(1L))) {
+                    url = Gnuplotter.createGraph(graphType, historyList);
+                    this.generatedGraphMap.put(graphType, LocalDateTime.now());
+                }
+                out.println("<img src=\"" + url + "\" alt=\"Graph\"> ");
             }
-            out.println("<img src=\"" + url + "\" alt=\"Graph\"> ");
         }
 
         out.println("</body>");

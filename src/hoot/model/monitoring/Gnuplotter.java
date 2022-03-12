@@ -4,12 +4,16 @@ import hoot.model.entities.History;
 import hoot.system.Filesystem.FileHandler;
 import hoot.system.Filesystem.MediaFileHandler;
 import hoot.system.Logger.LoggerInterface;
+import hoot.system.Monitoring.CollectorResult;
 import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.Serializer.Serializer;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.ObjectStreamException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 interface DataWriter
 {
@@ -113,13 +117,22 @@ public class Gnuplotter
 
                 line += history.timestamp.toString();
                 line += "\t";
-                line += history.memoryMax.toString();
+                line += history.workload.get(SystemWorkloadCollector.MEMORY_CLASS_COMMITTED);
                 line += "\t";
-                line += history.memoryTotal.toString();
+                line += history.workload.get(SystemWorkloadCollector.MEMORY_CLASS_RESERVED);
                 line += "\t";
-                line += history.memoryUsed.toString();
+                line += history.workload.get(SystemWorkloadCollector.MEMORY_THREAD_COMMITTED);
                 line += "\t";
-                line += history.memoryFree.toString();
+                line += history.workload.get(SystemWorkloadCollector.MEMORY_THREAD_RESERVED);
+                line += "\t";
+                line += history.workload.get(SystemWorkloadCollector.MEMORY_CODE_COMMITTED);
+                line += "\t";
+                line += history.workload.get(SystemWorkloadCollector.MEMORY_CODE_RESERVED);
+                line += "\t";
+                line += history.workload.get(SystemWorkloadCollector.MEMORY_GC_COMMITTED);
+                line += "\t";
+                line += history.workload.get(SystemWorkloadCollector.MEMORY_GC_RESERVED);
+
 
                 result.add(line);
             }
@@ -127,10 +140,14 @@ public class Gnuplotter
         };
 
         String[] gnuplotDirectives = {
-                "u 1:2 t \"memoryMax\" w lines, ",
-                "u 1:3 t \"memoryTotal\" w lines, ",
-                "u 1:4 t \"memoryUsed\" w lines, ",
-                "u 1:5 t \"memoryFree\" w lines",
+                "u 1:2 t \"" + SystemWorkloadCollector.MEMORY_CLASS_COMMITTED + "\" w lines, ",
+                "u 1:3 t \"" + SystemWorkloadCollector.MEMORY_CLASS_RESERVED + "\" w lines, ",
+                "u 1:4 t \"" + SystemWorkloadCollector.MEMORY_THREAD_COMMITTED + "\" w lines, ",
+                "u 1:5 t \"" + SystemWorkloadCollector.MEMORY_THREAD_RESERVED + "\" w lines, ",
+                "u 1:6 t \"" + SystemWorkloadCollector.MEMORY_CODE_COMMITTED + "\" w lines, ",
+                "u 1:7 t \"" + SystemWorkloadCollector.MEMORY_CODE_RESERVED + "\" w lines, ",
+                "u 1:8 t \"" + SystemWorkloadCollector.MEMORY_GC_COMMITTED + "\" w lines, ",
+                "u 1:9 t \"" + SystemWorkloadCollector.MEMORY_GC_RESERVED + "\" w lines",
                 };
 
         return Gnuplotter.createGraphWithGnuplot(GraphType.Memory, input, dataWriter, gnuplotDirectives);

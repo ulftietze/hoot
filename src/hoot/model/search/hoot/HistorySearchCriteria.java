@@ -13,6 +13,8 @@ public class HistorySearchCriteria implements SearchCriteriaInterface
     {
         QueryBuilder queryBuilder = (QueryBuilder) ObjectManager.create(QueryBuilder.class);
 
+        queryBuilder.LIMIT = 99999;
+
         return queryBuilder;
     }
 }

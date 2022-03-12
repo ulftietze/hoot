@@ -1,5 +1,6 @@
 package hoot.model.entities;
 
+import hoot.system.Monitoring.CollectorResult;
 import hoot.system.ObjectManager.ObjectManager;
 
 import java.time.LocalDateTime;
@@ -13,17 +14,14 @@ public class History
 
     public Integer currentLoggedIn   = 0,
             currentlyRegisteredUsers = 0,
-            memoryMax                = 0,
-            memoryTotal              = 0,
-            memoryFree               = 0,
-            memoryUsed               = 0,
             threadCount              = 0,
-            threadCountTotal         = 0;
+            loginsPerSixHours        = 0,
+            registrationsPerSixHours = 0,
+            requestsPerSecond = 0;
 
-    public Float loginsPerSixHours    = 0f,
-            registrationsPerSixHours  = 0f,
-            postsPerMinute            = 0f,
-            requestsPerSecond         = 0f,
+    public Long threadCountTotal = 0L;
+
+    public Float postsPerMinute       = 0f,
             requestsLoggedInPerSecond = 0f;
 
     public Double systemLoadAverage = 0d,
@@ -31,6 +29,11 @@ public class History
             processCPULoad          = 0d;
 
     public ArrayList<Tag> trendingHashtags;
+
+    public CollectorResult workload = new CollectorResult(),
+            queueSize               = new CollectorResult(),
+            cacheSize               = new CollectorResult(),
+            requestDurations        = new CollectorResult();
 
     public static ArrayList<Tag> getTrendingHashtagsFromCommaSeparatedTags(String commaSeparatedTags)
     {

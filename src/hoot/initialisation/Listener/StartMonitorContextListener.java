@@ -1,10 +1,7 @@
 package hoot.initialisation.Listener;
 
 import hoot.front.Service.HistoryService;
-import hoot.model.monitoring.CacheSizeCollector;
-import hoot.model.monitoring.QueueSizeCollector;
-import hoot.model.monitoring.SystemWorkloadCollector;
-import hoot.model.monitoring.TagCollector;
+import hoot.model.monitoring.*;
 import hoot.model.monitoring.consumer.CountLoginsCollector;
 import hoot.model.monitoring.consumer.CountRegistrationsCollector;
 import hoot.model.monitoring.consumer.RequestsCollector;
@@ -74,11 +71,11 @@ public class StartMonitorContextListener implements ServletContextListener
         this.historyScheduleAtFixedRate.cancel(true);
 
         // Get Collectors
-        CountLoginsCollector        loginsCollector        = this.getLoginsCollector();
-        CountRegistrationsCollector registrationsCollector = this.getRegistrationsCollector();
-        TagCollector                tagCollector           = this.getHashtagCollector();
-        RequestsCollector           requestsCollector      = this.getRequestCollector();
-        Monitor                     monitor                = (Monitor) ObjectManager.get(Monitor.class);
+        CountLoginsCollector        loginsCollector         = this.getLoginsCollector();
+        CountRegistrationsCollector registrationsCollector  = this.getRegistrationsCollector();
+        TagCollector                tagCollector            = this.getHashtagCollector();
+        RequestsCollector           requestsCollector       = this.getRequestCollector();
+        Monitor                     monitor                 = (Monitor) ObjectManager.get(Monitor.class);
 
         requestsCollector.stopRun();
         loginsCollector.stopRun();
