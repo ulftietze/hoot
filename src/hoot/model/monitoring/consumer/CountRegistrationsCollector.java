@@ -71,8 +71,8 @@ public class CountRegistrationsCollector extends Thread implements CollectorInte
     {
         return new CollectorResult()
         {{
-            put("Currently Registered User", currentlyRegisteredUsers);
-            put("Registrations in Period", userRegisteredInPeriod);
+            put("Currently Registered User", currentlyRegisteredUsers.get());
+            put("Registrations in Period", userRegisteredInPeriod.get());
         }};
     }
 

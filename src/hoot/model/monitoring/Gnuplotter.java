@@ -97,8 +97,7 @@ public class Gnuplotter
         };
 
         String[] gnuplotDirectives = {
-                "u 1:2 t \"threadCount\" w lines, ",
-                "u 1:3 t \"threadCountTotal\" w lines",
+                "u 1:2 t \"threadCount\" w lines, ", "u 1:3 t \"threadCountTotal\" w lines",
                 };
 
         return Gnuplotter.createGraphWithGnuplot(GraphType.Thread, input, dataWriter, gnuplotDirectives);
@@ -113,13 +112,21 @@ public class Gnuplotter
 
                 line += history.timestamp.toString();
                 line += "\t";
-                line += history.memoryMax.toString();
+                line += history.workload.get(SystemWorkloadCollector.MEMORY_CLASS_COMMITTED);
                 line += "\t";
-                line += history.memoryTotal.toString();
+                line += history.workload.get(SystemWorkloadCollector.MEMORY_CLASS_RESERVED);
                 line += "\t";
-                line += history.memoryUsed.toString();
+                line += history.workload.get(SystemWorkloadCollector.MEMORY_THREAD_COMMITTED);
                 line += "\t";
-                line += history.memoryFree.toString();
+                line += history.workload.get(SystemWorkloadCollector.MEMORY_THREAD_RESERVED);
+                line += "\t";
+                line += history.workload.get(SystemWorkloadCollector.MEMORY_CODE_COMMITTED);
+                line += "\t";
+                line += history.workload.get(SystemWorkloadCollector.MEMORY_CODE_RESERVED);
+                line += "\t";
+                line += history.workload.get(SystemWorkloadCollector.MEMORY_GC_COMMITTED);
+                line += "\t";
+                line += history.workload.get(SystemWorkloadCollector.MEMORY_GC_RESERVED);
 
                 result.add(line);
             }
@@ -127,10 +134,14 @@ public class Gnuplotter
         };
 
         String[] gnuplotDirectives = {
-                "u 1:2 t \"memoryMax\" w lines, ",
-                "u 1:3 t \"memoryTotal\" w lines, ",
-                "u 1:4 t \"memoryUsed\" w lines, ",
-                "u 1:5 t \"memoryFree\" w lines",
+                "u 1:2 t \"" + SystemWorkloadCollector.MEMORY_CLASS_COMMITTED + "\" w lines, ",
+                "u 1:3 t \"" + SystemWorkloadCollector.MEMORY_CLASS_RESERVED + "\" w lines, ",
+                "u 1:4 t \"" + SystemWorkloadCollector.MEMORY_THREAD_COMMITTED + "\" w lines, ",
+                "u 1:5 t \"" + SystemWorkloadCollector.MEMORY_THREAD_RESERVED + "\" w lines, ",
+                "u 1:6 t \"" + SystemWorkloadCollector.MEMORY_CODE_COMMITTED + "\" w lines, ",
+                "u 1:7 t \"" + SystemWorkloadCollector.MEMORY_CODE_RESERVED + "\" w lines, ",
+                "u 1:8 t \"" + SystemWorkloadCollector.MEMORY_GC_COMMITTED + "\" w lines, ",
+                "u 1:9 t \"" + SystemWorkloadCollector.MEMORY_GC_RESERVED + "\" w lines",
                 };
 
         return Gnuplotter.createGraphWithGnuplot(GraphType.Memory, input, dataWriter, gnuplotDirectives);
@@ -154,10 +165,7 @@ public class Gnuplotter
             return result;
         };
 
-        String[] gnuplotDirectives = {
-                "u 1:2 t \"systemCPULoad\" w lines, ",
-                "u 1:3 t \"processCPULoad\" w lines",
-                };
+        String[] gnuplotDirectives = {"u 1:2 t \"systemCPULoad\" w lines, ", "u 1:3 t \"processCPULoad\" w lines"};
 
         return Gnuplotter.createGraphWithGnuplot(GraphType.CPULoad, input, dataWriter, gnuplotDirectives);
     }
@@ -178,9 +186,7 @@ public class Gnuplotter
             return result;
         };
 
-        String[] gnuplotDirectives = {
-                "u 1:2 t \"systemLoadAverage\" w lines",
-                };
+        String[] gnuplotDirectives = {"u 1:2 t \"systemLoadAverage\" w lines"};
 
         return Gnuplotter.createGraphWithGnuplot(GraphType.SystemLoad, input, dataWriter, gnuplotDirectives);
     }
@@ -204,9 +210,8 @@ public class Gnuplotter
         };
 
         String[] gnuplotDirectives = {
-                "u 1:2 t \"requestsPerSecond\" w lines, ",
-                "u 1:3 t \"requestsLoggedInPerSecond\" w lines",
-                };
+                "u 1:2 t \"requestsPerSecond\" w lines, ", "u 1:3 t \"requestsLoggedInPerSecond\" w lines"
+        };
 
         return Gnuplotter.createGraphWithGnuplot(GraphType.Requests, input, dataWriter, gnuplotDirectives);
     }
@@ -228,8 +233,8 @@ public class Gnuplotter
         };
 
         String[] gnuplotDirectives = {
-                "u 1:2 t \"currentLoggedIn\" w lines",
-                };
+                "u 1:2 t \"currentLoggedIn\" w lines"
+        };
 
         return Gnuplotter.createGraphWithGnuplot(GraphType.CurrentLoggedIn, input, dataWriter, gnuplotDirectives);
     }

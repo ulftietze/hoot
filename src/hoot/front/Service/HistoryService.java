@@ -10,6 +10,7 @@ import hoot.model.monitoring.consumer.CountLoginsCollector;
 import hoot.model.monitoring.consumer.CountRegistrationsCollector;
 import hoot.model.monitoring.consumer.RequestsCollector;
 import hoot.model.repositories.HistoryRepository;
+import hoot.system.Exception.CouldNotSaveException;
 import hoot.system.Logger.LoggerInterface;
 import hoot.system.Monitoring.CollectorResult;
 import hoot.system.Monitoring.Monitor;
@@ -20,7 +21,6 @@ import hoot.system.Service.ServiceInterface;
 
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class HistoryService implements ServiceInterface
 {
@@ -55,40 +55,30 @@ public class HistoryService implements ServiceInterface
             CollectorResult queueSizes    = monitorData.get(QueueSizeCollector.COLLECTOR_NAME);
             CollectorResult cacheSizes    = monitorData.get(CacheSizeCollector.COLLECTOR_NAME);
 
-            this.logger.log("\n"
-                            + "LoginsPerPeriod: " + logins.get("LoginsPerPeriod") + "\n"
-                            + "Currently Registered User: " + registrations.get("Currently Registered User") + "\n"
-                            + "Registrations in Period: " + registrations.get("Registrations in Period") + "\n"
-                            + "Currently Logged In: " + requests.get("Currently Logged In") + "\n"
-                            + "Requests Per Second: " + requests.get("Requests Per Second") + "\n"
-                            + "Queue Sizes: " + this.serializer.serialize(queueSizes) + "\n"
-                            + "Cache Sizes: " + this.serializer.serialize(cacheSizes) + "\n"
-                            + "Memory used: " + ((long) workload.get("Memory Used") / 1024 / 1024) + "MiB\n"
-                            + "Memory total: " + ((long) workload.get("Memory Total") / 1024 / 1024) + "MiB\n"
-                            + "Memory max: " + ((long) workload.get("Memory Max") / 1024 / 1024) + "MiB\n"
-                            + "Memory free: " + ((long) workload.get("Memory Free") / 1024 / 1024) + "MiB\n"
-                            + "Memory Heap Usage: " + workload.get("Memory Heap Usage") + "\n"
-                            + "Memory NonHeap Usage: " + workload.get("Memory NonHeap Usage") + "\n"
-                            + "Thread Count: " + workload.get("Thread Count") + "\n"
-                            + "Thread Total Started Count: " + workload.get("Thread Total Started Count") + "\n"
-                            + "Available Processors: " + workload.get("Available Processors") + "\n"
-                            + "System Load Average: " + workload.get("System Load Average") + "\n"
-                            + "Process CPU Load: " + workload.get("Process CPU Load") + "\n"
-                            + "System CPU Load: " + workload.get("System CPU Load") + "\n"
-                            + "Most recent tags: "
-                            + ((ArrayList<Tag>) mostUsedTags.get("popularTags"))
-                                    .stream()
-                                    .map(t -> t.tag)
-                                    .collect(Collectors.joining(",")) + "\n"
-            );
+            entity.loginsPerSixHours        = (Integer) logins.get("LoginsPerPeriod");
+            entity.currentlyRegisteredUsers = (Integer) registrations.get("Currently Registered User");
+            entity.registrationsPerSixHours = (Integer) registrations.get("Registrations in Period");
+            entity.currentLoggedIn          = (Integer) requests.get("Currently Logged In");
+            //entity.requestsLoggedInPerSecond = requests.get("Requests Logged In Per Second");
+            entity.requestsPerSecond = (Integer) requests.get("Requests Per Second");
+            entity.queueSize         = queueSizes;
+            entity.cacheSize         = cacheSizes;
+            entity.workload          = workload;
+            entity.threadCount       = (Integer) workload.get("Thread Count");
+            entity.threadCountTotal  = (Long) workload.get("Thread Total Started Count");
+            entity.systemLoadAverage = (Double) workload.get("System Load Average");
+            entity.systemCPULoad     = (Double) workload.get("System CPU Load");
+            entity.processCPULoad    = (Double) workload.get("Process CPU Load");
+
+            entity.trendingHashtags = (ArrayList<Tag>) mostUsedTags.get("popularTags");
 
             //System.gc();
 
-            //try {
-            //    historyRepository.save(entity);
-            //} catch (CouldNotSaveException e) {
-            //    this.logger.log("[ERROR] Could not save history entry: " + e.getMessage());
-            //}
+            try {
+                historyRepository.save(entity);
+            } catch (CouldNotSaveException e) {
+                this.logger.log("[ERROR] Could not save history entry: " + e.getMessage());
+            }
         } catch (Exception e) {
             String msg = "[ERROR] Could not execute HistoryService::execute properly: " + e.getMessage();
             this.logger.logException(msg, e);

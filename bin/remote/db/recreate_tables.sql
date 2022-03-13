@@ -18,22 +18,22 @@ CREATE TABLE History
     id                        BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     timestamp                 DateTime        NOT NULL DEFAULT CURRENT_TIMESTAMP,
     currentLoggedIn           INT UNSIGNED    NOT NULL DEFAULT 0,
-    loginsPerSixHours         FLOAT UNSIGNED  NOT NULL DEFAULT 0,
-    registrationsPerSixHours  FLOAT UNSIGNED  NOT NULL DEFAULT 0,
+    loginsPerSixHours         INT UNSIGNED    NOT NULL DEFAULT 0,
+    registrationsPerSixHours  INT UNSIGNED    NOT NULL DEFAULT 0,
     postsPerMinute            FLOAT UNSIGNED  NOT NULL DEFAULT 0,
-    requestsPerSecond         FLOAT UNSIGNED  NOT NULL DEFAULT 0,
+    requestsPerSecond         INT UNSIGNED    NOT NULL DEFAULT 0,
     requestsLoggedInPerSecond FLOAT UNSIGNED  NOT NULL DEFAULT 0,
     currentlyRegisteredUsers  INT UNSIGNED    NOT NULL DEFAULT 0,
     trendingHashtags          VARCHAR(191)    NOT NULL DEFAULT '', /*   191 * 4bit < 767 bit   */
     systemLoadAverage         DOUBLE UNSIGNED NOT NULL DEFAULT 0,
     systemCPULoad             DOUBLE UNSIGNED NOT NULL DEFAULT 0,
     processCPULoad            DOUBLE UNSIGNED NOT NULL DEFAULT 0,
-    memoryMax                 INT UNSIGNED    NOT NULL DEFAULT 0,
-    memoryTotal               INT UNSIGNED    NOT NULL DEFAULT 0,
-    memoryFree                INT UNSIGNED    NOT NULL DEFAULT 0,
-    memoryUsed                INT UNSIGNED    NOT NULL DEFAULT 0,
     threadCount               INT UNSIGNED    NOT NULL DEFAULT 0,
-    threadCountTotal          INT UNSIGNED    NOT NULL DEFAULT 0
+    threadCountTotal          INT UNSIGNED    NOT NULL DEFAULT 0,
+    workload                  VARCHAR(2047)   NOT NULL DEFAULT '',
+    queueSize                 VARCHAR(191)    NOT NULL DEFAULT '',
+    cacheSize                 VARCHAR(191)    NOT NULL DEFAULT '',
+    requestDurations          VARCHAR(191)    NOT NULL DEFAULT ''
 )
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;
@@ -213,13 +213,6 @@ CREATE TABLE HootTags
 /* Inital Data */
 
 SET NAMES utf8mb4;
-
-INSERT INTO History (currentLoggedIn, loginsPerSixHours, registrationsPerSixHours, postsPerMinute, requestsPerSecond,
-                     requestsLoggedInPerSecond, currentlyRegisteredUsers, trendingHashtags,
-                     systemLoadAverage, systemCPULoad, processCPULoad, memoryMax, memoryTotal, memoryFree, memoryUsed,
-                     threadCount, threadCountTotal)
-VALUES (50, 42.1, 1.3, 24.9, 25.1, 3.4, 50, 'Hier,folgt,ein,Emoji,🐈', 98.5, 33.3, 11.1, 1024, 999, 137, 862, 5,
-        725);
 
 INSERT INTO User (username, passwordHash)
 VALUES ('BeispielUser1', '1234'),
