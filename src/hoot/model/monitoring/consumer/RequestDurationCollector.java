@@ -20,6 +20,11 @@ public class RequestDurationCollector extends Thread implements CollectorInterfa
 {
     public final static String COLLECTOR_NAME = "Request Duration Collector";
     public final static String ALL            = "All";
+    public final static String GET            = "GET";
+    public final static String PUT            = "PUT";
+    public final static String POST           = "POST";
+    public final static String DELETE         = "DELETE";
+    public final static String OPTION         = "OPTION";
 
     private final QueueManager    queueManager;
     private final LoggerInterface logger;
@@ -34,8 +39,20 @@ public class RequestDurationCollector extends Thread implements CollectorInterfa
         this.queueManager = (QueueManager) ObjectManager.get(QueueManager.class);
         this.logger       = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
 
-        this.methodDurations       = Collections.synchronizedNavigableMap(new TreeMap<>());
         this.methodAverageDuration = Collections.synchronizedNavigableMap(new TreeMap<>());
+        this.methodDurations       = Collections.synchronizedNavigableMap(new TreeMap<>());
+        this.resetAverage();
+    }
+
+    private void resetAverage()
+    {
+        // TODO: More
+        this.methodAverageDuration.put(ALL, Duration.ZERO);
+        this.methodAverageDuration.put(GET, Duration.ZERO);
+        this.methodAverageDuration.put(PUT, Duration.ZERO);
+        this.methodAverageDuration.put(POST, Duration.ZERO);
+        this.methodAverageDuration.put(DELETE, Duration.ZERO);
+        this.methodAverageDuration.put(OPTION, Duration.ZERO);
     }
 
     @Override
@@ -90,6 +107,7 @@ public class RequestDurationCollector extends Thread implements CollectorInterfa
             int      requests = 0;
 
             synchronized (this.methodDurations) {
+                this.resetAverage();
                 for (Map.Entry<String, List<Duration>> entry : this.methodDurations.entrySet()) {
                     String         method    = entry.getKey();
                     List<Duration> durations = entry.getValue();

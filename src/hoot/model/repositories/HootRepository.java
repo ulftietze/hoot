@@ -1,7 +1,7 @@
 package hoot.model.repositories;
 
+import hoot.model.cache.HootCache;
 import hoot.model.entities.*;
-import hoot.model.queue.publisher.TagsPublisher;
 import hoot.model.search.SearchCriteriaInterface;
 import hoot.model.search.hoot.MentionSearchCriteria;
 import hoot.model.search.hoot.TagSearchCriteria;
@@ -28,6 +28,8 @@ public class HootRepository extends AbstractRepository<Hoot>
 
     private final HootMentionRepository hootMentionRepository;
 
+    private final HootCache hootCache;
+
     public HootRepository()
     {
         super();
@@ -37,6 +39,7 @@ public class HootRepository extends AbstractRepository<Hoot>
         this.tagRepository         = (TagRepository) ObjectManager.get(TagRepository.class);
         this.hootTagRepository     = (HootTagRepository) ObjectManager.get(HootTagRepository.class);
         this.userRepository        = (UserRepository) ObjectManager.get(UserRepository.class);
+        this.hootCache             = (HootCache) ObjectManager.get(HootCache.class);
     }
 
     public Hoot getById(Integer id) throws EntityNotFoundException
@@ -45,11 +48,32 @@ public class HootRepository extends AbstractRepository<Hoot>
             throw new EntityNotFoundException("Hoot with ID null");
         }
 
-        Hoot hoot;
+        Hoot hoot = this.hootCache.get(id);
+
+        if (hoot != null) {
+            return hoot;
+        }
 
         try (Connection connection = this.getConnection()) {
             QueryBuilder queryBuilder = (QueryBuilder) ObjectManager.create(QueryBuilder.class);
-            this.prepareQueryBuilder(queryBuilder);
+            queryBuilder.SELECT.add("*");
+            queryBuilder.FROM = "Hoot h";
+
+            for (Interaction interaction : Interaction.values()) {
+                String reaction = interaction.toString();
+                String q = "count(CASE WHEN ia.interaction = '" + reaction + "' THEN 1 END) AS '" + reaction + "'";
+                queryBuilder.SELECT.add(q);
+            }
+
+            queryBuilder.JOINS.add("LEFT JOIN Image i ON h.id = i.hoot");
+            queryBuilder.JOINS.add("LEFT JOIN Post p ON h.id = p.hoot");
+            queryBuilder.JOINS.add("LEFT JOIN Comment c ON h.id = c.hoot");
+            queryBuilder.JOINS.add("LEFT JOIN HootTags ht ON h.id = ht.hoot");
+            queryBuilder.JOINS.add("LEFT JOIN Tag t ON ht.tag = t.tag");
+            queryBuilder.JOINS.add("LEFT JOIN Reaction r ON h.id = r.hoot");
+            queryBuilder.JOINS.add("LEFT JOIN Interaction ia ON r.interaction = ia.interaction");
+            queryBuilder.JOINS.add("LEFT JOIN User u ON h.user = u.id");
+            queryBuilder.GROUP_BY.add("h.id");
             queryBuilder.WHERE.add("h.id = ?");
             queryBuilder.PARAMETERS.add(id.toString());
 
@@ -57,11 +81,13 @@ public class HootRepository extends AbstractRepository<Hoot>
             QueryResultRow    resultRow = this.statementFetcher.fetchOne(statement);
             connection.close();
 
-            hoot = this.getHoot(resultRow);
+            hoot = this.mapHoot(resultRow);
         } catch (SQLException e) {
             this.logger.logException("Hoot by Id: " + id + " ==>" + e.getMessage(), e);
             throw new EntityNotFoundException("Hoot with ID " + id);
         }
+
+        this.hootCache.put(hoot);
 
         return hoot;
     }
@@ -73,14 +99,23 @@ public class HootRepository extends AbstractRepository<Hoot>
 
         try (Connection connection = this.getConnection()) {
             QueryBuilder queryBuilder = searchCriteria.getQueryBuilder();
-            this.prepareQueryBuilder(queryBuilder);
+            queryBuilder.SELECT.add("h.id");
+            queryBuilder.FROM = "Hoot h";
+            queryBuilder.JOINS.add("LEFT JOIN Image i ON h.id = i.hoot");
+            queryBuilder.JOINS.add("LEFT JOIN Post p ON h.id = p.hoot");
+            queryBuilder.JOINS.add("LEFT JOIN Comment c ON h.id = c.hoot");
+            queryBuilder.JOINS.add("LEFT JOIN HootTags ht ON h.id = ht.hoot");
+            queryBuilder.JOINS.add("LEFT JOIN Tag t ON ht.tag = t.tag");
+            queryBuilder.JOINS.add("LEFT JOIN User u ON h.user = u.id");
+
             PreparedStatement statement = queryBuilder.build(connection);
 
             QueryResult queryResult = this.statementFetcher.fetchAll(statement);
             connection.close();
 
             for (QueryResultRow row : queryResult) {
-                allHoots.add(this.getHoot(row));
+                Integer hootId = (Integer) row.get("Hoot.id");
+                allHoots.add(this.getById(hootId));
             }
         } catch (SQLException e) {
             this.log("Could not load list of Hoots: " + e.getMessage());
@@ -171,9 +206,6 @@ public class HootRepository extends AbstractRepository<Hoot>
 
             this.hootMentionRepository.save(hoot.mentions);
             this.hootTagRepository.save(hoot.tags);
-
-            TagsPublisher tagsPublisher = (TagsPublisher) ObjectManager.get(TagsPublisher.class);
-            tagsPublisher.publish(hoot.tags);
         } catch (SQLException e) {
             this.log("Hoot.save(): " + e.getMessage());
             throw new CouldNotSaveException("Hoot");
@@ -258,13 +290,12 @@ public class HootRepository extends AbstractRepository<Hoot>
 
             this.hootMentionRepository.save(hoot.mentions);
             this.hootTagRepository.save(hoot.tags);
-
-            TagsPublisher tagsPublisher = (TagsPublisher) ObjectManager.get(TagsPublisher.class);
-            tagsPublisher.publish(hoot.tags);
         } catch (SQLException e) {
             this.log("Hoot.save(): " + e.getMessage());
             throw new CouldNotSaveException("Hoot");
         }
+
+        this.hootCache.purge(hoot);
     }
 
     @Override
@@ -295,17 +326,18 @@ public class HootRepository extends AbstractRepository<Hoot>
             this.log("Hoot.delete(): " + e.getMessage());
             throw new CouldNotDeleteException("Hoot with ID " + hoot.id);
         }
+
+        this.hootCache.purge(hoot);
     }
 
     public HootMentions getMentions(Hoot hoot) throws EntityNotFoundException
     {
-        var hootMentions = (HootMentions) ObjectManager.create(HootMentions.class);
-        hootMentions.hoot = hoot;
         var searchCriteria = (MentionSearchCriteria) ObjectManager.create(MentionSearchCriteria.class);
         searchCriteria.hoot = hoot;
 
-        MentionRepository repository = (MentionRepository) ObjectManager.get(MentionRepository.class);
-        hootMentions.mentions = repository.getList(searchCriteria);
+        var hootMentions = (HootMentions) ObjectManager.create(HootMentions.class);
+        hootMentions.hoot     = hoot;
+        hootMentions.mentions = this.mentionRepository.getList(searchCriteria);
 
         return hootMentions;
     }
@@ -322,34 +354,12 @@ public class HootRepository extends AbstractRepository<Hoot>
         return hootTags;
     }
 
-    private void prepareQueryBuilder(QueryBuilder queryBuilder)
-    {
-        queryBuilder.SELECT.add("*");
-        queryBuilder.FROM = "Hoot h";
-
-        //for (Interaction interaction : Interaction.values()) {
-        //    String reaction = interaction.toString();
-        //    String q        = "count(CASE WHEN ia.interaction = '" + reaction + "' THEN 1 END) AS '" + reaction + "'";
-        //    queryBuilder.SELECT.add(q);
-        //}
-
-        queryBuilder.JOINS.add("LEFT JOIN Image i ON h.id = i.hoot");
-        queryBuilder.JOINS.add("LEFT JOIN Post p ON h.id = p.hoot");
-        queryBuilder.JOINS.add("LEFT JOIN Comment c ON h.id = c.hoot");
-        queryBuilder.JOINS.add("LEFT JOIN HootTags ht ON h.id = ht.hoot");
-        queryBuilder.JOINS.add("LEFT JOIN Tag t ON ht.tag = t.tag");
-        //queryBuilder.JOINS.add("LEFT JOIN Reaction r ON h.id = r.hoot");
-        //queryBuilder.JOINS.add("LEFT JOIN Interaction ia ON r.interaction = ia.interaction");
-        queryBuilder.JOINS.add("LEFT JOIN User u ON h.user = u.id");
-        queryBuilder.GROUP_BY.add("h.id");
-    }
-
-    private Hoot getHoot(QueryResultRow resultRow) throws SQLException
+    private Hoot mapHoot(QueryResultRow resultRow) throws SQLException
     {
         String dbHootType = (String) resultRow.get("Hoot.hootType");
 
         switch (HootType.valueOf(dbHootType)) {
-            // yes, this is bad, but it just works (TM)
+            // yes, this is not optimal, but it just works (TM)
             case Image:
                 Image imageHoot = (Image) ObjectManager.create(Image.class);
                 imageHoot.id = (Integer) resultRow.get("Hoot.id");
@@ -358,12 +368,12 @@ public class HootRepository extends AbstractRepository<Hoot>
                 imageHoot.content = (String) resultRow.get("Image.content");
                 imageHoot.onlyFollower = (boolean) resultRow.get("Image.onlyFollower");
                 imageHoot.user = this.userRepository.getById((int) resultRow.get("Hoot.user"));
-                //imageHoot.mentions = this.getMentions(imageHoot);
-                //imageHoot.tags = this.getTags(imageHoot);
+                imageHoot.mentions = this.getMentions(imageHoot);
+                imageHoot.tags = this.getTags(imageHoot);
 
-                //for (Interaction interaction : Interaction.values()) {
-                //    imageHoot.reactionCount.put(interaction, (int) resultRow.get(interaction.toString()));
-                //}
+                for (Interaction interaction : Interaction.values()) {
+                    imageHoot.reactionCount.put(interaction, (int) resultRow.get(interaction.toString()));
+                }
 
                 return imageHoot;
             case Post:
@@ -373,12 +383,12 @@ public class HootRepository extends AbstractRepository<Hoot>
                 postHoot.onlyFollower = (boolean) resultRow.getOrDefault("Post.onlyFollower", false);
                 postHoot.id = (int) resultRow.get("Hoot.id");
                 postHoot.user = this.userRepository.getById((int) resultRow.get("Hoot.user"));
-                //postHoot.mentions = this.getMentions(postHoot);
-                //postHoot.tags = this.getTags(postHoot);
+                postHoot.mentions = this.getMentions(postHoot);
+                postHoot.tags = this.getTags(postHoot);
 
-                //for (Interaction interaction : Interaction.values()) {
-                //    postHoot.reactionCount.put(interaction, (int) resultRow.get(interaction.toString()));
-                //}
+                for (Interaction interaction : Interaction.values()) {
+                    postHoot.reactionCount.put(interaction, (int) resultRow.get(interaction.toString()));
+                }
 
                 return postHoot;
             case Comment:
@@ -388,12 +398,12 @@ public class HootRepository extends AbstractRepository<Hoot>
                 commentHoot.id = (int) resultRow.get("Hoot.id");
                 commentHoot.user = this.userRepository.getById((int) resultRow.get("Hoot.user"));
                 commentHoot.parent = this.getById((int) resultRow.get("Comment.parent"));
-                //commentHoot.mentions = this.getMentions(commentHoot);
-                //commentHoot.tags = this.getTags(commentHoot);
+                commentHoot.mentions = this.getMentions(commentHoot);
+                commentHoot.tags = this.getTags(commentHoot);
 
-                //for (Interaction interaction : Interaction.values()) {
-                //    commentHoot.reactionCount.put(interaction, (int) resultRow.get(interaction.toString()));
-                //}
+                for (Interaction interaction : Interaction.values()) {
+                    commentHoot.reactionCount.put(interaction, (int) resultRow.get(interaction.toString()));
+                }
 
                 return commentHoot;
             default:

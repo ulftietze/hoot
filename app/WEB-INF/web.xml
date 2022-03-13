@@ -11,7 +11,7 @@
        *            We must make sure that this ObjectInstantiationContextListener is loaded at start.
      -->
     <listener>
-        <listener-class>hoot.initialisation.Listener.ObjectInstantiationContextListener</listener-class>
+        <listener-class>hoot.app.Listener.ObjectInstantiationContextListener</listener-class>
     </listener>
 
     <context-param>
