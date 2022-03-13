@@ -136,14 +136,14 @@ public class UserRepository extends AbstractRepository<User>
         return users;
     }
 
-    public Integer getUserQuantity() throws SQLException
+    public Long getUserQuantity() throws SQLException
     {
         DefaultSearchCriteria criteria = (DefaultSearchCriteria) ObjectManager.create(DefaultSearchCriteria.class);
 
         return this.getUserQuantityBySearchCriteria(criteria);
     }
 
-    public Integer getUserQuantityBySearchCriteria(SearchCriteriaInterface searchCriteriaInterface) throws SQLException
+    public Long getUserQuantityBySearchCriteria(SearchCriteriaInterface searchCriteriaInterface) throws SQLException
     {
         try (Connection connection = this.getConnection()) {
             QueryBuilder queryBuilder = searchCriteriaInterface.getQueryBuilder();
@@ -154,7 +154,7 @@ public class UserRepository extends AbstractRepository<User>
             QueryResultRow    resultRow = this.statementFetcher.fetchOne(statement);
             connection.close();
 
-            return (int) resultRow.get("quantity");
+            return (Long) resultRow.get("quantity");
         } catch (SQLException e) {
             this.log(e.getMessage());
             throw e;

@@ -19,11 +19,11 @@ CREATE TABLE History
     timestamp                 DateTime        NOT NULL DEFAULT CURRENT_TIMESTAMP,
     currentLoggedIn           INT UNSIGNED    NOT NULL DEFAULT 0,
     loginsPerSixHours         INT UNSIGNED    NOT NULL DEFAULT 0,
-    registrationsPerSixHours  INT UNSIGNED    NOT NULL DEFAULT 0,
     postsPerMinute            FLOAT UNSIGNED  NOT NULL DEFAULT 0,
     requestsPerSecond         INT UNSIGNED    NOT NULL DEFAULT 0,
     requestsLoggedInPerSecond FLOAT UNSIGNED  NOT NULL DEFAULT 0,
-    currentlyRegisteredUsers  INT UNSIGNED    NOT NULL DEFAULT 0,
+    registrationsPerSixHours  BIGINT UNSIGNED NOT NULL DEFAULT 0,
+    currentlyRegisteredUsers  BIGINT UNSIGNED NOT NULL DEFAULT 0,
     trendingHashtags          VARCHAR(191)    NOT NULL DEFAULT '', /*   191 * 4bit < 767 bit   */
     systemLoadAverage         DOUBLE UNSIGNED NOT NULL DEFAULT 0,
     systemCPULoad             DOUBLE UNSIGNED NOT NULL DEFAULT 0,
@@ -215,8 +215,8 @@ CREATE TABLE HootTags
 SET NAMES utf8mb4;
 
 INSERT INTO User (username, passwordHash)
-VALUES ('BeispielUser1', '1234'),
-       ('BeispielUser2', '5678'),
+VALUES ('BeispielUser1', '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08'),
+       ('BeispielUser2', '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08'),
        ('test1', '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08'),
        ('test2', '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08'),
        ('test3', '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08');

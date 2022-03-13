@@ -5,7 +5,7 @@ import hoot.system.Cache.AbstractCache;
 
 import java.util.HashMap;
 
-public class UserCache extends AbstractCache<User>
+public class UserCache extends AbstractCache<User> implements UserCacheInterface
 {
     private final HashMap<Integer, CacheObject> idLookupMap;
     private final HashMap<String, CacheObject>  usernameLookupMap;
@@ -16,12 +16,14 @@ public class UserCache extends AbstractCache<User>
         this.usernameLookupMap = new HashMap<>();
     }
 
-    public synchronized User get(int id)
+    @Override
+    public synchronized User get(Integer id)
     {
         CacheObject cacheObject = this.idLookupMap.get(id);
         return this.getTypeFromCacheObject(cacheObject);
     }
 
+    @Override
     public synchronized User get(String username)
     {
         CacheObject cacheObject = this.usernameLookupMap.get(username);

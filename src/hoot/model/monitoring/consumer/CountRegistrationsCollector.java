@@ -15,20 +15,23 @@ import java.sql.SQLException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class CountRegistrationsCollector extends Thread implements CollectorInterface, ConsumerInterface
 {
-    public final static  String COLLECTOR_NAME               = "CountRegistrations";
-    private final static long   PERIOD_REGISTRATIONS_MINUTES = 360;
+    public final static String COLLECTOR_NAME   = "CountRegistrations";
+    public final static String TOTAL_REGISTERED = "Currently Registered User";
+    public final static String IN_PERIOD        = "Registrations in Period";
+
+    private final static long PERIOD_REGISTRATIONS_MINUTES = 360;
 
     private final QueueManager queueManager;
 
     private final UserRepository userRepository;
 
-    private final AtomicInteger userRegisteredInPeriod;
+    private final AtomicLong userRegisteredInPeriod;
 
-    private final AtomicInteger currentlyRegisteredUsers;
+    private final AtomicLong currentlyRegisteredUsers;
 
     private final LoggerInterface logger;
 
@@ -39,8 +42,8 @@ public class CountRegistrationsCollector extends Thread implements CollectorInte
         this.userRepository = (UserRepository) ObjectManager.get(UserRepository.class);
 
         this.queueManager             = (QueueManager) ObjectManager.get(QueueManager.class);
-        this.userRegisteredInPeriod   = new AtomicInteger();
-        this.currentlyRegisteredUsers = new AtomicInteger();
+        this.userRegisteredInPeriod   = new AtomicLong();
+        this.currentlyRegisteredUsers = new AtomicLong();
         this.logger                   = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
     }
 
@@ -52,6 +55,7 @@ public class CountRegistrationsCollector extends Thread implements CollectorInte
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage());
         }
+
         ScheduledFuture<?> loadAmountOfRegisteredUsersInPeriodTask = this
                 .createScheduledExecutorService()
                 .scheduleAtFixedRate(this::registeredUsersInPeriod, 0, 10, TimeUnit.MINUTES);
@@ -79,8 +83,8 @@ public class CountRegistrationsCollector extends Thread implements CollectorInte
     {
         return new CollectorResult()
         {{
-            put("Currently Registered User", currentlyRegisteredUsers.get());
-            put("Registrations in Period", userRegisteredInPeriod.get());
+            put(TOTAL_REGISTERED, currentlyRegisteredUsers.get());
+            put(IN_PERIOD, userRegisteredInPeriod.get());
         }};
     }
 

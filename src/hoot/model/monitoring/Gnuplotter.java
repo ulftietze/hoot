@@ -1,5 +1,7 @@
 package hoot.model.monitoring;
 
+import hoot.model.cache.HootCacheInterface;
+import hoot.model.cache.UserCacheInterface;
 import hoot.model.entities.History;
 import hoot.model.monitoring.consumer.RequestDurationCollector;
 import hoot.system.Filesystem.FileHandler;
@@ -29,31 +31,39 @@ public class Gnuplotter
         return urlMap.get(graphtype);
     }
 
-    public static String createGraph(GraphType graphType, ArrayList<History> input)
+    public static void createGraph(GraphType graphType, ArrayList<History> input)
     {
         switch (graphType) {
             case Statistics:
-                return Gnuplotter.createStatisticsGraph(input);
+                Gnuplotter.createStatisticsGraph(input);
+                return;
             case Thread:
-                return Gnuplotter.createThreadGraph(input);
+                Gnuplotter.createThreadGraph(input);
+                return;
             case HeapMemory:
-                return Gnuplotter.createHeapMemoryGraph(input);
+                Gnuplotter.createHeapMemoryGraph(input);
+                return;
             case Memory:
-                return Gnuplotter.createMemoryGraph(input);
+                Gnuplotter.createMemoryGraph(input);
+                return;
             case CacheSize:
-                return Gnuplotter.createCacheSizeGraph(input);
+                Gnuplotter.createCacheSizeGraph(input);
+                return;
             case CPULoad:
-                return Gnuplotter.createCPULoadGraph(input);
+                Gnuplotter.createCPULoadGraph(input);
+                return;
             case SystemLoad:
-                return Gnuplotter.createSystemLoadGraph(input);
+                Gnuplotter.createSystemLoadGraph(input);
+                return;
             case Requests:
-                return Gnuplotter.createRequestsGraph(input);
+                Gnuplotter.createRequestsGraph(input);
+                return;
             case RequestDuration:
-                return Gnuplotter.createRequestDurationGraph(input);
+                Gnuplotter.createRequestDurationGraph(input);
+                return;
             case CurrentLoggedIn:
-                return Gnuplotter.createCurrentLoggedInGraph(input);
+                Gnuplotter.createCurrentLoggedInGraph(input);
         }
-        return null;
     }
 
     private static synchronized String createStatisticsGraph(ArrayList<History> input)
@@ -299,9 +309,9 @@ public class Gnuplotter
 
                 line += history.timestamp.toString();
                 line += "\t";
-                line += history.cacheSize.get(CacheSizeCollector.USER_CACHE);
+                line += history.cacheSize.get(UserCacheInterface.CACHE_NAME);
                 line += "\t";
-                line += history.cacheSize.get(CacheSizeCollector.HOOT_CACHE);
+                line += history.cacheSize.get(HootCacheInterface.CACHE_NAME);
 
                 result.add(line.toString());
             }
@@ -309,8 +319,8 @@ public class Gnuplotter
         };
 
         String[] gnuplotDirectives = {
-                "u 1:2 t \"" + CacheSizeCollector.USER_CACHE + "\" w lines, ",
-                "u 1:3 t \"" + CacheSizeCollector.HOOT_CACHE + "\" w lines",
+                "u 1:2 t \"" + UserCacheInterface.CACHE_NAME + "\" w lines, ",
+                "u 1:3 t \"" + HootCacheInterface.CACHE_NAME + "\" w lines",
                 };
 
         return Gnuplotter.createGraphWithGnuplot(GraphType.CacheSize, input, dataWriter, gnuplotDirectives);

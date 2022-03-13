@@ -3,6 +3,8 @@ package hoot.app.Listener;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hoot.app.Factory.*;
 import hoot.app.Factory.RedisFactory;
+import hoot.model.cache.*;
+import hoot.model.repositories.UserRepository;
 import hoot.system.Filesystem.FileHandler;
 import hoot.system.Filesystem.MediaFileHandler;
 import hoot.system.Logger.ContextLogger;
@@ -17,6 +19,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 import javax.sql.DataSource;
+import java.sql.SQLException;
 import java.util.concurrent.ScheduledExecutorService;
 
 @WebListener
@@ -42,5 +45,11 @@ public class ObjectInstantiationContextListener implements ServletContextListene
         ObjectManager.setFactory(ScheduledExecutorService.class, new SingleThreadScheduledExecutorFactory());
         ObjectManager.setFactory(ProcessBuilder.class, new ProcessBuilderFactory());
         ObjectManager.setFactory(Redis.class, new RedisFactory(context));
+
+        // Model
+        //ObjectManager.set(UserCacheInterface.class, UserCache.class);
+        ObjectManager.set(UserCacheInterface.class, UserRedisCache.class);
+        //ObjectManager.set(HootCacheInterface.class, HootCache.class);
+        ObjectManager.set(HootCacheInterface.class, HootRedisCache.class);
     }
 }

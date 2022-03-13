@@ -6,39 +6,26 @@ import hoot.system.Cache.AbstractRedisCache;
 import java.io.IOException;
 import java.util.HashMap;
 
-public class UserRedisCache extends AbstractRedisCache<User>
+public class UserRedisCache extends AbstractRedisCache<User> implements UserCacheInterface
 {
-    private HashMap<Integer, String> idToKeyMap       = new HashMap<>();
-    private HashMap<String, String>  usernameToKeyMap = new HashMap<>();
+    private final HashMap<Integer, String> idToKeyMap       = new HashMap<>();
+    private final HashMap<String, String>  usernameToKeyMap = new HashMap<>();
 
-    public synchronized User get(int id)
+    @Override
+    public synchronized User get(Integer id)
     {
         String key = this.idToKeyMap.get(id);
         return this.deserializeKey(key);
     }
 
+    @Override
     public synchronized User get(String username)
     {
         String key = this.usernameToKeyMap.get(username);
         return this.deserializeKey(key);
     }
 
-    private User deserializeKey(String key)
-    {
-        if (key != null) {
-            try {
-                String redisResult = this.redisManager.get(key);
-                if (redisResult == null) {
-                    return null;
-                }
-                return (User) this.serializer.deserialize(redisResult, User.class);
-            } catch (IOException e) {
-                this.logger.log("Could not deserialize String to User: " + e.getMessage());
-            }
-        }
-        return null;
-    }
-
+    @Override
     public synchronized void purge(User user)
     {
         String key = this.getKey(user);
@@ -47,6 +34,12 @@ public class UserRedisCache extends AbstractRedisCache<User>
             this.usernameToKeyMap.remove(user.username);
             this.redisManager.delete(key);
         }
+    }
+
+    @Override
+    public Integer getSize()
+    {
+        return 0;
     }
 
     @Override
@@ -61,6 +54,24 @@ public class UserRedisCache extends AbstractRedisCache<User>
         this.redisManager.set(key, this.serializer.serialize(user));
         this.idToKeyMap.put(user.id, key);
         this.usernameToKeyMap.put(user.username, key);
+    }
+
+    private User deserializeKey(String key)
+    {
+        if (key != null) {
+            try {
+                String redisResult = this.redisManager.get(key);
+
+                if (redisResult == null) {
+                    return null;
+                }
+
+                return (User) this.serializer.deserialize(redisResult, User.class);
+            } catch (IOException e) {
+                this.logger.log("Could not deserialize String to User: " + e.getMessage());
+            }
+        }
+        return null;
     }
 
     private String getKey(User user)
