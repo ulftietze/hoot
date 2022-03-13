@@ -64,6 +64,8 @@ public class UserRepository extends AbstractRepository<User>
             throw new EntityNotFoundException("User with ID: " + id);
         }
 
+        this.userCache.put(user);
+
         return user;
     }
 
@@ -98,6 +100,8 @@ public class UserRepository extends AbstractRepository<User>
             throw new EntityNotFoundException("User with username: " + username);
         }
 
+        this.userCache.put(user);
+
         return user;
     }
 
@@ -114,7 +118,7 @@ public class UserRepository extends AbstractRepository<User>
 
         try (Connection connection = this.getConnection()) {
             QueryBuilder queryBuilder = searchCriteria.getQueryBuilder();
-            queryBuilder.SELECT.add("*");
+            queryBuilder.SELECT.add("id");
             queryBuilder.FROM = "User";
 
             PreparedStatement statement   = queryBuilder.build(connection);
@@ -122,7 +126,7 @@ public class UserRepository extends AbstractRepository<User>
             connection.close();
 
             for (QueryResultRow resultRow : queryResult) {
-                User user = this.mapResultSetToUser(resultRow);
+                User user = this.getById((int) resultRow.get("User.id"));
                 users.add(user);
             }
         } catch (SQLException e) {
@@ -260,11 +264,8 @@ public class UserRepository extends AbstractRepository<User>
 
         try {
             user.followerCount = this.followerRepository.getFollowerCountForUser(user.id);
+            user.followsCount  = this.followerRepository.getFollowsCountForUser(user.id);
         } catch (EntityNotFoundException ignore) {
-        }
-
-        if (searchedUser != null) {
-            this.userCache.put(user);
         }
 
         return user;

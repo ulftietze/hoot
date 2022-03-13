@@ -1,20 +1,29 @@
 package hoot.model.entities;
 
+import hoot.system.Filesystem.MediaFileHandler;
+import hoot.system.ObjectManager.ObjectManager;
+
 public class Image extends Hoot
 {
-    public transient String imagePath;
-
-    public String content;
-
-    public boolean onlyFollower;
+    private final    MediaFileHandler mediaFileHandler;
+    public transient String           imagePath;
+    public           String           content;
+    public           boolean          onlyFollower;
 
     public Image()
     {
-        this.hootType = HootType.Image;
+        this.mediaFileHandler = (MediaFileHandler) ObjectManager.get(MediaFileHandler.class);
+        this.hootType         = HootType.Image;
     }
 
     public String getImageUrl()
     {
-        return "https://....de/../" + this.imagePath;
+        String imagePath = "default.png";
+
+        if (this.imagePath != null) {
+            imagePath = this.imagePath;
+        }
+
+        return this.mediaFileHandler.getImageUrl("hoots/image/" + imagePath);
     }
 }

@@ -44,6 +44,32 @@ public class FollowerRepository extends AbstractRepository<Follower>
         return followerCount;
     }
 
+    public int getFollowsCountForUser(Integer userID) throws EntityNotFoundException
+    {
+        if (userID == null) {
+            throw new EntityNotFoundException("FollowsCount for User with empty ID");
+        }
+
+        int followsCount = 0;
+
+        try (Connection connection = this.getConnection()) {
+            QueryBuilder queryBuilder = (QueryBuilder) ObjectManager.get(QueryBuilder.class, true);
+
+            queryBuilder.SELECT.add("COUNT(user) as quantity");
+            queryBuilder.FROM = "Follower";
+            queryBuilder.WHERE.add("user = ?");
+            queryBuilder.PARAMETERS.add(userID.toString());
+
+            PreparedStatement preparedStatement = queryBuilder.build(connection);
+
+            return (int) this.statementFetcher.fetchOne(preparedStatement).get("quantity");
+        } catch (SQLException e) {
+            this.log("FollowerCount could not be retrieved: " + e.getMessage());
+        }
+
+        return followsCount;
+    }
+
     @Override
     public ArrayList<Follower> getList(SearchCriteriaInterface searchCriteria) throws EntityNotFoundException
     {

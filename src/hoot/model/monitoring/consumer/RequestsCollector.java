@@ -66,7 +66,8 @@ public class RequestsCollector extends Thread implements CollectorInterface, Con
 
                 this.requestsCurrentSecond.incrementAndGet();
 
-                Integer userId = (Integer) request.get("userId");
+                //Integer userId = (Integer) request.get("userId");
+                Integer userId = null;
 
                 if (userId != null) {
                     try {

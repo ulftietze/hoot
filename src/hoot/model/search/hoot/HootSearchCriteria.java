@@ -41,6 +41,8 @@ public class HootSearchCriteria implements SearchCriteriaInterface
             queryBuilder.PARAMETERS.add(HootType.Comment.toString());
         }
 
+        queryBuilder.ORDER_BY.add("h.id DESC");
+
         return queryBuilder;
     }
 }

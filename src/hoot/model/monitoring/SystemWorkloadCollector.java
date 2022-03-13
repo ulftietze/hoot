@@ -11,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryMXBean;
 import java.lang.management.ThreadMXBean;
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,6 +31,11 @@ public class SystemWorkloadCollector extends Thread implements CollectorInterfac
     public final static String MEMORY_CODE_COMMITTED   = "Code Committed";
     public final static String MEMORY_GC_RESERVED      = "GC Reserved";
     public final static String MEMORY_GC_COMMITTED     = "GC Committed";
+    public final static String MEMORY_HEAP_MAX         = "Heap Max";
+    public final static String MEMORY_HEAP_TOTAL       = "Heap Total";
+    public final static String MEMORY_HEAP_FREE        = "Heap Free";
+    public final static String MEMORY_HEAP_USAGE       = "Heap Usage";
+    public final static String MEMORY_NON_HEAP_USAGE   = "NonHeap Usage";
 
     private final OperatingSystemMXBean system;
 
@@ -39,12 +45,15 @@ public class SystemWorkloadCollector extends Thread implements CollectorInterfac
 
     private final Map<String, Integer> memoryInfo;
 
+    private final MemoryMXBean memory;
+
     private boolean running = true;
 
     public SystemWorkloadCollector()
     {
         this.memoryInfo = Collections.synchronizedMap(new HashMap<>());
         this.system     = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+        this.memory     = ManagementFactory.getMemoryMXBean();
         this.thread     = ManagementFactory.getThreadMXBean();
         this.logger     = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
     }
@@ -83,6 +92,12 @@ public class SystemWorkloadCollector extends Thread implements CollectorInterfac
             put("Process CPU Load", system.getProcessCpuLoad());
             put("Thread Count", thread.getThreadCount());
             put("Thread Total Started Count", thread.getTotalStartedThreadCount());
+            put(MEMORY_HEAP_MAX, Runtime.getRuntime().maxMemory() / 1024 / 1024);
+            put(MEMORY_HEAP_TOTAL, Runtime.getRuntime().totalMemory() / 1024 / 1024);
+            put(MEMORY_HEAP_FREE, Runtime.getRuntime().freeMemory() / 1024 / 1024);
+            put("Memory Used", (Runtime.getRuntime().maxMemory() - Runtime.getRuntime().freeMemory()) / 1024 / 1024);
+            put(MEMORY_HEAP_USAGE, memory.getHeapMemoryUsage());
+            put(MEMORY_NON_HEAP_USAGE, memory.getNonHeapMemoryUsage());
             putAll(memoryInfo);
         }};
     }

@@ -7,7 +7,7 @@
               maxWaitMillis="5000"
               minIdle="10"
               maxIdle="-1"
-              maxTotal="25"
+              maxTotal="200"
               removeAbandoned="true"
               logAbandoned="true"
               removeAbandonedTimeout="60"
