@@ -4,6 +4,8 @@ import hoot.system.Logger.LoggerInterface;
 import hoot.system.ObjectManager.ObjectManager;
 
 import java.sql.*;
+import java.time.Duration;
+import java.time.Instant;
 
 public class StatementFetcher
 {
@@ -22,8 +24,17 @@ public class StatementFetcher
 
     public QueryResult fetchAll(PreparedStatement statement) throws SQLException
     {
+        LoggerInterface logger = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
+
+        Instant start = Instant.now();
+
         var       fetchData = (QueryResult) ObjectManager.create(QueryResult.class);
         ResultSet resultSet = statement.executeQuery();
+
+        Duration executionTime = Duration.between(start, Instant.now());
+        if (executionTime.toMillis() > 1000) {
+            logger.log("Slow Query Detected Duration: " + executionTime.toMillis() + " || Query was: " + statement.toString());
+        }
 
         while (resultSet.next()) {
             fetchData.add(this.mapRow(resultSet));

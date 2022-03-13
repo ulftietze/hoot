@@ -99,10 +99,10 @@ public class RequestDurationCollector extends Thread implements CollectorInterfa
                     requests++;
                 }
 
-                avg = avg.plus(methodAvg);
-
                 int amount = !entry.getValue().isEmpty() ? entry.getValue().size() : 1;
                 this.methodAverageDuration.put(method, methodAvg.dividedBy(amount));
+
+                avg = avg.plus(methodAvg);
             }
 
             this.methodAverageDuration.put(ALL, avg.dividedBy(requests != 0 ? requests : 1));
