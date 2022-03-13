@@ -21,7 +21,6 @@ import hoot.system.Service.ServiceInterface;
 
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class HistoryService implements ServiceInterface
 {
@@ -56,20 +55,20 @@ public class HistoryService implements ServiceInterface
             CollectorResult queueSizes    = monitorData.get(QueueSizeCollector.COLLECTOR_NAME);
             CollectorResult cacheSizes    = monitorData.get(CacheSizeCollector.COLLECTOR_NAME);
 
-            entity.loginsPerSixHours = (Integer) logins.get("LoginsPerPeriod");
+            entity.loginsPerSixHours        = (Integer) logins.get("LoginsPerPeriod");
             entity.currentlyRegisteredUsers = (Integer) registrations.get("Currently Registered User");
             entity.registrationsPerSixHours = (Integer) registrations.get("Registrations in Period");
-            entity.currentLoggedIn = (Integer) requests.get("Currently Logged In");
+            entity.currentLoggedIn          = (Integer) requests.get("Currently Logged In");
             //entity.requestsLoggedInPerSecond = requests.get("Requests Logged In Per Second");
             entity.requestsPerSecond = (Integer) requests.get("Requests Per Second");
-            entity.queueSize = queueSizes;
-            entity.cacheSize = cacheSizes;
-            entity.workload = workload;
-            entity.threadCount = (Integer) workload.get("Thread Count");
-            entity.threadCountTotal = (Long) workload.get("Thread Total Started Count");
+            entity.queueSize         = queueSizes;
+            entity.cacheSize         = cacheSizes;
+            entity.workload          = workload;
+            entity.threadCount       = (Integer) workload.get("Thread Count");
+            entity.threadCountTotal  = (Long) workload.get("Thread Total Started Count");
             entity.systemLoadAverage = (Double) workload.get("System Load Average");
-            entity.systemCPULoad = (Double) workload.get("System CPU Load");
-            entity.processCPULoad = (Double) workload.get("Process CPU Load");
+            entity.systemCPULoad     = (Double) workload.get("System CPU Load");
+            entity.processCPULoad    = (Double) workload.get("Process CPU Load");
 
             entity.trendingHashtags = (ArrayList<Tag>) mostUsedTags.get("popularTags");
 

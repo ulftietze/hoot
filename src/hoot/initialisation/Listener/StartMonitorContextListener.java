@@ -39,6 +39,7 @@ public class StartMonitorContextListener implements ServletContextListener
         loginsCollector.start();
         registrationsCollector.start();
         tagCollector.start();
+        systemWorkloadCollector.start();
         requestsCollector.start();
 
         // Register Collectors in Monitor and start monitoring
@@ -73,6 +74,7 @@ public class StartMonitorContextListener implements ServletContextListener
         // Get Collectors
         CountLoginsCollector        loginsCollector         = this.getLoginsCollector();
         CountRegistrationsCollector registrationsCollector  = this.getRegistrationsCollector();
+        SystemWorkloadCollector     systemWorkloadCollector = this.getSystemWorkloadCollector();
         TagCollector                tagCollector            = this.getHashtagCollector();
         RequestsCollector           requestsCollector       = this.getRequestCollector();
         Monitor                     monitor                 = (Monitor) ObjectManager.get(Monitor.class);
@@ -80,12 +82,14 @@ public class StartMonitorContextListener implements ServletContextListener
         requestsCollector.stopRun();
         loginsCollector.stopRun();
         registrationsCollector.stopRun();
+        systemWorkloadCollector.stopRun();
         tagCollector.stopRun();
         monitor.stopRun();
 
         requestsCollector.interrupt();
         loginsCollector.interrupt();
         registrationsCollector.interrupt();
+        systemWorkloadCollector.interrupt();
         tagCollector.interrupt();
         monitor.interrupt();
 

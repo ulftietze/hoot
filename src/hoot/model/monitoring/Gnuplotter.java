@@ -4,16 +4,12 @@ import hoot.model.entities.History;
 import hoot.system.Filesystem.FileHandler;
 import hoot.system.Filesystem.MediaFileHandler;
 import hoot.system.Logger.LoggerInterface;
-import hoot.system.Monitoring.CollectorResult;
 import hoot.system.ObjectManager.ObjectManager;
-import hoot.system.Serializer.Serializer;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.ObjectStreamException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 interface DataWriter
 {
@@ -101,8 +97,7 @@ public class Gnuplotter
         };
 
         String[] gnuplotDirectives = {
-                "u 1:2 t \"threadCount\" w lines, ",
-                "u 1:3 t \"threadCountTotal\" w lines",
+                "u 1:2 t \"threadCount\" w lines, ", "u 1:3 t \"threadCountTotal\" w lines",
                 };
 
         return Gnuplotter.createGraphWithGnuplot(GraphType.Thread, input, dataWriter, gnuplotDirectives);
@@ -132,7 +127,6 @@ public class Gnuplotter
                 line += history.workload.get(SystemWorkloadCollector.MEMORY_GC_COMMITTED);
                 line += "\t";
                 line += history.workload.get(SystemWorkloadCollector.MEMORY_GC_RESERVED);
-
 
                 result.add(line);
             }
@@ -171,10 +165,7 @@ public class Gnuplotter
             return result;
         };
 
-        String[] gnuplotDirectives = {
-                "u 1:2 t \"systemCPULoad\" w lines, ",
-                "u 1:3 t \"processCPULoad\" w lines",
-                };
+        String[] gnuplotDirectives = {"u 1:2 t \"systemCPULoad\" w lines, ", "u 1:3 t \"processCPULoad\" w lines"};
 
         return Gnuplotter.createGraphWithGnuplot(GraphType.CPULoad, input, dataWriter, gnuplotDirectives);
     }
@@ -195,9 +186,7 @@ public class Gnuplotter
             return result;
         };
 
-        String[] gnuplotDirectives = {
-                "u 1:2 t \"systemLoadAverage\" w lines",
-                };
+        String[] gnuplotDirectives = {"u 1:2 t \"systemLoadAverage\" w lines"};
 
         return Gnuplotter.createGraphWithGnuplot(GraphType.SystemLoad, input, dataWriter, gnuplotDirectives);
     }
@@ -221,9 +210,8 @@ public class Gnuplotter
         };
 
         String[] gnuplotDirectives = {
-                "u 1:2 t \"requestsPerSecond\" w lines, ",
-                "u 1:3 t \"requestsLoggedInPerSecond\" w lines",
-                };
+                "u 1:2 t \"requestsPerSecond\" w lines, ", "u 1:3 t \"requestsLoggedInPerSecond\" w lines"
+        };
 
         return Gnuplotter.createGraphWithGnuplot(GraphType.Requests, input, dataWriter, gnuplotDirectives);
     }
@@ -245,8 +233,8 @@ public class Gnuplotter
         };
 
         String[] gnuplotDirectives = {
-                "u 1:2 t \"currentLoggedIn\" w lines",
-                };
+                "u 1:2 t \"currentLoggedIn\" w lines"
+        };
 
         return Gnuplotter.createGraphWithGnuplot(GraphType.CurrentLoggedIn, input, dataWriter, gnuplotDirectives);
     }
