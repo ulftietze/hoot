@@ -8,6 +8,7 @@ import hoot.model.monitoring.SystemWorkloadCollector;
 import hoot.model.monitoring.TagCollector;
 import hoot.model.monitoring.consumer.CountLoginsCollector;
 import hoot.model.monitoring.consumer.CountRegistrationsCollector;
+import hoot.model.monitoring.consumer.RequestDurationCollector;
 import hoot.model.monitoring.consumer.RequestsCollector;
 import hoot.model.repositories.HistoryRepository;
 import hoot.system.Exception.CouldNotSaveException;
@@ -47,13 +48,14 @@ public class HistoryService implements ServiceInterface
             History     entity      = (History) ObjectManager.create(History.class);
             MonitorData monitorData = this.monitor.getMonitorData();
 
-            CollectorResult logins        = monitorData.get(CountLoginsCollector.COLLECTOR_NAME);
-            CollectorResult registrations = monitorData.get(CountRegistrationsCollector.COLLECTOR_NAME);
-            CollectorResult workload      = monitorData.get(SystemWorkloadCollector.COLLECTOR_NAME);
-            CollectorResult requests      = monitorData.get(RequestsCollector.COLLECTOR_NAME);
-            CollectorResult mostUsedTags  = monitorData.get(TagCollector.COLLECTOR_NAME);
-            CollectorResult queueSizes    = monitorData.get(QueueSizeCollector.COLLECTOR_NAME);
-            CollectorResult cacheSizes    = monitorData.get(CacheSizeCollector.COLLECTOR_NAME);
+            CollectorResult logins         = monitorData.get(CountLoginsCollector.COLLECTOR_NAME);
+            CollectorResult registrations  = monitorData.get(CountRegistrationsCollector.COLLECTOR_NAME);
+            CollectorResult workload       = monitorData.get(SystemWorkloadCollector.COLLECTOR_NAME);
+            CollectorResult requests       = monitorData.get(RequestsCollector.COLLECTOR_NAME);
+            CollectorResult avgReqDuration = monitorData.get(RequestDurationCollector.COLLECTOR_NAME);
+            CollectorResult mostUsedTags   = monitorData.get(TagCollector.COLLECTOR_NAME);
+            CollectorResult queueSizes     = monitorData.get(QueueSizeCollector.COLLECTOR_NAME);
+            CollectorResult cacheSizes     = monitorData.get(CacheSizeCollector.COLLECTOR_NAME);
 
             entity.loginsPerSixHours        = (Integer) logins.get("LoginsPerPeriod");
             entity.currentlyRegisteredUsers = (Integer) registrations.get("Currently Registered User");

@@ -10,9 +10,11 @@ import java.sql.SQLException;
  */
 public class FollowsSearchCriteria implements SearchCriteriaInterface
 {
-    public Integer userId;
-    public Integer lastUserId;
-    public Integer defaultPageSize;
+    public Integer userId = null;
+
+    public Integer lastUserId = null;
+
+    public Integer defaultPageSize = 50;
 
     @Override
     public QueryBuilder getQueryBuilder() throws SQLException

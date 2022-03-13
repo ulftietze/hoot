@@ -5,6 +5,8 @@ import hoot.model.entities.User;
 import hoot.model.search.DefaultSearchCriteria;
 import hoot.model.search.SearchCriteriaInterface;
 import hoot.system.Database.QueryBuilder;
+import hoot.system.Database.QueryResult;
+import hoot.system.Database.QueryResultRow;
 import hoot.system.Exception.CouldNotDeleteException;
 import hoot.system.Exception.CouldNotSaveException;
 import hoot.system.Exception.EntityNotFoundException;
@@ -12,8 +14,8 @@ import hoot.system.ObjectManager.ObjectManager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 public class UserRepository extends AbstractRepository<User>
@@ -46,22 +48,18 @@ public class UserRepository extends AbstractRepository<User>
         }
 
         try (Connection connection = this.getConnection()) {
-            QueryBuilder qb = (QueryBuilder) ObjectManager.create(QueryBuilder.class);
-            qb.SELECT.add("*");
-            qb.FROM = "User u";
-            qb.WHERE.add("id = ?");
-            qb.PARAMETERS.add(Integer.toString(id));
+            QueryBuilder queryBuilder = (QueryBuilder) ObjectManager.create(QueryBuilder.class);
+            queryBuilder.SELECT.add("*");
+            queryBuilder.FROM = "User u";
+            queryBuilder.addWhere("id = ?", Integer.toString(id));
 
-            PreparedStatement pss = qb.build(connection);
-            pss.setInt(1, id);
-            ResultSet rs = pss.executeQuery();
+            PreparedStatement statement = queryBuilder.build(connection);
+            statement.setInt(1, id);
 
-            rs.next(); // will throw SQLException if result set is empty
+            QueryResultRow resultRow = this.statementFetcher.fetchOne(statement);
+            connection.close();
 
-            user = this.mapResultSetToUser(rs);
-
-            rs.close();
-            pss.close();
+            user = this.mapResultSetToUser(resultRow);
         } catch (SQLException e) {
             throw new EntityNotFoundException("User with ID: " + id);
         }
@@ -85,19 +83,17 @@ public class UserRepository extends AbstractRepository<User>
         }
 
         try (Connection connection = this.getConnection()) {
-            QueryBuilder qb = (QueryBuilder) ObjectManager.create(QueryBuilder.class);
-            qb.SELECT.add("*");
-            qb.FROM = "User";
-            qb.addWhere("username = ?", username);
-            PreparedStatement pss = qb.build(connection);
+            QueryBuilder queryBuilder = (QueryBuilder) ObjectManager.create(QueryBuilder.class);
+            queryBuilder.SELECT.add("*");
+            queryBuilder.FROM = "User";
+            queryBuilder.addWhere("username = ?", username);
 
-            ResultSet rs = pss.executeQuery();
-            rs.next(); // will throw SQLException if result set is empty
+            PreparedStatement statement = queryBuilder.build(connection);
 
-            user = this.mapResultSetToUser(rs);
+            QueryResultRow resultRow = this.statementFetcher.fetchOne(statement);
+            connection.close();
 
-            rs.close();
-            pss.close();
+            user = this.mapResultSetToUser(resultRow);
         } catch (SQLException e) {
             throw new EntityNotFoundException("User with username: " + username);
         }
@@ -121,16 +117,14 @@ public class UserRepository extends AbstractRepository<User>
             queryBuilder.SELECT.add("*");
             queryBuilder.FROM = "User";
 
-            PreparedStatement statement  = queryBuilder.build(connection);
-            ResultSet         resultSet  = statement.executeQuery();
+            PreparedStatement statement   = queryBuilder.build(connection);
+            QueryResult       queryResult = this.statementFetcher.fetchAll(statement);
+            connection.close();
 
-            while (resultSet.next()) {
-                User user = this.mapResultSetToUser(resultSet);
+            for (QueryResultRow resultRow : queryResult) {
+                User user = this.mapResultSetToUser(resultRow);
                 users.add(user);
             }
-
-            resultSet.close();
-            statement.close();
         } catch (SQLException e) {
             this.log("UserRepository.getList(): " + e.getMessage());
         }
@@ -138,14 +132,14 @@ public class UserRepository extends AbstractRepository<User>
         return users;
     }
 
-    public Integer getUserQuantity()
+    public Integer getUserQuantity() throws SQLException
     {
         DefaultSearchCriteria criteria = (DefaultSearchCriteria) ObjectManager.create(DefaultSearchCriteria.class);
 
         return this.getUserQuantityBySearchCriteria(criteria);
     }
 
-    public Integer getUserQuantityBySearchCriteria(SearchCriteriaInterface searchCriteriaInterface)
+    public Integer getUserQuantityBySearchCriteria(SearchCriteriaInterface searchCriteriaInterface) throws SQLException
     {
         try (Connection connection = this.getConnection()) {
             QueryBuilder queryBuilder = searchCriteriaInterface.getQueryBuilder();
@@ -153,35 +147,27 @@ public class UserRepository extends AbstractRepository<User>
             queryBuilder.FROM = "User";
 
             PreparedStatement statement = queryBuilder.build(connection);
-            ResultSet resultSet         = statement.executeQuery();
+            QueryResultRow    resultRow = this.statementFetcher.fetchOne(statement);
+            connection.close();
 
-            resultSet.next();
-
-            int quantity = resultSet.getInt("quantity");
-
-            resultSet.close();
-            statement.close();
-
-            return quantity;
+            return (int) resultRow.get("quantity");
         } catch (SQLException e) {
             this.log(e.getMessage());
+            throw e;
         }
-
-        return 0;
     }
 
     private void create(User user) throws CouldNotSaveException
     {
         try (Connection connection = this.getConnection()) {
-            String            sqlStatement = "insert into User (username, imagePath, passwordHash) values (?, ?, ?)";
-            PreparedStatement pss          = connection.prepareStatement(sqlStatement);
+            String sqlStatement = "INSERT INTO User (username, imagePath, passwordHash) VALUES (?, ?, ?)";
 
+            PreparedStatement pss = connection.prepareStatement(sqlStatement);
             pss.setString(1, user.username);
             pss.setString(2, user.imagePath);
             pss.setString(3, user.passwordHash);
 
-            int rowCount = pss.executeUpdate();
-            pss.close();
+            int rowCount = this.statementFetcher.executeUpdate(pss);
 
             if (rowCount == 0) {
                 throw new CouldNotSaveException("new User with username " + user.username);
@@ -208,8 +194,7 @@ public class UserRepository extends AbstractRepository<User>
         }
 
         try (Connection connection = this.getConnection()) {
-            String sqlStatement = "UPDATE User "
-                                  + "SET username = ?, imagePath = ?, passwordHash = ?, lastLogin = ? "
+            String sqlStatement = "UPDATE User " + "SET username = ?, imagePath = ?, passwordHash = ?, lastLogin = ? "
                                   + "WHERE id = ?";
 
             PreparedStatement pss = connection.prepareStatement(sqlStatement);
@@ -220,8 +205,7 @@ public class UserRepository extends AbstractRepository<User>
             pss.setTimestamp(4, this.getSQLTimestampFromLocalDateTime(user.lastLogin));
             pss.setInt(5, user.id);
 
-            int rowCount = pss.executeUpdate();
-            pss.close();
+            int rowCount = this.statementFetcher.executeUpdate(pss);
 
             if (rowCount == 0) {
                 throw new SQLException("User with username " + user.username + " was not saved.");
@@ -246,8 +230,7 @@ public class UserRepository extends AbstractRepository<User>
             PreparedStatement pss = connection.prepareStatement("DELETE FROM User WHERE id = ?");
             pss.setInt(1, user.id);
 
-            int rowCount = pss.executeUpdate();
-            pss.close();
+            int rowCount = this.statementFetcher.executeUpdate(pss);
 
             if (rowCount == 0) {
                 throw new CouldNotDeleteException("User with username " + user.username);
@@ -259,21 +242,21 @@ public class UserRepository extends AbstractRepository<User>
         }
     }
 
-    private User mapResultSetToUser(ResultSet rs) throws SQLException
+    private User mapResultSetToUser(QueryResultRow resultRow) throws SQLException
     {
         User user = (User) ObjectManager.create(User.class);
-        user.id = rs.getInt("id");
+        user.id = (int) resultRow.get("User.id");
 
         User searchedUser = this.userCache.get(user.id);
         if (searchedUser != null) {
             user = searchedUser;
         }
 
-        user.username     = rs.getString("username");
-        user.imagePath    = rs.getString("imagePath");
-        user.passwordHash = rs.getString("passwordHash");
-        user.created      = this.getLocalDateTimeFromSQLTimestamp(rs.getTimestamp("created"));
-        user.lastLogin    = this.getLocalDateTimeFromSQLTimestamp(rs.getTimestamp("lastLogin"));
+        user.username     = (String) resultRow.get("User.username");
+        user.imagePath    = (String) resultRow.get("User.imagePath");
+        user.passwordHash = (String) resultRow.get("User.passwordHash");
+        user.created      = this.getLocalDateTimeFromSQLTimestamp((Timestamp) resultRow.get("User.created"));
+        user.lastLogin    = this.getLocalDateTimeFromSQLTimestamp((Timestamp) resultRow.get("User.lastLogin"));
 
         try {
             user.followerCount = this.followerRepository.getFollowerCountForUser(user.id);

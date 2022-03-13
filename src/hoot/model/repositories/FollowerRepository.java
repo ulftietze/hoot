@@ -3,6 +3,8 @@ package hoot.model.repositories;
 import hoot.model.entities.Follower;
 import hoot.model.search.SearchCriteriaInterface;
 import hoot.system.Database.QueryBuilder;
+import hoot.system.Database.QueryResult;
+import hoot.system.Database.QueryResultRow;
 import hoot.system.Exception.CouldNotDeleteException;
 import hoot.system.Exception.CouldNotSaveException;
 import hoot.system.Exception.EntityNotFoundException;
@@ -10,9 +12,9 @@ import hoot.system.ObjectManager.ObjectManager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class FollowerRepository extends AbstractRepository<Follower>
 {
@@ -27,23 +29,14 @@ public class FollowerRepository extends AbstractRepository<Follower>
         try (Connection connection = this.getConnection()) {
             QueryBuilder queryBuilder = (QueryBuilder) ObjectManager.get(QueryBuilder.class, true);
 
-            queryBuilder.SELECT.add("COUNT(user)");
+            queryBuilder.SELECT.add("COUNT(user) as quantity");
             queryBuilder.FROM = "Follower";
             queryBuilder.WHERE.add("follows = ?");
             queryBuilder.PARAMETERS.add(userID.toString());
 
             PreparedStatement preparedStatement = queryBuilder.build(connection);
-            ResultSet         resultSet         = preparedStatement.executeQuery();
 
-            resultSet.close();
-            preparedStatement.close();
-            connection.close();
-
-            resultSet.next();
-            followerCount = resultSet.getInt(1);
-
-            resultSet.close();
-            preparedStatement.close();
+            return (int) this.statementFetcher.fetchOne(preparedStatement).get("quantity");
         } catch (SQLException e) {
             this.log("FollowerCount could not be retrieved: " + e.getMessage());
         }
@@ -58,24 +51,23 @@ public class FollowerRepository extends AbstractRepository<Follower>
 
         try (Connection connection = this.getConnection()) {
             QueryBuilder queryBuilder = searchCriteria.getQueryBuilder();
-
             queryBuilder.SELECT.add("*");
             queryBuilder.FROM = "Follower";
+            PreparedStatement statement = queryBuilder.build(connection);
 
-            PreparedStatement statement  = queryBuilder.build(connection);
-            ResultSet         resultSet  = statement.executeQuery();
+            QueryResult queryResult = this.statementFetcher.fetchAll(statement);
+            connection.close();
 
             UserRepository userRepository = (UserRepository) ObjectManager.get(UserRepository.class);
 
-            while (resultSet.next()) {
-                Follower follower = new Follower();
-                follower.user    = userRepository.getById(resultSet.getInt("user"));
-                follower.follows = userRepository.getById(resultSet.getInt("follows"));
+            for (QueryResultRow row : queryResult) {
+                Follower follower = (Follower) ObjectManager.create(Follower.class);
+
+                follower.user    = userRepository.getById((Integer) row.get("Follower.user"));
+                follower.follows = userRepository.getById((Integer) row.get("Follower.follows"));
+
                 followerList.add(follower);
             }
-
-            resultSet.close();
-            statement.close();
         } catch (SQLException e) {
             this.log("FollowerRepository.getList(): " + e.getMessage());
         }
@@ -90,24 +82,27 @@ public class FollowerRepository extends AbstractRepository<Follower>
             throw new CouldNotSaveException("Follower (ID null)");
         }
 
-        try (Connection connection = this.getConnection()) {
-            String            sqlStatement = "insert into Follower (user, follows) values (?, ?)";
-            PreparedStatement pss          = connection.prepareStatement(sqlStatement);
+        if (Objects.equals(entity.user.id, entity.follows.id)) {
+            throw new CouldNotSaveException("Follower can't follows itself.");
+        }
 
+        try (Connection connection = this.getConnection()) {
+            String sqlStatement = "INSERT INTO Follower (user, follows) VALUES (?, ?)";
+
+            PreparedStatement pss = connection.prepareStatement(sqlStatement);
             pss.setInt(1, entity.user.id);
             pss.setInt(2, entity.follows.id);
 
-            int rowCount = pss.executeUpdate();
-
-            pss.close();
+            int rowCount = this.statementFetcher.executeUpdate(pss);
+            connection.close();
 
             if (rowCount == 0) {
-                throw new CouldNotSaveException(
-                        "New Follower " + entity.user.id + " trying to follow " + entity.follows.id);
+                throw new CouldNotSaveException("Follower");
             }
         } catch (SQLException e) {
-            this.log(e.getMessage());
-            throw new CouldNotSaveException("New Follower " + entity.user.id + " trying to follow " + entity.follows.id);
+            String msg = "New Follower " + entity.user.id + " trying to follow " + entity.follows.id + e.getMessage();
+            this.log(msg);
+            throw new CouldNotSaveException(msg);
         }
     }
 
@@ -125,13 +120,11 @@ public class FollowerRepository extends AbstractRepository<Follower>
             pss.setInt(1, entity.user.id);
             pss.setInt(2, entity.follows.id);
 
-            int rowCount = pss.executeUpdate();
-
-            pss.close();
+            int rowCount = this.statementFetcher.executeUpdate(pss);
+            connection.close();
 
             if (rowCount == 0) {
-                throw new CouldNotDeleteException(
-                        "Delete Follower " + entity.user.id + " following " + entity.follows.id);
+                throw new CouldNotDeleteException("Follower");
             }
         } catch (SQLException e) {
             this.log(e.getMessage());

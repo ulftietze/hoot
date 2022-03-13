@@ -1,6 +1,38 @@
 @startuml
 'https://plantuml.com/sequence-diagram
 
+skinparam sequence {
+    ArrowColor #444365
+    ActorBorderColor #444365
+    LifeLineBorderColor #444365
+    LifeLineBackgroundColor #d56a4e
+
+    ParticipantBackgroundColor #444365
+    ParticipantFontName Impact
+    ParticipantFontSize 17
+    ParticipantFontColor #d56a4e
+    ParticipantBorderColor #444365
+    ParticipantBackgroundColor #444365
+    ParticipantFontName Impact
+    ParticipantFontSize 17
+    ParticipantFontColor #d56a4e
+
+    ActorBackgroundColor aqua
+    ActorFontColor DeepSkyBlue
+    ActorFontSize 17
+    ActorFontName Aapex
+}
+
+skinparam collections {
+    BackgroundColor #444365
+    BorderColor #444365
+}
+
+skinparam entity {
+    BackgroundColor #d56a4e
+    BorderColor #444365
+}
+
 Client -> Servlet: sendJson(DtoAsJson)
 Servlet -> Servlet: getDtoFromRequestJson()
 Servlet -> Mapper: mapDtoToEntity

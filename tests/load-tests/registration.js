@@ -1,15 +1,19 @@
 import http from 'k6/http';
+import exec from "k6/execution";
 import {check} from 'k6';
 
 export let options = {
-    vus       : '1',
-    //duration  : '120s',
-    iterations: '1',
+    scenarios: {
+        "1000-registrations": {
+            executor: "shared-iterations", vus: 20, iterations: 1000, maxDuration: "1h"
+        }
+    }
 };
+
 export default function() {
     const url = `https://informatik.hs-bremerhaven.de/${__ENV.USER}-java/api/V1/register`;
     let data  = {
-        username: uuidv4(),
+        username: "testUser" + exec.scenario.iterationInTest,
         password: 'test123',
         image   : 'String,String',
     };
@@ -20,12 +24,4 @@ export default function() {
 
     //console.log(res.json());
     check(res, {'status is 201': (r) => r.status === 201});
-}
-
-export function uuidv4()
-{
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        let r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-    });
 }

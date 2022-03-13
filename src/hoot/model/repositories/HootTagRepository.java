@@ -17,6 +17,15 @@ import java.util.stream.Collectors;
 
 public class HootTagRepository extends AbstractRepository<HootTags>
 {
+    private final TagRepository tagRepository;
+
+    public HootTagRepository()
+    {
+        super();
+
+        this.tagRepository = (TagRepository) ObjectManager.get(TagRepository.class);
+    }
+
     /**
      * This method never makes sense. Use TagRepository.getList() instead.
      */
@@ -32,8 +41,6 @@ public class HootTagRepository extends AbstractRepository<HootTags>
         if (hootTags.hoot == null) {
             throw new CouldNotSaveException("HootTags for null Hoot");
         }
-
-        TagRepository tagRepository = (TagRepository) ObjectManager.get(TagRepository.class);
 
         try (Connection connection = this.getConnection()) {
             this.delete(hootTags);
@@ -62,8 +69,7 @@ public class HootTagRepository extends AbstractRepository<HootTags>
             QueryLoggerInterface logger = (QueryLoggerInterface) ObjectManager.get(QueryLoggerInterface.class);
             logger.log(statement + " [parameters=" + parameters + "]");
 
-            pss.executeUpdate();
-            pss.close();
+            this.statementFetcher.executeUpdate(pss);
         } catch (SQLException e) {
             this.log(e.getMessage());
             throw new CouldNotSaveException("HootTag for Hoot " + hootTags.hoot.id);
@@ -82,8 +88,7 @@ public class HootTagRepository extends AbstractRepository<HootTags>
             PreparedStatement pss       = connection.prepareStatement(statement);
             pss.setInt(1, hootTags.hoot.id);
 
-            pss.executeUpdate();
-            pss.close();
+            this.statementFetcher.executeUpdate(pss);
         } catch (SQLException e) {
             this.log(e.getMessage());
             throw new CouldNotDeleteException("HootTag for Hoot " + hootTags.hoot.id);

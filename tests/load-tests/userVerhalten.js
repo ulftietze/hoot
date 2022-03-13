@@ -2,19 +2,27 @@ import http from 'k6/http';
 import exec from "k6/execution";
 import {SharedArray} from "k6/data";
 
+let size = 1000;
+let vus  = 20;
+
 const data = new SharedArray("my dataset", function () {
-    return JSON.parse(open(`${__ENV.PATH}/tests/load-tests/userdata.json`));
+    let data = [];
+    for (let i = 0; i < size; i++) {
+        data[i] = {"username": "testUser" + i, "password": "test123"}
+    }
+
+    return data;
 })
 export const options = {
     scenarios: {
         "use-all-the-data": {
-            executor: "shared-iterations", vus: 2, iterations: data.length, maxDuration: "1h"
+            executor: "shared-iterations", vus: vus, iterations: data.length, maxDuration: "1h"
         }
     }
 }
 
 export default function () {
-    var item = data[exec.scenario.iterationInTest];
+    let item = data[exec.scenario.iterationInTest];
     let random = Math.floor(Math.random() * data.length);
 
     let dataPost = {content: `RandomZahlenLOL #randomZahl #${random}`, onlyFollower: true}

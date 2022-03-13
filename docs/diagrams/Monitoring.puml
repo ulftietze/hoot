@@ -1,5 +1,39 @@
 @startuml
 'https://plantuml.com/sequence-diagram
+'#444365 primary
+'#d56a4e secondary
+
+skinparam sequence {
+    ArrowColor #d56a4e
+    ActorBorderColor #444365
+    LifeLineBorderColor #444365
+    LifeLineBackgroundColor #d56a4e
+
+    ParticipantBackgroundColor #444365
+    ParticipantFontName Impact
+    ParticipantFontSize 17
+    ParticipantFontColor #d56a4e
+    ParticipantBorderColor #444365
+    ParticipantBackgroundColor #444365
+    ParticipantFontName Impact
+    ParticipantFontSize 17
+    ParticipantFontColor #d56a4e
+
+    ActorBackgroundColor aqua
+    ActorFontColor DeepSkyBlue
+    ActorFontSize 17
+    ActorFontName Aapex
+}
+
+skinparam collections {
+    BackgroundColor #444365
+    BorderColor #444365
+}
+
+skinparam entity {
+    BackgroundColor #d56a4e
+    BorderColor #444365
+}
 
 collections Publisher
 entity Queue
@@ -22,6 +56,7 @@ Monitor -> ":MonitorData": create()
 par Loops are executed parallel
 loop
 CollectorConsumers -> Queue: take()
+Queue -> Queue: waitUntilEntry()
 Queue --> CollectorConsumers
 activate CollectorConsumers
 CollectorConsumers -> CollectorConsumers: prepareResultData()

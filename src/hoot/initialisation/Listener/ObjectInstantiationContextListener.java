@@ -2,6 +2,8 @@ package hoot.initialisation.Listener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hoot.initialisation.Factory.*;
+import hoot.model.monitoring.consumer.CountRegistrationsCollector;
+import hoot.model.repositories.UserRepository;
 import hoot.system.Filesystem.FileHandler;
 import hoot.system.Filesystem.MediaFileHandler;
 import hoot.system.Logger.ContextLogger;

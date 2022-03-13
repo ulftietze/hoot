@@ -1,9 +1,13 @@
 package hoot.initialisation.Listener;
 
 import hoot.front.Service.HistoryService;
-import hoot.model.monitoring.*;
+import hoot.model.monitoring.CacheSizeCollector;
+import hoot.model.monitoring.QueueSizeCollector;
+import hoot.model.monitoring.SystemWorkloadCollector;
+import hoot.model.monitoring.TagCollector;
 import hoot.model.monitoring.consumer.CountLoginsCollector;
 import hoot.model.monitoring.consumer.CountRegistrationsCollector;
+import hoot.model.monitoring.consumer.RequestDurationCollector;
 import hoot.model.monitoring.consumer.RequestsCollector;
 import hoot.system.Monitoring.Monitor;
 import hoot.system.ObjectManager.ObjectManager;
@@ -27,13 +31,14 @@ public class StartMonitorContextListener implements ServletContextListener
         contextEvent.getServletContext().log("init StartMonitorContextListener");
 
         // Get Collectors
-        CountLoginsCollector        loginsCollector         = this.getLoginsCollector();
-        CountRegistrationsCollector registrationsCollector  = this.getRegistrationsCollector();
-        SystemWorkloadCollector     systemWorkloadCollector = this.getSystemWorkloadCollector();
-        TagCollector                tagCollector            = this.getHashtagCollector();
-        RequestsCollector           requestsCollector       = this.getRequestCollector();
-        QueueSizeCollector          queueSizeCollector      = this.getQueueSizeCollector();
-        CacheSizeCollector          cacheSizeCollector      = this.getCacheSizeCollector();
+        CountLoginsCollector        loginsCollector           = this.getLoginsCollector();
+        CountRegistrationsCollector registrationsCollector    = this.getRegistrationsCollector();
+        SystemWorkloadCollector     systemWorkloadCollector   = this.getSystemWorkloadCollector();
+        TagCollector                tagCollector              = this.getHashtagCollector();
+        RequestsCollector           requestsCollector         = this.getRequestCollector();
+        RequestDurationCollector    requestsDurationCollector = this.getRequestDurationCollector();
+        QueueSizeCollector          queueSizeCollector        = this.getQueueSizeCollector();
+        CacheSizeCollector          cacheSizeCollector        = this.getCacheSizeCollector();
 
         // Start Collector when a thread/consumer
         loginsCollector.start();
@@ -41,12 +46,14 @@ public class StartMonitorContextListener implements ServletContextListener
         tagCollector.start();
         systemWorkloadCollector.start();
         requestsCollector.start();
+        requestsDurationCollector.start();
 
         // Register Collectors in Monitor and start monitoring
         Monitor monitor = (Monitor) ObjectManager.get(Monitor.class);
         monitor.addCollector(loginsCollector);
         monitor.addCollector(registrationsCollector);
         monitor.addCollector(requestsCollector);
+        monitor.addCollector(requestsDurationCollector);
         monitor.addCollector(tagCollector);
         monitor.addCollector(systemWorkloadCollector);
         monitor.addCollector(queueSizeCollector);
@@ -72,14 +79,16 @@ public class StartMonitorContextListener implements ServletContextListener
         this.historyScheduleAtFixedRate.cancel(true);
 
         // Get Collectors
-        CountLoginsCollector        loginsCollector         = this.getLoginsCollector();
-        CountRegistrationsCollector registrationsCollector  = this.getRegistrationsCollector();
-        SystemWorkloadCollector     systemWorkloadCollector = this.getSystemWorkloadCollector();
-        TagCollector                tagCollector            = this.getHashtagCollector();
-        RequestsCollector           requestsCollector       = this.getRequestCollector();
-        Monitor                     monitor                 = (Monitor) ObjectManager.get(Monitor.class);
+        CountLoginsCollector        loginsCollector           = this.getLoginsCollector();
+        CountRegistrationsCollector registrationsCollector    = this.getRegistrationsCollector();
+        SystemWorkloadCollector     systemWorkloadCollector   = this.getSystemWorkloadCollector();
+        TagCollector                tagCollector              = this.getHashtagCollector();
+        RequestsCollector           requestsCollector         = this.getRequestCollector();
+        RequestDurationCollector    requestsDurationCollector = this.getRequestDurationCollector();
+        Monitor                     monitor                   = (Monitor) ObjectManager.get(Monitor.class);
 
         requestsCollector.stopRun();
+        requestsDurationCollector.stopRun();
         loginsCollector.stopRun();
         registrationsCollector.stopRun();
         systemWorkloadCollector.stopRun();
@@ -87,6 +96,7 @@ public class StartMonitorContextListener implements ServletContextListener
         monitor.stopRun();
 
         requestsCollector.interrupt();
+        requestsDurationCollector.interrupt();
         loginsCollector.interrupt();
         registrationsCollector.interrupt();
         systemWorkloadCollector.interrupt();
@@ -123,6 +133,11 @@ public class StartMonitorContextListener implements ServletContextListener
     private RequestsCollector getRequestCollector()
     {
         return (RequestsCollector) ObjectManager.get(RequestsCollector.class);
+    }
+
+    private RequestDurationCollector getRequestDurationCollector()
+    {
+        return (RequestDurationCollector) ObjectManager.get(RequestDurationCollector.class);
     }
 
     private ScheduledExecutorService createScheduledExecutorService()

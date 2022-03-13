@@ -4,13 +4,13 @@ import hoot.system.ObjectManager.ObjectManager;
 import hoot.system.Queue.PublisherInterface;
 import hoot.system.Queue.QueueManager;
 
-public class TagsPublisher implements PublisherInterface
+public class HttpRequestDurationPublisher implements PublisherInterface
 {
-    public static final String QUEUE_ID = "tags";
+    public static final String QUEUE_ID = "http-request-duration";
 
     private final QueueManager queueManager;
 
-    public TagsPublisher()
+    public HttpRequestDurationPublisher()
     {
         this.queueManager = (QueueManager) ObjectManager.get(QueueManager.class);
     }
@@ -18,6 +18,6 @@ public class TagsPublisher implements PublisherInterface
     @Override
     public void publish(Object queueData)
     {
-        new Thread(() -> this.queueManager.add(QUEUE_ID, queueData)).start();
+        this.queueManager.add(QUEUE_ID, queueData);
     }
 }

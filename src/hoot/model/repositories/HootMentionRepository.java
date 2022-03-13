@@ -59,8 +59,8 @@ public class HootMentionRepository extends AbstractRepository<HootMentions>
             QueryLoggerInterface logger = (QueryLoggerInterface) ObjectManager.get(QueryLoggerInterface.class);
             logger.log(statement + " [parameters=" + parameters + "]");
 
-            pss.executeUpdate();
-            pss.close();
+            this.statementFetcher.executeUpdate(pss);
+            connection.close();
         } catch (SQLException e) {
             this.log(e.getMessage());
             throw new CouldNotSaveException("HootMentions for Hoot " + hootMentions.hoot.id);
@@ -79,8 +79,7 @@ public class HootMentionRepository extends AbstractRepository<HootMentions>
             PreparedStatement pss       = connection.prepareStatement(statement);
             pss.setInt(1, hootMentions.hoot.id);
 
-            pss.executeUpdate();
-            pss.close();
+            this.statementFetcher.executeUpdate(pss);
         } catch (SQLException e) {
             this.log(e.getMessage());
             throw new CouldNotDeleteException("HootMentions for Hoot " + hootMentions.hoot.id);

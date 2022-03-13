@@ -1,7 +1,6 @@
 package hoot.model.monitoring.consumer;
 
 import hoot.model.entities.User;
-import hoot.model.query.api.IsValidUserSession;
 import hoot.model.queue.publisher.HttpRequestPublisher;
 import hoot.model.repositories.UserRepository;
 import hoot.system.Exception.CollectorException;
@@ -13,7 +12,6 @@ import hoot.system.ObjectManager.ObjectManager;
 import hoot.system.Queue.ConsumerInterface;
 import hoot.system.Queue.QueueManager;
 
-import javax.servlet.http.HttpSession;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
@@ -32,7 +30,6 @@ public class RequestsCollector extends Thread implements CollectorInterface, Con
     private final NavigableMap<Integer, Instant>         userCurLoggedIn;
     private final AtomicInteger                          requestsCurrentSecond;
     private final AtomicInteger                          requestsLastSecond;
-    private final IsValidUserSession                     isValidUserSession;
     private final UserRepository                         userRepository;
     private final LoggerInterface                        logger;
 
@@ -47,9 +44,8 @@ public class RequestsCollector extends Thread implements CollectorInterface, Con
         this.requestsLastSecond    = new AtomicInteger(0);
         this.requestsCurrentSecond = new AtomicInteger(0);
 
-        this.isValidUserSession = (IsValidUserSession) ObjectManager.get(IsValidUserSession.class);
-        this.userRepository     = (UserRepository) ObjectManager.get(UserRepository.class);
-        this.logger             = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
+        this.userRepository = (UserRepository) ObjectManager.get(UserRepository.class);
+        this.logger         = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
     }
 
     @Override
@@ -70,10 +66,9 @@ public class RequestsCollector extends Thread implements CollectorInterface, Con
 
                 this.requestsCurrentSecond.incrementAndGet();
 
-                HttpSession session = (HttpSession) request.get("session");
+                Integer userId = (Integer) request.get("userId");
 
-                if (this.isValidUserSession.execute(session)) {
-                    int userId = (int) session.getAttribute(IsValidUserSession.SESSION_USER_IDENTIFIER);
+                if (userId != null) {
                     try {
                         User loggedInUser = this.userRepository.getById(userId);
 
