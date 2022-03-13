@@ -89,28 +89,26 @@ public class RequestDurationCollector extends Thread implements CollectorInterfa
             Duration avg      = Duration.ZERO;
             int      requests = 0;
 
-            for (Map.Entry<String, List<Duration>> entry : this.methodDurations.entrySet()) {
-                String         method    = entry.getKey();
-                List<Duration> durations = entry.getValue();
-                Duration       methodAvg = Duration.ZERO;
+            synchronized (this.methodDurations) {
+                for (Map.Entry<String, List<Duration>> entry : this.methodDurations.entrySet()) {
+                    String         method    = entry.getKey();
+                    List<Duration> durations = entry.getValue();
+                    Duration       methodAvg = Duration.ZERO;
 
-                for (Duration d : durations) {
-                    methodAvg = methodAvg.plus(d);
-                    requests++;
+                    for (Duration d : durations) {
+                        methodAvg = methodAvg.plus(d);
+                        requests++;
+                    }
+
+                    int amount = !entry.getValue().isEmpty() ? entry.getValue().size() : 1;
+                    this.methodAverageDuration.put(method, methodAvg.dividedBy(amount));
+
+                    avg = avg.plus(methodAvg);
                 }
 
-                int amount = !entry.getValue().isEmpty() ? entry.getValue().size() : 1;
-                this.methodAverageDuration.put(method, methodAvg.dividedBy(amount));
-
-                avg = avg.plus(methodAvg);
-            }
-
-            this.methodAverageDuration.put(ALL, avg.dividedBy(requests != 0 ? requests : 1));
-
-            synchronized (this.methodDurations) {
+                this.methodAverageDuration.put(ALL, avg.dividedBy(requests != 0 ? requests : 1));
                 this.methodDurations.clear();
             }
-
         } catch (Throwable t) {
             this.logger.logException("RequestDurationCollector::cleanup failed: " + t.getMessage(), t);
         }
