@@ -1,6 +1,6 @@
 package hoot.model.repositories;
 
-import hoot.model.cache.UserCache;
+import hoot.model.cache.UserRedisCache;
 import hoot.model.entities.User;
 import hoot.model.search.DefaultSearchCriteria;
 import hoot.model.search.SearchCriteriaInterface;
@@ -20,7 +20,7 @@ import java.util.ArrayList;
 
 public class UserRepository extends AbstractRepository<User>
 {
-    private final UserCache userCache;
+    private final UserRedisCache userCache;
 
     private final FollowerRepository followerRepository;
 
@@ -29,7 +29,7 @@ public class UserRepository extends AbstractRepository<User>
         super();
 
         this.followerRepository = (FollowerRepository) ObjectManager.get(FollowerRepository.class);
-        this.userCache          = (UserCache) ObjectManager.get(UserCache.class);
+        this.userCache          = (UserRedisCache) ObjectManager.get(UserRedisCache.class);
     }
 
     /**

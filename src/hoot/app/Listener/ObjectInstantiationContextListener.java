@@ -2,6 +2,7 @@ package hoot.app.Listener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hoot.app.Factory.*;
+import hoot.app.Factory.RedisFactory;
 import hoot.system.Filesystem.FileHandler;
 import hoot.system.Filesystem.MediaFileHandler;
 import hoot.system.Logger.ContextLogger;
@@ -9,6 +10,7 @@ import hoot.system.Logger.LoggerInterface;
 import hoot.system.Logger.NullLogger;
 import hoot.system.Logger.QueryLoggerInterface;
 import hoot.system.ObjectManager.ObjectManager;
+import nl.melp.redis.Redis;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -39,5 +41,6 @@ public class ObjectInstantiationContextListener implements ServletContextListene
         ObjectManager.setFactory(ObjectMapper.class, new JacksonSerializerFactory());
         ObjectManager.setFactory(ScheduledExecutorService.class, new SingleThreadScheduledExecutorFactory());
         ObjectManager.setFactory(ProcessBuilder.class, new ProcessBuilderFactory());
+        ObjectManager.setFactory(Redis.class, new RedisFactory(context));
     }
 }
