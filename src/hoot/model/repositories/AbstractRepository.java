@@ -2,9 +2,11 @@ package hoot.model.repositories;
 
 import hoot.model.search.DefaultSearchCriteria;
 import hoot.model.search.SearchCriteriaInterface;
+import hoot.system.Database.StatementFetcher;
 import hoot.system.Exception.CouldNotDeleteException;
 import hoot.system.Exception.CouldNotSaveException;
 import hoot.system.Exception.EntityNotFoundException;
+import hoot.system.Filesystem.MediaFileHandler;
 import hoot.system.Logger.LoggerInterface;
 import hoot.system.ObjectManager.ObjectManager;
 
@@ -18,6 +20,19 @@ import java.util.ArrayList;
 
 public abstract class AbstractRepository<Type>
 {
+    protected final StatementFetcher statementFetcher;
+
+    protected final MediaFileHandler mediaFileHandler;
+
+    protected final LoggerInterface logger;
+
+    public AbstractRepository()
+    {
+        this.statementFetcher = (StatementFetcher) ObjectManager.get(StatementFetcher.class);
+        this.mediaFileHandler = (MediaFileHandler) ObjectManager.get(MediaFileHandler.class);
+        this.logger           = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
+    }
+
     public ArrayList<Type> getList() throws EntityNotFoundException
     {
         return this.getList((DefaultSearchCriteria) ObjectManager.get(DefaultSearchCriteria.class));
@@ -48,8 +63,7 @@ public abstract class AbstractRepository<Type>
      */
     protected void log(String message)
     {
-        LoggerInterface logger = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
-        logger.log(message);
+        this.logger.log(message);
     }
 
     protected LocalDateTime getLocalDateTimeFromSQLTimestamp(Timestamp timestamp)

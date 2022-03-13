@@ -79,8 +79,6 @@ public class QueryBuilder
     {
         for (int i = 1; i <= this.PARAMETERS.size(); i++) {
             Object param = this.PARAMETERS.get(i - 1);
-            //LoggerInterface logger = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
-            //logger.log(param.getClass().getName());
 
             if (param instanceof LocalDateTime) {
                 statement.setTimestamp(i, this.getSQLTimestampFromLocalDateTime((LocalDateTime) param));

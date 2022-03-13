@@ -40,6 +40,7 @@ public class HistoryRepository extends AbstractRepository<History>
             PreparedStatement statement = queryBuilder.build(connection);
 
             ResultSet resultSet = statement.executeQuery();
+            connection.close();
             resultSet.next();
 
             history = this.mapResultSetToHistory(resultSet);
@@ -67,6 +68,7 @@ public class HistoryRepository extends AbstractRepository<History>
             PreparedStatement statement = queryBuilder.build(connection);
 
             ResultSet resultSet = statement.executeQuery();
+            connection.close();
 
             while (resultSet.next()) {
                 allHistorys.add(this.mapResultSetToHistory(resultSet));

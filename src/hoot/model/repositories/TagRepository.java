@@ -3,13 +3,15 @@ package hoot.model.repositories;
 import hoot.model.entities.Tag;
 import hoot.model.search.SearchCriteriaInterface;
 import hoot.system.Database.QueryBuilder;
+import hoot.system.Database.QueryResult;
+import hoot.system.Database.QueryResultRow;
 import hoot.system.Exception.CouldNotDeleteException;
 import hoot.system.Exception.CouldNotSaveException;
 import hoot.system.Exception.EntityNotFoundException;
+import hoot.system.ObjectManager.ObjectManager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -21,22 +23,19 @@ public class TagRepository extends AbstractRepository<Tag>
         ArrayList<Tag> tags = new ArrayList<>();
 
         try (Connection connection = this.getConnection()) {
-            QueryBuilder   queryBuilder = searchCriteria.getQueryBuilder();
-
+            QueryBuilder queryBuilder = searchCriteria.getQueryBuilder();
             queryBuilder.SELECT.add("tag");
             queryBuilder.FROM = "HootTags ht";
 
-            PreparedStatement statement = queryBuilder.build(connection);
-            ResultSet         resultSet = statement.executeQuery();
+            PreparedStatement statement   = queryBuilder.build(connection);
+            QueryResult       queryResult = this.statementFetcher.fetchAll(statement);
+            connection.close();
 
-            while (resultSet.next()) {
-                Tag tag = new Tag();
-                tag.tag = resultSet.getString("tag");
+            for (QueryResultRow resultRow : queryResult) {
+                Tag tag = (Tag) ObjectManager.create(Tag.class);
+                tag.tag = (String) resultRow.get("HootTags.tag");
                 tags.add(tag);
             }
-
-            resultSet.close();
-            statement.close();
         } catch (SQLException e) {
             this.log("TagRepository.getList(): " + e.getMessage());
         }
@@ -54,18 +53,15 @@ public class TagRepository extends AbstractRepository<Tag>
     public void save(Tag tag) throws CouldNotSaveException
     {
         try (Connection connection = this.getConnection()) {
-            String            sqlStatement = "INSERT INTO Tag values (?) ON DUPLICATE KEY UPDATE tag = tag";
-            PreparedStatement statement    = connection.prepareStatement(sqlStatement);
+            String sqlStatement = "INSERT INTO Tag values (?) ON DUPLICATE KEY UPDATE tag = tag";
 
+            PreparedStatement statement = connection.prepareStatement(sqlStatement);
             statement.setString(1, tag.tag.toLowerCase());
 
-            int rowCount = statement.executeUpdate();
-
+            this.statementFetcher.executeUpdate(statement);
             /*  If the insert fails, we cannot determine if it failed because of an SQL error,
                 or because the key already exists.
                 For this Reason, we do not throw a CouldNotSaveException if the row count is not 1. */
-
-            statement.close();
         } catch (SQLException e) {
             this.log("Could not save Tag " + tag.tag);
             throw new CouldNotSaveException("Tag " + tag.tag);
@@ -82,14 +78,13 @@ public class TagRepository extends AbstractRepository<Tag>
     public void delete(Tag tag) throws CouldNotDeleteException
     {
         try (Connection connection = this.getConnection()) {
-            String            sqlStatement = "delete from Tag where tag = ?";
-            PreparedStatement statement    = connection.prepareStatement(sqlStatement);
+            String sqlStatement = "DELETE FROM Tag WHERE tag = ?";
 
+            PreparedStatement statement = connection.prepareStatement(sqlStatement);
             statement.setString(1, tag.tag.toLowerCase());
 
-            int rowCount = statement.executeUpdate();
-
-            statement.close();
+            int rowCount = this.statementFetcher.executeUpdate(statement);
+            connection.close();
 
             if (rowCount == 0) {
                 throw new CouldNotDeleteException("Tag " + tag.tag);

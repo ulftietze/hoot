@@ -3,6 +3,8 @@ package hoot.model.repositories;
 import hoot.model.entities.Mention;
 import hoot.model.search.SearchCriteriaInterface;
 import hoot.system.Database.QueryBuilder;
+import hoot.system.Database.QueryResult;
+import hoot.system.Database.QueryResultRow;
 import hoot.system.Exception.CouldNotDeleteException;
 import hoot.system.Exception.CouldNotSaveException;
 import hoot.system.Exception.EntityNotFoundException;
@@ -10,12 +12,20 @@ import hoot.system.ObjectManager.ObjectManager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class MentionRepository extends AbstractRepository<Mention>
 {
+    private final UserRepository userRepository;
+
+    public MentionRepository()
+    {
+        super();
+
+        this.userRepository = (UserRepository) ObjectManager.get(UserRepository.class);
+    }
+
     @Override
     public ArrayList<Mention> getList(SearchCriteriaInterface searchCriteria) throws EntityNotFoundException
     {
@@ -26,19 +36,15 @@ public class MentionRepository extends AbstractRepository<Mention>
             queryBuilder.SELECT.add("mention");
             queryBuilder.FROM = "HootMentions";
 
-            PreparedStatement statement  = queryBuilder.build(connection);
-            ResultSet         resultSet  = statement.executeQuery();
+            PreparedStatement statement   = queryBuilder.build(connection);
+            QueryResult       queryResult = this.statementFetcher.fetchAll(statement);
+            connection.close();
 
-            UserRepository userRepository = (UserRepository) ObjectManager.get(UserRepository.class);
-
-            while (resultSet.next()) {
+            for (QueryResultRow row : queryResult) {
                 Mention mention = new Mention();
-                mention.mentioned = userRepository.getById(resultSet.getInt("mention"));
+                mention.mentioned = this.userRepository.getById((int) row.get("HootMentions.mention"));
                 mentioned.add(mention);
             }
-
-            resultSet.close();
-            statement.close();
         } catch (SQLException e) {
             this.log("MentionRepository.getList(): " + e.getMessage());
         }

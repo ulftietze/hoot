@@ -11,6 +11,7 @@ import hoot.system.ObjectManager.ObjectManager;
 import hoot.system.Queue.ConsumerInterface;
 import hoot.system.Queue.QueueManager;
 
+import java.sql.SQLException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -23,27 +24,34 @@ public class CountRegistrationsCollector extends Thread implements CollectorInte
 
     private final QueueManager queueManager;
 
+    private final UserRepository userRepository;
+
     private final AtomicInteger userRegisteredInPeriod;
 
-    private final LoggerInterface logger;
-
     private final AtomicInteger currentlyRegisteredUsers;
+
+    private final LoggerInterface logger;
 
     private boolean running = true;
 
     public CountRegistrationsCollector()
     {
-        UserRepository userRepository = (UserRepository) ObjectManager.get(UserRepository.class);
+        this.userRepository = (UserRepository) ObjectManager.get(UserRepository.class);
 
         this.queueManager             = (QueueManager) ObjectManager.get(QueueManager.class);
         this.userRegisteredInPeriod   = new AtomicInteger();
-        this.currentlyRegisteredUsers = new AtomicInteger(userRepository.getUserQuantity());
+        this.currentlyRegisteredUsers = new AtomicInteger();
         this.logger                   = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
     }
 
     @Override
     public void run()
     {
+        try {
+            this.currentlyRegisteredUsers.set(this.userRepository.getUserQuantity());
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage());
+        }
         ScheduledFuture<?> loadAmountOfRegisteredUsersInPeriodTask = this
                 .createScheduledExecutorService()
                 .scheduleAtFixedRate(this::registeredUsersInPeriod, 0, 10, TimeUnit.MINUTES);
