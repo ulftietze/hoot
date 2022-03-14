@@ -12,28 +12,25 @@ public class History
 
     public LocalDateTime timestamp;
 
-    public Integer currentLoggedIn   = 0,
-            currentlyRegisteredUsers = 0,
-            threadCount              = 0,
-            loginsPerSixHours        = 0,
-            registrationsPerSixHours = 0,
-            requestsPerSecond = 0;
+    public Integer currentLoggedIn = 0, loginsPerSixHours = 0, threadCount = 0, requestsPerSecond = 0;
+
+    public Long currentlyRegisteredUsers = 0L, registrationsPerSixHours = 0L;
 
     public Long threadCountTotal = 0L;
 
-    public Float postsPerMinute       = 0f,
-            requestsLoggedInPerSecond = 0f;
+    public Float postsPerMinute = 0f, requestsLoggedInPerSecond = 0f;
 
-    public Double systemLoadAverage = 0d,
-            systemCPULoad           = 0d,
-            processCPULoad          = 0d;
+    public Double systemLoadAverage = 0d, systemCPULoad = 0d, processCPULoad = 0d;
 
     public ArrayList<Tag> trendingHashtags;
 
-    public CollectorResult workload = new CollectorResult(),
-            queueSize               = new CollectorResult(),
-            cacheSize               = new CollectorResult(),
-            requestDurations        = new CollectorResult();
+    public CollectorResult workload = new CollectorResult();
+
+    public CollectorResult queueSize = new CollectorResult();
+
+    public CollectorResult cacheSize = new CollectorResult();
+
+    public CollectorResult requestDurations = new CollectorResult();
 
     public static ArrayList<Tag> getTrendingHashtagsFromCommaSeparatedTags(String commaSeparatedTags)
     {

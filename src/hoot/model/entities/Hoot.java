@@ -20,7 +20,7 @@ public abstract class Hoot
 
     public HootTags tags;
 
-    public Map<Interaction, Integer> reactionCount = new HashMap<>();
+    public Map<Interaction, Long> reactionCount = new HashMap<>();
 
     public Hoot()
     {

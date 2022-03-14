@@ -6,6 +6,7 @@ import hoot.system.ObjectManager.ObjectManager;
 import java.sql.*;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Objects;
 
 public class StatementFetcher
 {
@@ -29,19 +30,27 @@ public class StatementFetcher
         Instant start = Instant.now();
 
         var       fetchData = (QueryResult) ObjectManager.create(QueryResult.class);
-        ResultSet resultSet = statement.executeQuery();
+        ResultSet resultSet = null;
 
-        Duration executionTime = Duration.between(start, Instant.now());
-        if (executionTime.toMillis() > 1000) {
-            logger.log("Slow Query Detected Duration: " + executionTime.toMillis() + " || Query was: " + statement.toString());
+        try {
+            resultSet = statement.executeQuery();
+
+            Duration executionTime = Duration.between(start, Instant.now());
+            if (executionTime.toMillis() > 1000) {
+                logger.log("Slow Query Detected Duration: " + executionTime.toMillis());
+            }
+
+            while (resultSet.next()) {
+                fetchData.add(this.mapRow(resultSet));
+            }
+        } catch (Throwable t) {
+            throw t;
+        } finally {
+            if (resultSet != null) {
+                resultSet.close();
+            }
+            statement.close();
         }
-
-        while (resultSet.next()) {
-            fetchData.add(this.mapRow(resultSet));
-        }
-
-        resultSet.close();
-        statement.close();
 
         return fetchData;
     }
@@ -59,8 +68,6 @@ public class StatementFetcher
         ResultSetMetaData metaData = resultSet.getMetaData();
         QueryResultRow    row      = (QueryResultRow) ObjectManager.create(QueryResultRow.class);
 
-        LoggerInterface logger = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
-
         for (int i = 1; i <= metaData.getColumnCount(); ++i) {
             String column = "";
 
@@ -70,9 +77,7 @@ public class StatementFetcher
                 column = metaData.getColumnLabel(i);
             }
 
-            //logger.log("Entry (" + column + " => " + resultSet.getObject(i) + ")::" + resultSet
-            //        .getMetaData()
-            //        .getColumnTypeName(i));
+            //this.debugResultSet(resultSet, i, column);
 
             //if (row.containsKey(column)) {
             //    throw new SQLException("Column " + column + " is represented at least twice.");
@@ -80,6 +85,15 @@ public class StatementFetcher
 
             switch (resultSet.getMetaData().getColumnType(i)) {
                 case Types.BIGINT:
+                    // TODO: This is legit no joke lol.
+                    // Since the IDs are an unsigned int, it's a long and int at the same time
+                    // Since we don't want to modify the whole code base, this is the easiest workaround
+                    if (Objects.equals("INTEGER", resultSet.getMetaData().getColumnTypeName(i))) {
+                        row.put(column, resultSet.getInt(i));
+                    } else {
+                        row.put(column, resultSet.getLong(i));
+                    }
+                    break;
                 case Types.INTEGER:
                 case Types.SMALLINT:
                     row.put(column, resultSet.getInt(i));
@@ -117,5 +131,18 @@ public class StatementFetcher
         }
 
         return row;
+    }
+
+    private void debugResultSet(ResultSet resultSet, int i, String column) throws SQLException
+    {
+        if (!column.contains("id")) {
+            return;
+        }
+
+        LoggerInterface logger = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
+
+        int    type     = resultSet.getMetaData().getColumnType(i);
+        String typeName = resultSet.getMetaData().getColumnTypeName(i);
+        logger.log("Entry (" + column + " => " + resultSet.getObject(i) + ")::" + typeName + "::" + type);
     }
 }

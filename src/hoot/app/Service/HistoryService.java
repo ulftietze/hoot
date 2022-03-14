@@ -21,7 +21,6 @@ import hoot.system.Serializer.Serializer;
 import hoot.system.Service.ServiceInterface;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 public class HistoryService implements ServiceInterface
 {
@@ -57,20 +56,9 @@ public class HistoryService implements ServiceInterface
             CollectorResult queueSizes     = monitorData.get(QueueSizeCollector.COLLECTOR_NAME);
             CollectorResult cacheSizes     = monitorData.get(CacheSizeCollector.COLLECTOR_NAME);
 
-            this.logger.log("\n"
-                            + "LoginsPerPeriod: " + logins.get("LoginsPerPeriod") + "\n"
-                            + "Currently Registered User: " + registrations.get("Currently Registered User") + "\n"
-                            + "Registrations in Period: " + registrations.get("Registrations in Period") + "\n"
-                            + "Currently Logged In: " + requests.get("Currently Logged In") + "\n"
-                            + "Requests Per Second: " + requests.get("Requests Per Second") + "\n"
-                            + "AvgDurations: " + this.serializer.serialize(avgReqDuration) + "\n"
-                            + "Queue Sizes: " + this.serializer.serialize(queueSizes) + "\n"
-                            + "Cache Sizes: " + this.serializer.serialize(cacheSizes) + "\n"
-            );
-
             entity.loginsPerSixHours        = (Integer) logins.get("LoginsPerPeriod");
-            entity.currentlyRegisteredUsers = (Integer) registrations.get("Currently Registered User");
-            entity.registrationsPerSixHours = (Integer) registrations.get("Registrations in Period");
+            entity.currentlyRegisteredUsers = (Long) registrations.get(CountRegistrationsCollector.TOTAL_REGISTERED);
+            entity.registrationsPerSixHours = (Long) registrations.get(CountRegistrationsCollector.IN_PERIOD);
             entity.currentLoggedIn          = (Integer) requests.get("Currently Logged In");
             //entity.requestsLoggedInPerSecond = requests.get("Requests Logged In Per Second");
             entity.requestsPerSecond = (Integer) requests.get("Requests Per Second");
@@ -83,10 +71,7 @@ public class HistoryService implements ServiceInterface
             entity.systemLoadAverage = (Double) workload.get("System Load Average");
             entity.systemCPULoad     = (Double) workload.get("System CPU Load");
             entity.processCPULoad    = (Double) workload.get("Process CPU Load");
-
             entity.trendingHashtags = (ArrayList<Tag>) mostUsedTags.get("popularTags");
-
-            //System.gc();
 
             try {
                 historyRepository.save(entity);
@@ -97,23 +82,5 @@ public class HistoryService implements ServiceInterface
             String msg = "[ERROR] Could not execute HistoryService::execute properly: " + e.getMessage();
             this.logger.logException(msg, e);
         }
-    }
-
-    private void mapLoginsToEntity(Map<String, Object> loginData, History entity)
-    {
-        if (loginData == null) {
-            return;
-        }
-
-        entity.currentLoggedIn = (Integer) loginData.get("CurrentlyLoggedIn");
-    }
-
-    private void mapRegistrationsToEntity(Map<String, Object> registrationData, History entity)
-    {
-        if (registrationData == null) {
-            return;
-        }
-
-        entity.currentlyRegisteredUsers = (Integer) registrationData.get("CurrentlyRegisteredUser");
     }
 }

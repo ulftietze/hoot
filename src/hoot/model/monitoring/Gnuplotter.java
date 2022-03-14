@@ -1,5 +1,7 @@
 package hoot.model.monitoring;
 
+import hoot.model.cache.HootCacheInterface;
+import hoot.model.cache.UserCacheInterface;
 import hoot.model.entities.History;
 import hoot.model.monitoring.consumer.RequestDurationCollector;
 import hoot.system.Filesystem.FileHandler;
@@ -19,44 +21,55 @@ interface DataWriter
 
 public class Gnuplotter
 {
-    private static final String                     tmpFolder   = "tmp";
-    private static final String                     tmpPath     = tmpFolder + File.separator;
-    private static final String                     graphFolder = "graphs";
-    private static final HashMap<GraphType, String> urlMap      = new HashMap<>();
+    private static final String tmpFolder   = "tmp";
+    private static final String tmpPath     = tmpFolder + File.separator;
+    private static final String graphFolder = "graphs";
+
+    private static final HashMap<GraphType, String> urlMap = new HashMap<>();
 
     public static String getGraphUrl(GraphType graphtype)
     {
-        return urlMap.get(graphtype);
+        MediaFileHandler fileHandler = (MediaFileHandler) ObjectManager.get(MediaFileHandler.class);
+
+        return fileHandler.getImageUrl(graphFolder + "/" + graphtype + ".png");
     }
 
-    public static String createGraph(GraphType graphType, ArrayList<History> input)
+    public static void createGraph(GraphType graphType, ArrayList<History> input)
     {
         switch (graphType) {
             case Statistics:
-                return Gnuplotter.createStatisticsGraph(input);
+                Gnuplotter.createStatisticsGraph(input);
+                return;
             case Thread:
-                return Gnuplotter.createThreadGraph(input);
+                Gnuplotter.createThreadGraph(input);
+                return;
             case HeapMemory:
-                return Gnuplotter.createHeapMemoryGraph(input);
+                Gnuplotter.createHeapMemoryGraph(input);
+                return;
             case Memory:
-                return Gnuplotter.createMemoryGraph(input);
+                Gnuplotter.createMemoryGraph(input);
+                return;
             case CacheSize:
-                return Gnuplotter.createCacheSizeGraph(input);
+                Gnuplotter.createCacheSizeGraph(input);
+                return;
             case CPULoad:
-                return Gnuplotter.createCPULoadGraph(input);
+                Gnuplotter.createCPULoadGraph(input);
+                return;
             case SystemLoad:
-                return Gnuplotter.createSystemLoadGraph(input);
+                Gnuplotter.createSystemLoadGraph(input);
+                return;
             case Requests:
-                return Gnuplotter.createRequestsGraph(input);
+                Gnuplotter.createRequestsGraph(input);
+                return;
             case RequestDuration:
-                return Gnuplotter.createRequestDurationGraph(input);
+                Gnuplotter.createRequestDurationGraph(input);
+                return;
             case CurrentLoggedIn:
-                return Gnuplotter.createCurrentLoggedInGraph(input);
+                Gnuplotter.createCurrentLoggedInGraph(input);
         }
-        return null;
     }
 
-    private static synchronized String createStatisticsGraph(ArrayList<History> input)
+    private static void createStatisticsGraph(ArrayList<History> input)
     {
         DataWriter dataWriter = (histories) -> {
             ArrayList<String> result = new ArrayList<>();
@@ -82,10 +95,10 @@ public class Gnuplotter
                 "u 1:4 t \"postsPerMinute\" w lines"
         };
 
-        return Gnuplotter.createGraphWithGnuplot(GraphType.Statistics, input, dataWriter, gnuplotDirectives);
+        Gnuplotter.createGraphWithGnuplot(GraphType.Statistics, input, dataWriter, gnuplotDirectives);
     }
 
-    private static synchronized String createThreadGraph(ArrayList<History> input)
+    private static void createThreadGraph(ArrayList<History> input)
     {
         DataWriter dataWriter = (histories) -> {
             ArrayList<String> result = new ArrayList<>();
@@ -103,10 +116,10 @@ public class Gnuplotter
 
         String[] gnuplotDirectives = {"u 1:2 t \"threadCount\" w lines"};
 
-        return Gnuplotter.createGraphWithGnuplot(GraphType.Thread, input, dataWriter, gnuplotDirectives);
+        Gnuplotter.createGraphWithGnuplot(GraphType.Thread, input, dataWriter, gnuplotDirectives);
     }
 
-    private static synchronized String createHeapMemoryGraph(ArrayList<History> input)
+    private static void createHeapMemoryGraph(ArrayList<History> input)
     {
         DataWriter dataWriter = (histories) -> {
             ArrayList<String> result = new ArrayList<>();
@@ -134,10 +147,10 @@ public class Gnuplotter
                 "u 1:6 t \"" + SystemWorkloadCollector.MEMORY_NON_HEAP_USAGE + "\" w lines",
                 };
 
-        return Gnuplotter.createGraphWithGnuplot(GraphType.HeapMemory, input, dataWriter, gnuplotDirectives);
+        Gnuplotter.createGraphWithGnuplot(GraphType.HeapMemory, input, dataWriter, gnuplotDirectives);
     }
 
-    private static synchronized String createMemoryGraph(ArrayList<History> input)
+    private static void createMemoryGraph(ArrayList<History> input)
     {
         DataWriter dataWriter = (histories) -> {
             ArrayList<String> result = new ArrayList<>();
@@ -178,10 +191,10 @@ public class Gnuplotter
                 "u 1:9 t \"" + SystemWorkloadCollector.MEMORY_GC_RESERVED + "\" w lines",
                 };
 
-        return Gnuplotter.createGraphWithGnuplot(GraphType.Memory, input, dataWriter, gnuplotDirectives);
+        Gnuplotter.createGraphWithGnuplot(GraphType.Memory, input, dataWriter, gnuplotDirectives);
     }
 
-    private static synchronized String createCPULoadGraph(ArrayList<History> input)
+    private static void createCPULoadGraph(ArrayList<History> input)
     {
         DataWriter dataWriter = (histories) -> {
             ArrayList<String> result = new ArrayList<>();
@@ -201,10 +214,10 @@ public class Gnuplotter
 
         String[] gnuplotDirectives = {"u 1:2 t \"systemCPULoad\" w lines, ", "u 1:3 t \"processCPULoad\" w lines"};
 
-        return Gnuplotter.createGraphWithGnuplot(GraphType.CPULoad, input, dataWriter, gnuplotDirectives);
+        Gnuplotter.createGraphWithGnuplot(GraphType.CPULoad, input, dataWriter, gnuplotDirectives);
     }
 
-    private static synchronized String createSystemLoadGraph(ArrayList<History> input)
+    private static void createSystemLoadGraph(ArrayList<History> input)
     {
         DataWriter dataWriter = (histories) -> {
             ArrayList<String> result = new ArrayList<>();
@@ -222,10 +235,10 @@ public class Gnuplotter
 
         String[] gnuplotDirectives = {"u 1:2 t \"systemLoadAverage\" w lines"};
 
-        return Gnuplotter.createGraphWithGnuplot(GraphType.SystemLoad, input, dataWriter, gnuplotDirectives);
+        Gnuplotter.createGraphWithGnuplot(GraphType.SystemLoad, input, dataWriter, gnuplotDirectives);
     }
 
-    private static synchronized String createRequestsGraph(ArrayList<History> input)
+    private static void createRequestsGraph(ArrayList<History> input)
     {
         DataWriter dataWriter = (histories) -> {
             ArrayList<String> result = new ArrayList<>();
@@ -247,10 +260,10 @@ public class Gnuplotter
                 "u 1:2 t \"requestsPerSecond\" w lines, ", "u 1:3 t \"requestsLoggedInPerSecond\" w lines"
         };
 
-        return Gnuplotter.createGraphWithGnuplot(GraphType.Requests, input, dataWriter, gnuplotDirectives);
+        Gnuplotter.createGraphWithGnuplot(GraphType.Requests, input, dataWriter, gnuplotDirectives);
     }
 
-    private static synchronized String createRequestDurationGraph(ArrayList<History> input)
+    private static void createRequestDurationGraph(ArrayList<History> input)
     {
         DataWriter dataWriter = (histories) -> {
             ArrayList<String> result = new ArrayList<>();
@@ -260,17 +273,17 @@ public class Gnuplotter
 
                 line += history.timestamp.toString();
                 line += "\t";
-                line += history.requestDurations.get(RequestDurationCollector.ALL);
+                line += ((Double) history.requestDurations.get(RequestDurationCollector.ALL) * 1000);
                 line += "\t";
-                line += history.requestDurations.get(RequestDurationCollector.GET);
+                line += ((Double) history.requestDurations.get(RequestDurationCollector.GET) * 1000);
                 line += "\t";
-                line += history.requestDurations.get(RequestDurationCollector.PUT);
+                line += ((Double) history.requestDurations.get(RequestDurationCollector.PUT) * 1000);
                 line += "\t";
-                line += history.requestDurations.get(RequestDurationCollector.POST);
+                line += ((Double) history.requestDurations.get(RequestDurationCollector.POST) * 1000);
                 line += "\t";
-                line += history.requestDurations.get(RequestDurationCollector.DELETE);
+                line += ((Double) history.requestDurations.get(RequestDurationCollector.DELETE) * 1000);
                 line += "\t";
-                line += history.requestDurations.get(RequestDurationCollector.OPTION);
+                line += ((Double) history.requestDurations.get(RequestDurationCollector.OPTION) * 1000);
 
                 result.add(line.toString());
             }
@@ -286,10 +299,10 @@ public class Gnuplotter
                 "u 1:7 t \"" + RequestDurationCollector.OPTION + "\" w lines",
                 };
 
-        return Gnuplotter.createGraphWithGnuplot(GraphType.RequestDuration, input, dataWriter, gnuplotDirectives);
+        Gnuplotter.createGraphWithGnuplot(GraphType.RequestDuration, input, dataWriter, gnuplotDirectives);
     }
 
-    private static String createCacheSizeGraph(ArrayList<History> input)
+    private static void createCacheSizeGraph(ArrayList<History> input)
     {
         DataWriter dataWriter = (histories) -> {
             ArrayList<String> result = new ArrayList<>();
@@ -299,9 +312,9 @@ public class Gnuplotter
 
                 line += history.timestamp.toString();
                 line += "\t";
-                line += history.cacheSize.get(CacheSizeCollector.USER_CACHE);
+                line += history.cacheSize.get(UserCacheInterface.CACHE_NAME);
                 line += "\t";
-                line += history.cacheSize.get(CacheSizeCollector.HOOT_CACHE);
+                line += history.cacheSize.get(HootCacheInterface.CACHE_NAME);
 
                 result.add(line.toString());
             }
@@ -309,14 +322,14 @@ public class Gnuplotter
         };
 
         String[] gnuplotDirectives = {
-                "u 1:2 t \"" + CacheSizeCollector.USER_CACHE + "\" w lines, ",
-                "u 1:3 t \"" + CacheSizeCollector.HOOT_CACHE + "\" w lines",
+                "u 1:2 t \"" + UserCacheInterface.CACHE_NAME + "\" w lines, ",
+                "u 1:3 t \"" + HootCacheInterface.CACHE_NAME + "\" w lines",
                 };
 
-        return Gnuplotter.createGraphWithGnuplot(GraphType.CacheSize, input, dataWriter, gnuplotDirectives);
+        Gnuplotter.createGraphWithGnuplot(GraphType.CacheSize, input, dataWriter, gnuplotDirectives);
     }
 
-    private static synchronized String createCurrentLoggedInGraph(ArrayList<History> input)
+    private static void createCurrentLoggedInGraph(ArrayList<History> input)
     {
         DataWriter dataWriter = (histories) -> {
             ArrayList<String> result = new ArrayList<>();
@@ -336,15 +349,15 @@ public class Gnuplotter
                 "u 1:2 t \"currentLoggedIn\" w lines"
         };
 
-        return Gnuplotter.createGraphWithGnuplot(GraphType.CurrentLoggedIn, input, dataWriter, gnuplotDirectives);
+        Gnuplotter.createGraphWithGnuplot(GraphType.CurrentLoggedIn, input, dataWriter, gnuplotDirectives);
     }
 
-    private static synchronized String createGraphWithGnuplot(
-            final GraphType graphType, final ArrayList<History> input, DataWriter dataWriter, String[] gnuplotDirectives
+    private static void createGraphWithGnuplot(
+            GraphType graphType, final ArrayList<History> input, DataWriter dataWriter, String[] gnuplotDirectives
     )
     {
         if (input == null) {
-            return null;
+            return;
         }
 
         FileHandler      fileHandler      = (FileHandler) ObjectManager.create(FileHandler.class);
@@ -383,24 +396,16 @@ public class Gnuplotter
 
         try {
             plotProcess.start().waitFor();
-
-            String url = mediaFileHandler.getImageUrl(graphFolder + "/" + graphType + ".png");
-
-            Gnuplotter.urlMap.put(graphType, url);
-
-            return url;
         } catch (IOException e) {
             Gnuplotter.log("Gnuplot Process execution failed: " + e.getMessage());
-            return null;
         } catch (InterruptedException e) {
             Gnuplotter.log("Gnuplot Process failed to terminate: " + e.getMessage());
-            return null;
         } finally {
             fileHandler.delete(tmpPath, tmpDataFile);
         }
     }
 
-    private static synchronized void log(String input)
+    private static void log(String input)
     {
         LoggerInterface logger = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
         logger.log(input);

@@ -26,24 +26,31 @@ public class MonitorGraphCreationService implements ServiceInterface
     @Override
     public void execute()
     {
-        ArrayList<History>    historyList           = null;
-        HistorySearchCriteria historySearchCriteria = this.createHistorySearchCriteria();
-        historySearchCriteria.secondsToLoad = 900; // 15 Minuten
-
         try {
-            historyList = historyRepository.getList(historySearchCriteria);
-        } catch (EntityNotFoundException e) {
-            this.logger.log("Could not get List of History Objects");
-        }
+            HistorySearchCriteria historySearchCriteria = this.createHistorySearchCriteria();
+            historySearchCriteria.secondsToLoad = 3600; // 1 hour
 
-        if (historyList != null) {
-            for (Gnuplotter.GraphType graphType : Gnuplotter.GraphType.values()) {
+            try {
+                ArrayList<History> historyList = historyRepository.getList(historySearchCriteria);
+                this.drawGraphs(historyList);
+            } catch (EntityNotFoundException e) {
+                this.logger.log("Could not get List of History Objects");
+            }
+        } catch (Throwable t) {
+            this.logger.logException("Could not monitor History: " + t.getMessage(), t);
+        }
+    }
+
+    private void drawGraphs(ArrayList<History> historyList)
+    {
+        for (Gnuplotter.GraphType graphType : Gnuplotter.GraphType.values()) {
+            new Thread(() -> {
                 try {
                     Gnuplotter.createGraph(graphType, historyList);
                 } catch (Throwable t) {
                     this.logger.logException("Could not create Graph " + graphType.name(), t);
                 }
-            }
+            }).start();
         }
     }
 

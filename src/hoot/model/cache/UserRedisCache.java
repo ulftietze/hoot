@@ -3,50 +3,50 @@ package hoot.model.cache;
 import hoot.model.entities.User;
 import hoot.system.Cache.AbstractRedisCache;
 
-import java.io.IOException;
 import java.util.HashMap;
 
-public class UserRedisCache extends AbstractRedisCache<User>
+public class UserRedisCache extends AbstractRedisCache<User> implements UserCacheInterface
 {
-    private HashMap<Integer, String> idToKeyMap       = new HashMap<>();
-    private HashMap<String, String>  usernameToKeyMap = new HashMap<>();
+    private final HashMap<Integer, String> idToKeyMap       = new HashMap<>();
+    private final HashMap<String, String>  usernameToKeyMap = new HashMap<>();
 
-    public synchronized User get(int id)
+    @Override
+    public synchronized User get(Integer id)
     {
         String key = this.idToKeyMap.get(id);
-        return this.deserializeKey(key);
+        return (User) this.loadRedisResult(key, User.class);
     }
 
+    @Override
     public synchronized User get(String username)
     {
         String key = this.usernameToKeyMap.get(username);
-        return this.deserializeKey(key);
+        return (User) this.loadRedisResult(key, User.class);
     }
 
-    private User deserializeKey(String key)
-    {
-        if (key != null) {
-            try {
-                String redisResult = this.redisManager.get(key);
-                if (redisResult == null) {
-                    return null;
-                }
-                return (User) this.serializer.deserialize(redisResult, User.class);
-            } catch (IOException e) {
-                this.logger.log("Could not deserialize String to User: " + e.getMessage());
-            }
-        }
-        return null;
-    }
-
+    @Override
     public synchronized void purge(User user)
     {
         String key = this.getKey(user);
         if (key != null) {
             this.idToKeyMap.remove(user.id);
             this.usernameToKeyMap.remove(user.username);
-            this.redisManager.delete(key);
+            super.delete(key);
         }
+    }
+
+    @Override
+    public void clean()
+    {
+        this.delete(this.getIdentifier());
+        this.idToKeyMap.clear();
+        this.usernameToKeyMap.clear();
+    }
+
+    @Override
+    public Integer getSize()
+    {
+        return this.countByKeyIdentifier(this.getIdentifier());
     }
 
     @Override
@@ -54,19 +54,15 @@ public class UserRedisCache extends AbstractRedisCache<User>
     {
         String key = this.getKey(user);
 
-        if (key == null) {
-            return;
-        }
-
-        this.redisManager.set(key, this.serializer.serialize(user));
+        super.put(key, user);
         this.idToKeyMap.put(user.id, key);
         this.usernameToKeyMap.put(user.username, key);
     }
 
-    private String getKey(User user)
+    protected String getKey(User user)
     {
         if (user != null && user.id != null) {
-            return "user-" + user.id;
+            return this.getIdentifier() + "-" + user.id;
         } else {
             return null;
         }

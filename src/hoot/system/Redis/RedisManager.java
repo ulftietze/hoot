@@ -5,18 +5,19 @@ import hoot.system.ObjectManager.ObjectManager;
 import nl.melp.redis.Redis;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RedisManager
 {
-    private final Redis redisInstance;
-    private final LoggerInterface logger;
-
     private final static int EXPIRE_IN_SECONDS = 60 * 60 * 6;
+    private final Redis           redisInstance;
+    private final LoggerInterface logger;
 
     public RedisManager()
     {
         this.redisInstance = (Redis) ObjectManager.get(Redis.class);
-        this.logger = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
+        this.logger        = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
     }
 
     public synchronized boolean set(String key, String value)
@@ -46,6 +47,36 @@ public class RedisManager
         }
     }
 
+    public synchronized Integer countKeysByPattern(String keyPattern)
+    {
+        return this.getKeysByPattern(keyPattern).size();
+    }
+
+    public synchronized List<String> getKeysByPattern(String keyPattern)
+    {
+        if (keyPattern == null || keyPattern.equals("")) {
+            keyPattern = "*";
+        }
+
+        List<String> matchingKeys = new ArrayList<>();
+
+        try {
+            List<Object> res = this.redisInstance.call("KEYS", keyPattern);
+
+            if (res == null) {
+                return null;
+            }
+
+            for (var r : res) {
+                matchingKeys.add(new String((byte[]) r));
+            }
+        } catch (IOException e) {
+            this.logger.logException("Could not load keys by pattern " + keyPattern + ": " + e.getMessage(), e);
+        }
+
+        return matchingKeys;
+    }
+
     public synchronized void delete(String key)
     {
         try {
@@ -53,5 +84,10 @@ public class RedisManager
         } catch (IOException e) {
             this.logger.log("Deleting of Redis Key/Value was not possible: " + e.getMessage());
         }
+    }
+
+    public synchronized void delete(List<String> keys)
+    {
+        keys.forEach(this::delete);
     }
 }

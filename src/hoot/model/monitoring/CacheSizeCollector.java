@@ -1,7 +1,7 @@
 package hoot.model.monitoring;
 
-import hoot.model.cache.HootCache;
-import hoot.model.cache.UserCache;
+import hoot.model.cache.HootCacheInterface;
+import hoot.model.cache.UserCacheInterface;
 import hoot.system.Exception.CollectorException;
 import hoot.system.Monitoring.CollectorInterface;
 import hoot.system.Monitoring.CollectorResult;
@@ -10,17 +10,15 @@ import hoot.system.ObjectManager.ObjectManager;
 public class CacheSizeCollector extends Thread implements CollectorInterface
 {
     public final static String COLLECTOR_NAME = "Cache Sizes";
-    public final static String USER_CACHE     = "User Cache";
-    public final static String HOOT_CACHE     = "Hoot Cache";
 
-    private final UserCache userCache;
+    private final UserCacheInterface userCache;
 
-    private final HootCache hootCache;
+    private final HootCacheInterface hootCache;
 
     public CacheSizeCollector()
     {
-        this.userCache = (UserCache) ObjectManager.get(UserCache.class);
-        this.hootCache = (HootCache) ObjectManager.get(HootCache.class);
+        this.userCache = (UserCacheInterface) ObjectManager.get(UserCacheInterface.class);
+        this.hootCache = (HootCacheInterface) ObjectManager.get(HootCacheInterface.class);
     }
 
     @Override
@@ -34,8 +32,8 @@ public class CacheSizeCollector extends Thread implements CollectorInterface
     {
         return new CollectorResult()
         {{
-            put(USER_CACHE, userCache.getSize());
-            put(HOOT_CACHE, hootCache.getSize());
+            put(UserCacheInterface.CACHE_NAME, userCache.getSize());
+            put(HootCacheInterface.CACHE_NAME, hootCache.getSize());
         }};
     }
 }

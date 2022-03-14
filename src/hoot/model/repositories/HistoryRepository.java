@@ -3,6 +3,8 @@ package hoot.model.repositories;
 import hoot.model.entities.History;
 import hoot.model.search.SearchCriteriaInterface;
 import hoot.system.Database.QueryBuilder;
+import hoot.system.Database.QueryResult;
+import hoot.system.Database.QueryResultRow;
 import hoot.system.Exception.CouldNotDeleteException;
 import hoot.system.Exception.CouldNotSaveException;
 import hoot.system.Exception.EntityNotFoundException;
@@ -11,10 +13,7 @@ import hoot.system.ObjectManager.ObjectManager;
 import hoot.system.Serializer.Serializer;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 
 public class HistoryRepository extends AbstractRepository<History>
@@ -38,15 +37,10 @@ public class HistoryRepository extends AbstractRepository<History>
             queryBuilder.PARAMETERS.add(id);
 
             PreparedStatement statement = queryBuilder.build(connection);
-
-            ResultSet resultSet = statement.executeQuery();
+            QueryResultRow    resultRow = this.statementFetcher.fetchOne(statement);
             connection.close();
-            resultSet.next();
 
-            history = this.mapResultSetToHistory(resultSet);
-
-            resultSet.close();
-            statement.close();
+            history = this.mapResultSetToHistory(resultRow);
         } catch (SQLException e) {
             //this.log("HistoryRepository.getById(): " + e.getSQLState() + " " + e.getMessage());
             throw new EntityNotFoundException("History");
@@ -58,7 +52,7 @@ public class HistoryRepository extends AbstractRepository<History>
     @Override
     public ArrayList<History> getList(SearchCriteriaInterface searchCriteria) throws EntityNotFoundException
     {
-        ArrayList<History> allHistorys = new ArrayList<>();
+        ArrayList<History> historyList = new ArrayList<>();
 
         try (Connection connection = this.getConnection()) {
             QueryBuilder queryBuilder = searchCriteria.getQueryBuilder();
@@ -67,43 +61,39 @@ public class HistoryRepository extends AbstractRepository<History>
 
             PreparedStatement statement = queryBuilder.build(connection);
 
-            ResultSet resultSet = statement.executeQuery();
+            QueryResult queryResult = this.statementFetcher.fetchAll(statement);
             connection.close();
 
-            while (resultSet.next()) {
-                allHistorys.add(this.mapResultSetToHistory(resultSet));
+            for (QueryResultRow resultRow : queryResult) {
+                historyList.add(this.mapResultSetToHistory(resultRow));
             }
-
-            resultSet.close();
-            statement.close();
         } catch (SQLException e) {
             //this.log("HistoryRepository.getList(): " + e.getMessage());
             throw new EntityNotFoundException("History");
         }
 
-        return allHistorys;
+        return historyList;
     }
 
     public void create(History history) throws CouldNotSaveException
     {
         try (Connection connection = this.getConnection()) {
-            String sqlStatement =
-                    "INSERT INTO History (currentLoggedIn, loginsPerSixHours, registrationsPerSixHours, "
-                    + "postsPerMinute, requestsPerSecond, requestsLoggedInPerSecond, currentlyRegisteredUsers, "
-                    + "trendingHashtags, systemLoadAverage, systemCPULoad, processCPULoad, threadCount, "
-                    + "threadCountTotal, workload, queueSize, cacheSize, requestDurations) "
-                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
-                    + "RETURNING id, timestamp";
+            String sqlStatement = "INSERT INTO History (currentLoggedIn, loginsPerSixHours, registrationsPerSixHours, "
+                                  + "postsPerMinute, requestsPerSecond, requestsLoggedInPerSecond, currentlyRegisteredUsers, "
+                                  + "trendingHashtags, systemLoadAverage, systemCPULoad, processCPULoad, threadCount, "
+                                  + "threadCountTotal, workload, queueSize, cacheSize, requestDurations) "
+                                  + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
+                                  + "RETURNING id, timestamp";
 
             PreparedStatement statement = connection.prepareStatement(sqlStatement);
 
             statement.setInt(1, history.currentLoggedIn);
             statement.setInt(2, history.loginsPerSixHours);
-            statement.setInt(3, history.registrationsPerSixHours);
+            statement.setLong(3, history.registrationsPerSixHours);
             statement.setFloat(4, history.postsPerMinute);
             statement.setInt(5, history.requestsPerSecond);
             statement.setFloat(6, history.requestsLoggedInPerSecond);
-            statement.setInt(7, history.currentlyRegisteredUsers);
+            statement.setLong(7, history.currentlyRegisteredUsers);
             statement.setString(8, history.getCommaSeperatedTags());
             statement.setDouble(9, history.systemLoadAverage);
             statement.setDouble(10, history.systemCPULoad);
@@ -148,12 +138,12 @@ public class HistoryRepository extends AbstractRepository<History>
 
             statement.setTimestamp(1, this.getSQLTimestampFromLocalDateTime(history.timestamp));
             statement.setInt(2, history.currentLoggedIn);
-            statement.setInt(3, history.loginsPerSixHours);
-            statement.setInt(4, history.registrationsPerSixHours);
+            statement.setLong(3, history.loginsPerSixHours);
+            statement.setLong(4, history.registrationsPerSixHours);
             statement.setFloat(5, history.postsPerMinute);
             statement.setInt(6, history.requestsPerSecond);
             statement.setFloat(7, history.requestsLoggedInPerSecond);
-            statement.setInt(8, history.currentlyRegisteredUsers);
+            statement.setLong(8, history.currentlyRegisteredUsers);
             statement.setString(9, history.getCommaSeperatedTags());
             statement.setDouble(10, history.systemLoadAverage);
             statement.setDouble(11, history.systemCPULoad);
@@ -205,58 +195,41 @@ public class HistoryRepository extends AbstractRepository<History>
         }
     }
 
-    private History mapResultSetToHistory(ResultSet resultSet) throws SQLException
+    private History mapResultSetToHistory(QueryResultRow resultRow) throws SQLException
     {
         History history = (History) ObjectManager.create(History.class);
 
-        history.id                        = resultSet.getLong("id");
-        history.timestamp                 = this.getLocalDateTimeFromSQLTimestamp(resultSet.getTimestamp("timestamp"));
-        history.currentLoggedIn           = resultSet.getInt("currentLoggedIn");
-        history.loginsPerSixHours         = resultSet.getInt("loginsPerSixHours");
-        history.registrationsPerSixHours  = resultSet.getInt("registrationsPerSixHours");
-        history.postsPerMinute            = resultSet.getFloat("postsPerMinute");
-        history.requestsPerSecond         = resultSet.getInt("requestsPerSecond");
-        history.requestsLoggedInPerSecond = resultSet.getFloat("requestsLoggedInPerSecond");
-        history.currentlyRegisteredUsers  = resultSet.getInt("currentlyRegisteredUsers");
-        history.trendingHashtags          = History.getTrendingHashtagsFromCommaSeparatedTags(resultSet.getString(
-                "trendingHashtags"));
-        history.systemLoadAverage         = resultSet.getDouble("systemLoadAverage");
-        history.systemCPULoad             = resultSet.getDouble("systemCPULoad");
-        history.processCPULoad            = resultSet.getDouble("processCPULoad");
-        history.threadCount               = resultSet.getInt("threadCount");
-        history.threadCountTotal          = resultSet.getLong("threadCountTotal");
+        Timestamp timestamp        = (Timestamp) resultRow.get("History.timestamp");
+        String    trendingHashtags = (String) resultRow.get("History.trendingHashtags");
+
+        history.id                        = (Long) resultRow.get("History.id");
+        history.timestamp                 = this.getLocalDateTimeFromSQLTimestamp(timestamp);
+        history.currentLoggedIn           = (int) resultRow.get("History.currentLoggedIn");
+        history.loginsPerSixHours         = (Integer) resultRow.get("History.loginsPerSixHours");
+        history.registrationsPerSixHours  = (Long) resultRow.get("History.registrationsPerSixHours");
+        history.postsPerMinute            = (float) resultRow.get("History.postsPerMinute");
+        history.trendingHashtags          = History.getTrendingHashtagsFromCommaSeparatedTags(trendingHashtags);
+        history.requestsPerSecond         = (int) resultRow.get("History.requestsPerSecond");
+        history.requestsLoggedInPerSecond = (float) resultRow.get("History.requestsLoggedInPerSecond");
+        history.currentlyRegisteredUsers  = (Long) resultRow.get("History.currentlyRegisteredUsers");
+        history.systemLoadAverage         = (double) resultRow.get("History.systemLoadAverage");
+        history.systemCPULoad             = (double) resultRow.get("History.systemCPULoad");
+        history.processCPULoad            = (double) resultRow.get("History.processCPULoad");
+        history.threadCount               = (int) resultRow.get("History.threadCount");
+        history.threadCountTotal          = (Long) resultRow.get("History.threadCountTotal");
+
+        String workload  = (String) resultRow.get("History.workload");
+        String queueSize = (String) resultRow.get("History.queueSize");
+        String cacheSize = (String) resultRow.get("History.cacheSize");
+        String durations = (String) resultRow.get("History.requestDurations");
 
         try {
-            history.workload = (CollectorResult) this.serializer.deserialize(
-                    resultSet.getString("workload"),
-                    CollectorResult.class
-            );
+            history.workload         = (CollectorResult) this.serializer.deserialize(workload, CollectorResult.class);
+            history.queueSize        = (CollectorResult) this.serializer.deserialize(queueSize, CollectorResult.class);
+            history.cacheSize        = (CollectorResult) this.serializer.deserialize(cacheSize, CollectorResult.class);
+            history.requestDurations = (CollectorResult) this.serializer.deserialize(durations, CollectorResult.class);
         } catch (IOException e) {
-            this.log("Could not deserialize workload: " + e.getMessage());
-        }
-        try {
-            history.queueSize = (CollectorResult) this.serializer.deserialize(
-                    resultSet.getString("queueSize"),
-                    CollectorResult.class
-            );
-        } catch (IOException e) {
-            this.log("Could not deserialize queueSize: " + e.getMessage());
-        }
-        try {
-            history.cacheSize = (CollectorResult) this.serializer.deserialize(
-                    resultSet.getString("cacheSize"),
-                    CollectorResult.class
-            );
-        } catch (IOException e) {
-            this.log("Could not deserialize cacheSize: " + e.getMessage());
-        }
-        try {
-            history.requestDurations = (CollectorResult) this.serializer.deserialize(
-                    resultSet.getString("requestDurations"),
-                    CollectorResult.class
-            );
-        } catch (IOException e) {
-            this.log("Could not deserialize requestDurations: " + e.getMessage());
+            this.log("Could not deserialize serialized history row: " + e.getMessage());
         }
 
         return history;

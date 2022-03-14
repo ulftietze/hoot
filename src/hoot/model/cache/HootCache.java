@@ -5,7 +5,7 @@ import hoot.system.Cache.AbstractCache;
 
 import java.util.HashMap;
 
-public class HootCache extends AbstractCache<Hoot>
+public class HootCache extends AbstractCache<Hoot> implements HootCacheInterface
 {
     private final HashMap<Integer, CacheObject> idLookupMap;
 
@@ -14,7 +14,8 @@ public class HootCache extends AbstractCache<Hoot>
         this.idLookupMap = new HashMap<>();
     }
 
-    public synchronized Hoot get(int id)
+    @Override
+    public synchronized Hoot get(Integer id)
     {
         CacheObject cacheObject = this.idLookupMap.get(id);
         return this.getTypeFromCacheObject(cacheObject);
@@ -44,6 +45,13 @@ public class HootCache extends AbstractCache<Hoot>
             this.timedDeleteMap.get(cacheObject.getDestroyTimestamp()).remove(cacheObject);
             this.removeReferences(cacheObject.getObject());
         }
+    }
+
+    @Override
+    public void clean()
+    {
+        this.idLookupMap.forEach((k, c) -> this.timedDeleteMap.get(c.getDestroyTimestamp()).remove(c));
+        this.idLookupMap.clear();
     }
 
     @Override

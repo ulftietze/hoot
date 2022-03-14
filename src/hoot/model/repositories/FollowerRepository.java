@@ -18,13 +18,13 @@ import java.util.Objects;
 
 public class FollowerRepository extends AbstractRepository<Follower>
 {
-    public int getFollowerCountForUser(Integer userID) throws EntityNotFoundException
+    public Long getFollowerCountForUser(Integer userID) throws EntityNotFoundException
     {
         if (userID == null) {
             throw new EntityNotFoundException("FollowerCount for User with empty ID");
         }
 
-        int followerCount = 0;
+        Long followerCount = 0L;
 
         try (Connection connection = this.getConnection()) {
             QueryBuilder queryBuilder = (QueryBuilder) ObjectManager.get(QueryBuilder.class, true);
@@ -36,7 +36,7 @@ public class FollowerRepository extends AbstractRepository<Follower>
 
             PreparedStatement preparedStatement = queryBuilder.build(connection);
 
-            return (int) this.statementFetcher.fetchOne(preparedStatement).get("quantity");
+            return (Long) this.statementFetcher.fetchOne(preparedStatement).get("quantity");
         } catch (SQLException e) {
             this.log("FollowerCount could not be retrieved: " + e.getMessage());
         }
@@ -44,13 +44,13 @@ public class FollowerRepository extends AbstractRepository<Follower>
         return followerCount;
     }
 
-    public int getFollowsCountForUser(Integer userID) throws EntityNotFoundException
+    public Long getFollowsCountForUser(Integer userID) throws EntityNotFoundException
     {
         if (userID == null) {
             throw new EntityNotFoundException("FollowsCount for User with empty ID");
         }
 
-        int followsCount = 0;
+        Long followsCount = 0L;
 
         try (Connection connection = this.getConnection()) {
             QueryBuilder queryBuilder = (QueryBuilder) ObjectManager.get(QueryBuilder.class, true);
@@ -62,7 +62,7 @@ public class FollowerRepository extends AbstractRepository<Follower>
 
             PreparedStatement preparedStatement = queryBuilder.build(connection);
 
-            return (int) this.statementFetcher.fetchOne(preparedStatement).get("quantity");
+            return (Long) this.statementFetcher.fetchOne(preparedStatement).get("quantity");
         } catch (SQLException e) {
             this.log("FollowerCount could not be retrieved: " + e.getMessage());
         }

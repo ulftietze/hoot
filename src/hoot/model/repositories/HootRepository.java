@@ -1,6 +1,6 @@
 package hoot.model.repositories;
 
-import hoot.model.cache.HootCache;
+import hoot.model.cache.HootCacheInterface;
 import hoot.model.entities.*;
 import hoot.model.search.SearchCriteriaInterface;
 import hoot.model.search.hoot.MentionSearchCriteria;
@@ -28,7 +28,7 @@ public class HootRepository extends AbstractRepository<Hoot>
 
     private final HootMentionRepository hootMentionRepository;
 
-    private final HootCache hootCache;
+    private final HootCacheInterface hootCache;
 
     public HootRepository()
     {
@@ -39,7 +39,7 @@ public class HootRepository extends AbstractRepository<Hoot>
         this.tagRepository         = (TagRepository) ObjectManager.get(TagRepository.class);
         this.hootTagRepository     = (HootTagRepository) ObjectManager.get(HootTagRepository.class);
         this.userRepository        = (UserRepository) ObjectManager.get(UserRepository.class);
-        this.hootCache             = (HootCache) ObjectManager.get(HootCache.class);
+        this.hootCache             = (HootCacheInterface) ObjectManager.get(HootCacheInterface.class);
     }
 
     public Hoot getById(Integer id) throws EntityNotFoundException
@@ -61,7 +61,8 @@ public class HootRepository extends AbstractRepository<Hoot>
 
             for (Interaction interaction : Interaction.values()) {
                 String reaction = interaction.toString();
-                String q = "count(CASE WHEN ia.interaction = '" + reaction + "' THEN 1 END) AS '" + reaction + "'";
+                String q = "count(CASE WHEN ia.interaction = '" + reaction + "' THEN 1 END) AS '" + reaction
+                           + "'";
                 queryBuilder.SELECT.add(q);
             }
 
@@ -372,7 +373,7 @@ public class HootRepository extends AbstractRepository<Hoot>
                 imageHoot.tags = this.getTags(imageHoot);
 
                 for (Interaction interaction : Interaction.values()) {
-                    imageHoot.reactionCount.put(interaction, (int) resultRow.get(interaction.toString()));
+                    imageHoot.reactionCount.put(interaction, (Long) resultRow.get(interaction.toString()));
                 }
 
                 return imageHoot;
@@ -387,7 +388,7 @@ public class HootRepository extends AbstractRepository<Hoot>
                 postHoot.tags = this.getTags(postHoot);
 
                 for (Interaction interaction : Interaction.values()) {
-                    postHoot.reactionCount.put(interaction, (int) resultRow.get(interaction.toString()));
+                    postHoot.reactionCount.put(interaction, (Long) resultRow.get(interaction.toString()));
                 }
 
                 return postHoot;
@@ -402,7 +403,7 @@ public class HootRepository extends AbstractRepository<Hoot>
                 commentHoot.tags = this.getTags(commentHoot);
 
                 for (Interaction interaction : Interaction.values()) {
-                    commentHoot.reactionCount.put(interaction, (int) resultRow.get(interaction.toString()));
+                    commentHoot.reactionCount.put(interaction, (Long) resultRow.get(interaction.toString()));
                 }
 
                 return commentHoot;
