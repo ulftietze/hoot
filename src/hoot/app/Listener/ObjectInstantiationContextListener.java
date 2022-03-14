@@ -2,10 +2,7 @@ package hoot.app.Listener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hoot.app.Factory.*;
-import hoot.model.cache.HootCacheInterface;
-import hoot.model.cache.HootRedisCache;
-import hoot.model.cache.UserCacheInterface;
-import hoot.model.cache.UserRedisCache;
+import hoot.model.cache.*;
 import hoot.system.Filesystem.FileHandler;
 import hoot.system.Filesystem.MediaFileHandler;
 import hoot.system.Logger.ContextLogger;
@@ -49,7 +46,7 @@ public class ObjectInstantiationContextListener implements ServletContextListene
         // Cache
         //ObjectManager.set(UserCacheInterface.class, UserCache.class);
         ObjectManager.set(UserCacheInterface.class, UserRedisCache.class);
-        //ObjectManager.set(HootCacheInterface.class, HootCache.class);
-        ObjectManager.set(HootCacheInterface.class, HootRedisCache.class);
+        ObjectManager.set(HootCacheInterface.class, HootCache.class);
+        //ObjectManager.set(HootCacheInterface.class, HootRedisCache.class);
     }
 }

@@ -28,6 +28,8 @@ public class CacheManager
         List<String> cacheKeys = this.redisManager.getKeysByPattern(AbstractRedisCache.PREFIX + "*");
         this.redisManager.delete(cacheKeys);
         this.caches.forEach((s, c) -> c.clean());
+
+        System.gc();
     }
 
     public void cleanCache(String ...cacheIdentifier)
@@ -44,5 +46,7 @@ public class CacheManager
 
             this.caches.get(cacheId).clean();
         }
+
+        System.gc();
     }
 }

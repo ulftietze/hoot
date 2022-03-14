@@ -30,19 +30,27 @@ public class StatementFetcher
         Instant start = Instant.now();
 
         var       fetchData = (QueryResult) ObjectManager.create(QueryResult.class);
-        ResultSet resultSet = statement.executeQuery();
+        ResultSet resultSet = null;
 
-        Duration executionTime = Duration.between(start, Instant.now());
-        if (executionTime.toMillis() > 1000) {
-            logger.log("Slow Query Detected Duration: " + executionTime.toMillis());
+        try {
+            resultSet = statement.executeQuery();
+
+            Duration executionTime = Duration.between(start, Instant.now());
+            if (executionTime.toMillis() > 1000) {
+                logger.log("Slow Query Detected Duration: " + executionTime.toMillis());
+            }
+
+            while (resultSet.next()) {
+                fetchData.add(this.mapRow(resultSet));
+            }
+        } catch (Throwable t) {
+            throw t;
+        } finally {
+            if (resultSet != null) {
+                resultSet.close();
+            }
+            statement.close();
         }
-
-        while (resultSet.next()) {
-            fetchData.add(this.mapRow(resultSet));
-        }
-
-        resultSet.close();
-        statement.close();
 
         return fetchData;
     }

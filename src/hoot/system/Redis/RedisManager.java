@@ -74,8 +74,6 @@ public class RedisManager
             this.logger.logException("Could not load keys by pattern " + keyPattern + ": " + e.getMessage(), e);
         }
 
-        this.logger.log("Size [" + keyPattern + "] => " + matchingKeys.size());
-
         return matchingKeys;
     }
 
