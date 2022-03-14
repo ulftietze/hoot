@@ -204,24 +204,24 @@ public class HistoryRepository extends AbstractRepository<History>
 
         history.id                        = (Long) resultRow.get("History.id");
         history.timestamp                 = this.getLocalDateTimeFromSQLTimestamp(timestamp);
-        history.currentLoggedIn           = (int) resultRow.get("currentLoggedIn");
-        history.loginsPerSixHours         = (Integer) resultRow.get("loginsPerSixHours");
-        history.registrationsPerSixHours  = (Long) resultRow.get("registrationsPerSixHours");
-        history.postsPerMinute            = (float) resultRow.get("postsPerMinute");
+        history.currentLoggedIn           = (int) resultRow.get("History.currentLoggedIn");
+        history.loginsPerSixHours         = (Integer) resultRow.get("History.loginsPerSixHours");
+        history.registrationsPerSixHours  = (Long) resultRow.get("History.registrationsPerSixHours");
+        history.postsPerMinute            = (float) resultRow.get("History.postsPerMinute");
         history.trendingHashtags          = History.getTrendingHashtagsFromCommaSeparatedTags(trendingHashtags);
-        history.requestsPerSecond         = (int) resultRow.get("requestsPerSecond");
-        history.requestsLoggedInPerSecond = (float) resultRow.get("requestsLoggedInPerSecond");
-        history.currentlyRegisteredUsers  = (Long) resultRow.get("currentlyRegisteredUsers");
-        history.systemLoadAverage         = (double) resultRow.get("systemLoadAverage");
-        history.systemCPULoad             = (double) resultRow.get("systemCPULoad");
-        history.processCPULoad            = (double) resultRow.get("processCPULoad");
-        history.threadCount               = (int) resultRow.get("threadCount");
-        history.threadCountTotal          = (Long) resultRow.get("threadCountTotal");
+        history.requestsPerSecond         = (int) resultRow.get("History.requestsPerSecond");
+        history.requestsLoggedInPerSecond = (float) resultRow.get("History.requestsLoggedInPerSecond");
+        history.currentlyRegisteredUsers  = (Long) resultRow.get("History.currentlyRegisteredUsers");
+        history.systemLoadAverage         = (double) resultRow.get("History.systemLoadAverage");
+        history.systemCPULoad             = (double) resultRow.get("History.systemCPULoad");
+        history.processCPULoad            = (double) resultRow.get("History.processCPULoad");
+        history.threadCount               = (int) resultRow.get("History.threadCount");
+        history.threadCountTotal          = (Long) resultRow.get("History.threadCountTotal");
 
-        String workload  = (String) resultRow.get("workload");
-        String queueSize = (String) resultRow.get("queueSize");
-        String cacheSize = (String) resultRow.get("cacheSize");
-        String durations = (String) resultRow.get("requestDurations");
+        String workload  = (String) resultRow.get("History.workload");
+        String queueSize = (String) resultRow.get("History.queueSize");
+        String cacheSize = (String) resultRow.get("History.cacheSize");
+        String durations = (String) resultRow.get("History.requestDurations");
 
         try {
             history.workload         = (CollectorResult) this.serializer.deserialize(workload, CollectorResult.class);

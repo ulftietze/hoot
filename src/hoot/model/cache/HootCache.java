@@ -17,8 +17,11 @@ public class HootCache extends AbstractCache<Hoot> implements HootCacheInterface
     @Override
     public synchronized Hoot get(Integer id)
     {
-        CacheObject cacheObject = this.idLookupMap.get(id);
-        return this.getTypeFromCacheObject(cacheObject);
+        // CacheObject cacheObject = this.idLookupMap.get(id);
+        //return this.getTypeFromCacheObject(cacheObject);
+
+        // TODO: There is an error during deserialization :(
+        return null;
     }
 
     @Override
@@ -45,6 +48,13 @@ public class HootCache extends AbstractCache<Hoot> implements HootCacheInterface
             this.timedDeleteMap.get(cacheObject.getDestroyTimestamp()).remove(cacheObject);
             this.removeReferences(cacheObject.getObject());
         }
+    }
+
+    @Override
+    public void clean()
+    {
+        this.idLookupMap.forEach((k, c) -> this.timedDeleteMap.get(c.getDestroyTimestamp()).remove(c));
+        this.idLookupMap.clear();
     }
 
     @Override

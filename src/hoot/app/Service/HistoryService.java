@@ -74,16 +74,16 @@ public class HistoryService implements ServiceInterface
 
             entity.trendingHashtags = (ArrayList<Tag>) mostUsedTags.get("popularTags");
 
-            this.logger.log("\n"
-                + "LoginsPerPeriod: " + logins.get("LoginsPerPeriod") + "\n"
-                + "Currently Registered User: " + entity.currentlyRegisteredUsers + "\n"
-                + "Registrations in Period: " + registrations.get("Registrations in Period") + "\n"
-                + "Currently Logged In: " + requests.get("Currently Logged In") + "\n"
-                + "Requests Per Second: " + requests.get("Requests Per Second") + "\n"
-                + "AvgDurations: " + this.serializer.serialize(avgReqDuration) + "\n"
-                + "Queue Sizes: " + this.serializer.serialize(queueSizes) + "\n"
-                + "Cache Sizes: " + this.serializer.serialize(cacheSizes) + "\n"
-            );
+            //this.logger.log("\n"
+            //                + "LoginsPerPeriod: " + logins.get("LoginsPerPeriod") + "\n"
+            //                + "Currently Registered User: " + entity.currentlyRegisteredUsers + "\n"
+            //                + "Registrations in Period: " + registrations.get("Registrations in Period") + "\n"
+            //                + "Currently Logged In: " + requests.get("Currently Logged In") + "\n"
+            //                + "Requests Per Second: " + requests.get("Requests Per Second") + "\n"
+            //                + "AvgDurations: " + this.serializer.serialize(avgReqDuration) + "\n"
+            //                + "Queue Sizes: " + this.serializer.serialize(queueSizes) + "\n"
+            //                + "Cache Sizes: " + this.serializer.serialize(cacheSizes) + "\n"
+            //);
 
             try {
                 historyRepository.save(entity);

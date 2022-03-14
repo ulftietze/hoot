@@ -58,6 +58,14 @@ public class UserCache extends AbstractCache<User> implements UserCacheInterface
     }
 
     @Override
+    public void clean()
+    {
+        this.idLookupMap.forEach((k, c) -> this.timedDeleteMap.get(c.getDestroyTimestamp()).remove(c));
+        this.idLookupMap.clear();
+        this.usernameLookupMap.clear();
+    }
+
+    @Override
     public Integer getSize()
     {
         return this.idLookupMap.size();

@@ -29,7 +29,7 @@ CREATE TABLE History
     systemCPULoad             DOUBLE UNSIGNED NOT NULL DEFAULT 0,
     processCPULoad            DOUBLE UNSIGNED NOT NULL DEFAULT 0,
     threadCount               INT UNSIGNED    NOT NULL DEFAULT 0,
-    threadCountTotal          INT UNSIGNED    NOT NULL DEFAULT 0,
+    threadCountTotal          BIGINT UNSIGNED NOT NULL DEFAULT 0,
     workload                  VARCHAR(2047)   NOT NULL DEFAULT '',
     queueSize                 VARCHAR(191)    NOT NULL DEFAULT '',
     cacheSize                 VARCHAR(191)    NOT NULL DEFAULT '',

@@ -26,14 +26,18 @@ public class MonitorGraphCreationService implements ServiceInterface
     @Override
     public void execute()
     {
-        HistorySearchCriteria historySearchCriteria = this.createHistorySearchCriteria();
-        historySearchCriteria.secondsToLoad = 3600; // 1 hour
-
         try {
-            ArrayList<History> historyList = historyRepository.getList(historySearchCriteria);
-            this.drawGraphs(historyList);
-        } catch (EntityNotFoundException e) {
-            this.logger.log("Could not get List of History Objects");
+            HistorySearchCriteria historySearchCriteria = this.createHistorySearchCriteria();
+            historySearchCriteria.secondsToLoad = 3600; // 1 hour
+
+            try {
+                ArrayList<History> historyList = historyRepository.getList(historySearchCriteria);
+                this.drawGraphs(historyList);
+            } catch (EntityNotFoundException e) {
+                this.logger.log("Could not get List of History Objects");
+            }
+        } catch (Throwable t) {
+            this.logger.logException("Could not monitor History: " + t.getMessage(), t);
         }
     }
 
@@ -46,7 +50,7 @@ public class MonitorGraphCreationService implements ServiceInterface
                 } catch (Throwable t) {
                     this.logger.logException("Could not create Graph " + graphType.name(), t);
                 }
-            });
+            }).start();
         }
     }
 

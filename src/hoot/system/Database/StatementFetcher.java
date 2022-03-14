@@ -69,7 +69,7 @@ public class StatementFetcher
                 column = metaData.getColumnLabel(i);
             }
 
-            this.debugResultSet(resultSet, i, column);
+            //this.debugResultSet(resultSet, i, column);
 
             //if (row.containsKey(column)) {
             //    throw new SQLException("Column " + column + " is represented at least twice.");
