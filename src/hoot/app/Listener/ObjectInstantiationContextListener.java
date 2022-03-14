@@ -45,8 +45,10 @@ public class ObjectInstantiationContextListener implements ServletContextListene
 
         // Cache
         //ObjectManager.set(UserCacheInterface.class, UserCache.class);
-        ObjectManager.set(UserCacheInterface.class, UserRedisCache.class);
-        ObjectManager.set(HootCacheInterface.class, HootCache.class);
+        //ObjectManager.set(UserCacheInterface.class, UserRedisCache.class);
+        ObjectManager.set(UserCacheInterface.class, UserEmptyCache.class);
+        //ObjectManager.set(HootCacheInterface.class, HootCache.class);
         //ObjectManager.set(HootCacheInterface.class, HootRedisCache.class);
+        ObjectManager.set(HootCacheInterface.class, HootEmptyCache.class);
     }
 }
