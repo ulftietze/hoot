@@ -3,7 +3,7 @@ import exec from "k6/execution";
 import {SharedArray} from "k6/data";
 
 let size = 1000;
-let vus  = 20;
+let vus  = 50;
 
 const data = new SharedArray("my dataset", function () {
     let data = [];
@@ -16,13 +16,13 @@ const data = new SharedArray("my dataset", function () {
 export const options = {
     scenarios: {
         "use-all-the-data": {
-            executor: "shared-iterations", vus: vus, iterations: data.length, maxDuration: "1h"
+            executor: "shared-iterations", vus: vus, duration: "3m"
         }
     }
 }
 
 export default function () {
-    let item = data[exec.scenario.iterationInTest];
+    let item = data[Math.floor(Math.random() * data.length)];
     let random = Math.floor(Math.random() * data.length);
 
     let dataPost = {content: `RandomZahlenLOL #randomZahl #${random}`, onlyFollower: true}
