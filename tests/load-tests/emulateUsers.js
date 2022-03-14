@@ -16,7 +16,7 @@ const data = new SharedArray("my dataset", function () {
 export const options = {
     scenarios: {
         "use-all-the-data": {
-            executor: "shared-iterations", vus: vus, duration: "3m"
+            executor: "constant-vus", vus: vus, duration: "3m"
         }
     }
 }
