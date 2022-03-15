@@ -10,7 +10,6 @@
               maxTotal="200"
               removeAbandoned="true"
               logAbandoned="true"
-              removeAbandonedTimeout="60"
               username="__MARIA_USER__"
               password="__MARIA_PWD__"
               driverClassName="org.mariadb.jdbc.Driver"

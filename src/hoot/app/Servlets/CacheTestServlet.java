@@ -54,9 +54,13 @@ public class CacheTestServlet extends AbstractApiServlet
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
+        UserCacheInterface currentUserCache = (UserCacheInterface) ObjectManager.get(UserCacheInterface.class);
+        HootCacheInterface currentHootCache = (HootCacheInterface) ObjectManager.get(HootCacheInterface.class);
+
         try {
             HashMap<String, Long> res = new HashMap<>();
-            int amount                = 1000;
+            int userAmount                = 1000;
+            int hootAmount                = 30000;
 
             this.cacheManager.flushCache();
             this.userCacheRedis.clean();
@@ -71,14 +75,14 @@ public class CacheTestServlet extends AbstractApiServlet
 
             // USER
             Instant start = Instant.now();
-            for (int i = 1; i <= amount; i++) {
+            for (int i = 1; i <= userAmount; i++) {
                 this.userRepository.getById(i);
             }
             Duration d = Duration.between(start, Instant.now());
             this.logger.log("[REDIS] User -> Load from Database and fill cache: " + d.toMillis());
             res.put        ("[REDIS] User -> Load from Database and fill cache: ", d.toMillis());
             start = Instant.now();
-            for (int i = 1; i <= amount; i++) {
+            for (int i = 1; i <= userAmount; i++) {
                 this.userRepository.getById(i);
             }
             d = Duration.between(start, Instant.now());
@@ -87,14 +91,14 @@ public class CacheTestServlet extends AbstractApiServlet
 
             // Hoot
             start = Instant.now();
-            for (int i = 1; i <= amount; i++) {
+            for (int i = 1; i <= hootAmount; i++) {
                 this.hootRepository.getById(i);
             }
             d = Duration.between(start, Instant.now());
             this.logger.log("[REDIS] Hoot -> Load from Database and fill cache: " + d.toMillis());
             res.put        ("[REDIS] Hoot -> Load from Database and fill cache: ", d.toMillis());
             start = Instant.now();
-            for (int i = 1; i <= amount; i++) {
+            for (int i = 1; i <= hootAmount; i++) {
                 this.hootRepository.getById(i);
             }
             d = Duration.between(start, Instant.now());
@@ -110,14 +114,14 @@ public class CacheTestServlet extends AbstractApiServlet
 
             // USER
             start = Instant.now();
-            for (int i = 1; i <= amount; i++) {
+            for (int i = 1; i <= userAmount; i++) {
                 this.userRepository.getById(i);
             }
             d = Duration.between(start, Instant.now());
             this.logger.log("[IN MEMORY] User -> Load from Database and fill cache: " + d.toMillis());
             res.put        ("[IN MEMORY] User -> Load from Database and fill cache: ", d.toMillis());
             start = Instant.now();
-            for (int i = 1; i <= amount; i++) {
+            for (int i = 1; i <= userAmount; i++) {
                 this.userRepository.getById(i);
             }
             d = Duration.between(start, Instant.now());
@@ -126,14 +130,14 @@ public class CacheTestServlet extends AbstractApiServlet
 
             // Hoot
             start = Instant.now();
-            for (int i = 1; i <= amount; i++) {
+            for (int i = 1; i <= hootAmount; i++) {
                 this.hootRepository.getById(i);
             }
             d = Duration.between(start, Instant.now());
             this.logger.log("[IN MEMORY] Hoot -> Load from Database and fill cache: " + d.toMillis());
             res.put        ("[IN MEMORY] Hoot -> Load from Database and fill cache: ", d.toMillis());
             start = Instant.now();
-            for (int i = 1; i <= amount; i++) {
+            for (int i = 1; i <= hootAmount; i++) {
                 this.hootRepository.getById(i);
             }
             d = Duration.between(start, Instant.now());
@@ -148,7 +152,7 @@ public class CacheTestServlet extends AbstractApiServlet
 
             // USER
             start = Instant.now();
-            for (int i = 1; i <= amount; i++) {
+            for (int i = 1; i <= userAmount; i++) {
                 this.userRepository.getById(i);
             }
             d = Duration.between(start, Instant.now());
@@ -157,7 +161,7 @@ public class CacheTestServlet extends AbstractApiServlet
 
             // Hoot
             start = Instant.now();
-            for (int i = 1; i <= amount; i++) {
+            for (int i = 1; i <= hootAmount; i++) {
                 this.hootRepository.getById(i);
             }
             d = Duration.between(start, Instant.now());
@@ -168,6 +172,9 @@ public class CacheTestServlet extends AbstractApiServlet
             this.sendResponse(response, HttpServletResponse.SC_OK, this.serialize(res));
         } catch (Throwable e) {
             throw new ServletException("Noped out: " + e.getMessage());
+        } finally {
+            ObjectManager.set(UserCacheInterface.class, currentUserCache);
+            ObjectManager.set(HootCacheInterface.class, currentHootCache);
         }
     }
 }
