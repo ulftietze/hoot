@@ -44,10 +44,10 @@ public class ObjectInstantiationContextListener implements ServletContextListene
         ObjectManager.setFactory(Redis.class, new RedisFactory(context));
 
         // Cache
-        ObjectManager.set(UserCacheInterface.class, UserEmptyCache.class);
-        ObjectManager.set(HootCacheInterface.class, HootEmptyCache.class);
-        //ObjectManager.set(UserCacheInterface.class, UserCache.class);
-        //ObjectManager.set(HootCacheInterface.class, HootCache.class);
+        //ObjectManager.set(UserCacheInterface.class, UserEmptyCache.class);
+        //ObjectManager.set(HootCacheInterface.class, HootEmptyCache.class);
+        ObjectManager.set(UserCacheInterface.class, UserCache.class);
+        ObjectManager.set(HootCacheInterface.class, HootCache.class);
         //ObjectManager.set(UserCacheInterface.class, UserRedisCache.class);
         //ObjectManager.set(HootCacheInterface.class, HootRedisCache.class);
     }
