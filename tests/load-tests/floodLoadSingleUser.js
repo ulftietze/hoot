@@ -10,7 +10,7 @@ export let options = {
 
 export default function() {
     let url = `https://informatik.hs-bremerhaven.de/${__ENV.USER}-java/api/V1/`
-    let res = http.get(`${url}hoot/timeline/global?lastPostId=100&quantity=50`);
+    let res = http.get(`${url}api/V1/user?id=5`);
     check(res, {
         'is status 200': (r) => r.status === 200,
     });
