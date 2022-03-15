@@ -17,7 +17,7 @@ const data = new SharedArray("my dataset", function () {
 export const options = {
     scenarios: {
         "use-all-the-data": {
-            executor: "shared-iterations", vus: vus, iterations: 1, maxDuration: "3m"
+            executor: "shared-iterations", vus: vus, iterations: 3000, maxDuration: "3m"
         }
     }
 }
@@ -50,7 +50,6 @@ export default function () {
     res.push(http.get(`${url}hoot/timeline/global?lastPostId=50&quantity=50`));
     res.push(http.post(`${url}hoot/image`, JSON.stringify(dataImage), {headers: {'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8'}}));
     res.push(http.get(`${url}hoot/timeline/mine?lastPostId=50&quantity=50`));
-    res.push(http.post(`${url}hoot/comment`, JSON.stringify(dataComment), {headers: {'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8'}}));
     res.push(http.get(`${url}hoot/timeline/global?lastPostId=100&quantity=50`));
     res.push(http.get(`${url}hoot/timeline/mine?lastPostId=100&quantity=50`));
     res.push(http.get(`${url}hoot/timeline/global?lastPostId=200&quantity=50`));
