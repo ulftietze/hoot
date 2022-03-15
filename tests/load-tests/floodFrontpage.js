@@ -3,13 +3,14 @@ import { check } from 'k6';
 
 export let options = {
     vus: '50',
-    duration: '180s',
+    duration: '120s',
     //iterations    : '300000',
     noCookiesReset: true,
 };
 
 export default function() {
-    let res = http.get('https://informatik.hs-bremerhaven.de/docker-swe3-21-team-d-java/hello-world');
+    let url = `https://informatik.hs-bremerhaven.de/${__ENV.USER}-java/hello-world`
+    let res = http.get(url);
     check(res, {
         'is status 200': (r) => r.status === 200,
     });
