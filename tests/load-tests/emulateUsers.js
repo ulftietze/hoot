@@ -4,7 +4,7 @@ import { check } from "k6";
 import {SharedArray} from "k6/data";
 
 let size = 1000;
-let vus  = 1;
+let vus  = 50;
 
 const data = new SharedArray("my dataset", function () {
     let data = [];
