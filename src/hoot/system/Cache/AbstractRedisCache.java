@@ -40,7 +40,9 @@ public abstract class AbstractRedisCache<Type>
 
     protected void delete(String key)
     {
-        this.redisManager.delete(PREFIX + key);
+        if (key != null) {
+            this.redisManager.delete(PREFIX + key);
+        }
     }
 
     protected Object loadRedisResult(String key, Class<Type> targetClass)

@@ -10,7 +10,7 @@ import java.util.Objects;
 
 public class StatementFetcher
 {
-    public QueryResultRow fetchOne(PreparedStatement statement) throws SQLException
+    public synchronized QueryResultRow fetchOne(PreparedStatement statement) throws SQLException
     {
         ResultSet resultSet = statement.executeQuery();
         resultSet.next();
@@ -23,7 +23,7 @@ public class StatementFetcher
         return row;
     }
 
-    public QueryResult fetchAll(PreparedStatement statement) throws SQLException
+    public synchronized QueryResult fetchAll(PreparedStatement statement) throws SQLException
     {
         LoggerInterface logger = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
 
@@ -55,7 +55,7 @@ public class StatementFetcher
         return fetchData;
     }
 
-    public int executeUpdate(PreparedStatement statement) throws SQLException
+    public synchronized int executeUpdate(PreparedStatement statement) throws SQLException
     {
         int rowCount = statement.executeUpdate();
         statement.close();
