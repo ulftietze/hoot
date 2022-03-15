@@ -23,8 +23,8 @@ export const options = {
 }
 
 export default function () {
-    let item = data[Math.floor(Math.random() * data.length)];
-    let random = Math.floor(Math.random() * data.length);
+    let randomUser = data[Math.floor(Math.random() * (data.length - 1)) + 1];
+    let random = Math.floor(Math.random() * (data.length - 1)) + 1;
 
     let dataPost = {content: `RandomZahlenLOL #randomZahl #${random}`, onlyFollower: true}
     let dataImage = { content: "testImage", imageFilename: "image/testImage.png", image: "String,String", onlyFollower: true}
@@ -34,7 +34,7 @@ export default function () {
 
     let res = [];
 
-    res.push(http.post(`${url}login`, JSON.stringify(item), {headers: {'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8'}}));
+    res.push(http.post(`${url}login`, JSON.stringify(randomUser), {headers: {'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8'}}));
     res.push(http.get(`${url}user?id=${random}`));
     res.push(http.get(`${url}hoot/search?quantity=50&userId=${random}`));
     res.push(http.get(`${url}user/follower?userId=${random}&quantity=50`));

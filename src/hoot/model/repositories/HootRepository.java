@@ -221,7 +221,7 @@ public class HootRepository extends AbstractRepository<Hoot>
      * @throws CouldNotSaveException if the Hoot could not be saved
      */
     @Override
-    public synchronized void save(Hoot hoot) throws CouldNotSaveException
+    public void save(Hoot hoot) throws CouldNotSaveException
     {
         if (hoot.id == null) {
             if (hoot.user != null && hoot.user.id != null) {
