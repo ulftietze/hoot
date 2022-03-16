@@ -8,9 +8,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import hoot.model.entities.*;
-import hoot.system.Logger.LoggerInterface;
-import hoot.system.ObjectManager.ObjectManager;
-import hoot.system.Serializer.Serializer;
 
 import java.io.IOException;
 
@@ -21,26 +18,24 @@ public class HootDeserializer extends StdDeserializer<Hoot>
         this(null);
     }
 
-    public HootDeserializer(Class<?> vc) {
+    public HootDeserializer(Class<?> vc)
+    {
         super(vc);
     }
 
     @Override
     public Hoot deserialize(JsonParser jsonParser, DeserializationContext context) throws IOException, JacksonException
     {
-        Serializer serializer = (Serializer) ObjectManager.get(Serializer.class);
-        JsonNode node = jsonParser.getCodec().readTree(jsonParser);
+        ObjectMapper mapper = (ObjectMapper) jsonParser.getCodec();
+        JsonNode     tree   = mapper.readTree(jsonParser);
 
-        //LoggerInterface logger = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
-        //logger.log("LOG: " + node.toPrettyString());
-
-        switch (HootType.valueOf(node.get("hootType").asText())) {
+        switch (HootType.valueOf(tree.get("hootType").asText())) {
             case Post:
-                return (Hoot) serializer.deserialize(node.toString(), Post.class);
+                return mapper.treeToValue(tree, Post.class);
             case Comment:
-                return (Hoot) serializer.deserialize(node.toString(), Comment.class);
+                return mapper.treeToValue(tree, Comment.class);
             case Image:
-                return (Hoot) serializer.deserialize(node.toString(), Image.class);
+                return mapper.treeToValue(tree, Image.class);
         }
 
         throw new JsonParseException(jsonParser, "No matching hoot type found.");

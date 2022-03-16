@@ -18,6 +18,6 @@ public class HttpRequestDurationPublisher implements PublisherInterface
     @Override
     public void publish(Object queueData)
     {
-        new Thread(() -> this.queueManager.add(QUEUE_ID, queueData)).start();
+        this.queueManager.add(QUEUE_ID, queueData);
     }
 }

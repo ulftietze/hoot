@@ -8,6 +8,6 @@ public class User implements Serializable
     public Integer id;
     public Long    followerCount, followsCount;
     public String username, imagePath;
-    public transient String        passwordHash;
-    public           LocalDateTime lastLogin, created;
+    public String        passwordHash;
+    public LocalDateTime lastLogin, created;
 }

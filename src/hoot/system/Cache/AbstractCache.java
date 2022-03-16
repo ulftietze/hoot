@@ -35,7 +35,13 @@ public abstract class AbstractCache<Type>
     protected synchronized Type getTypeFromCacheObject(CacheObject cacheObject)
     {
         if (cacheObject != null) {
-            this.timedDeleteMap.get(cacheObject.getDestroyTimestamp()).remove(cacheObject);
+            ArrayList<CacheObject> timeDelMap = this.timedDeleteMap.get(cacheObject.getDestroyTimestamp());
+            timeDelMap.remove(cacheObject);
+
+            if (timeDelMap.isEmpty()) {
+                this.timedDeleteMap.remove(cacheObject.getDestroyTimestamp());
+            }
+
             Type object = cacheObject.getObject();
             this.putInTimedDeleteMap(cacheObject);
             return object;
