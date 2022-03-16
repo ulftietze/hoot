@@ -2,6 +2,7 @@ package hoot.app.Servlets;
 
 import hoot.app.Servlets.Api.V1.AbstractApiServlet;
 import hoot.model.cache.*;
+import hoot.model.entities.Hoot;
 import hoot.model.repositories.HootRepository;
 import hoot.model.repositories.UserRepository;
 import hoot.system.Cache.CacheManager;
@@ -15,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 @WebServlet("/api/V1/cache")
@@ -59,8 +61,8 @@ public class CacheTestServlet extends AbstractApiServlet
 
         try {
             HashMap<String, Long> res = new HashMap<>();
-            int userAmount                = 1000;
-            int hootAmount                = 30000;
+            int userAmount            = 1000;
+            int hootAmount            = 30000;
 
             this.cacheManager.flushCache();
             this.userCacheRedis.clean();
@@ -136,13 +138,21 @@ public class CacheTestServlet extends AbstractApiServlet
             d = Duration.between(start, Instant.now());
             this.logger.log("[IN MEMORY] Hoot -> Load from Database and fill cache: " + d.toMillis());
             res.put        ("[IN MEMORY] Hoot -> Load from Database and fill cache: ", d.toMillis());
+            ArrayList<Hoot> l = new ArrayList<>();
             start = Instant.now();
             for (int i = 1; i <= hootAmount; i++) {
-                this.hootRepository.getById(i);
+                l.add(this.hootRepository.getById(i));
             }
             d = Duration.between(start, Instant.now());
             this.logger.log("[IN MEMORY] Hoot -> Load from Cache and deserialize: " + d.toMillis());
             res.put        ("[IN MEMORY] Hoot -> Load from Cache and deserialize: ", d.toMillis());
+            start = Instant.now();
+            for (Hoot h : l) {
+                this.serialize(h);
+            }
+            d = Duration.between(start, Instant.now());
+            this.logger.log("[SERIALIZE] Cached Hoots: " + d.toMillis());
+            res.put        ("[SERIALIZE] Cached Hoots: ", d.toMillis());
             // ############################################################### //
 
             // ############################################################### //
