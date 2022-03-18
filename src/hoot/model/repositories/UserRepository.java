@@ -10,7 +10,8 @@ import hoot.system.Database.QueryResultRow;
 import hoot.system.Exception.CouldNotDeleteException;
 import hoot.system.Exception.CouldNotSaveException;
 import hoot.system.Exception.EntityNotFoundException;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.Inject;
+import hoot.system.objects.ObjectManager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -20,17 +21,8 @@ import java.util.ArrayList;
 
 public class UserRepository extends AbstractRepository<User>
 {
-    private final UserCacheInterface userCache;
-
-    private final FollowerRepository followerRepository;
-
-    public UserRepository()
-    {
-        super();
-
-        this.followerRepository = (FollowerRepository) ObjectManager.get(FollowerRepository.class);
-        this.userCache          = (UserCacheInterface) ObjectManager.get(UserCacheInterface.class);
-    }
+    @Inject private UserCacheInterface userCache;
+    @Inject private FollowerRepository followerRepository;
 
     /**
      * Try to return a User object representing the database entry with the given id.

@@ -1,7 +1,7 @@
 package hoot.app.Servlets.Api.V1;
 
 import hoot.system.Filesystem.MediaFileHandler;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.ObjectManager;
 import hoot.system.Serializer.Serializer;
 
 import javax.servlet.ServletException;

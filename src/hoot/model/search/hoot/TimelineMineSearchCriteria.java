@@ -7,7 +7,7 @@ import hoot.model.search.FollowsSearchCriteria;
 import hoot.model.search.SearchCriteriaInterface;
 import hoot.system.Database.QueryBuilder;
 import hoot.system.Exception.EntityNotFoundException;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.ObjectManager;
 
 import java.sql.SQLException;
 import java.util.ArrayList;

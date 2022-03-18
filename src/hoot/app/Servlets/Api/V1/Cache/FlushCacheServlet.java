@@ -2,7 +2,7 @@ package hoot.app.Servlets.Api.V1.Cache;
 
 import hoot.app.Servlets.Api.V1.AbstractApiServlet;
 import hoot.system.Cache.CacheManager;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.ObjectManager;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

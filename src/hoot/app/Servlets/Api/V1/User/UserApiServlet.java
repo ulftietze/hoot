@@ -4,10 +4,10 @@ import hoot.app.Servlets.Api.V1.AbstractApiServlet;
 import hoot.model.entities.User;
 import hoot.model.entities.authentication.SecureUser;
 import hoot.model.repositories.UserRepository;
-import hoot.system.Annotation.AuthenticationRequired;
+import hoot.system.Security.AuthenticationRequired;
 import hoot.system.Exception.CouldNotSaveException;
 import hoot.system.Exception.EntityNotFoundException;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.ObjectManager;
 import hoot.system.Security.Hasher;
 
 import javax.servlet.ServletException;

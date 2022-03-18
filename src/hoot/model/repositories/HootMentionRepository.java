@@ -7,7 +7,7 @@ import hoot.system.Exception.CouldNotDeleteException;
 import hoot.system.Exception.CouldNotSaveException;
 import hoot.system.Exception.EntityNotFoundException;
 import hoot.system.Logger.QueryLoggerInterface;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.ObjectManager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

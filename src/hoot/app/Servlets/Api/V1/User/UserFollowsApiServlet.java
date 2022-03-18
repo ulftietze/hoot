@@ -4,9 +4,9 @@ import hoot.app.Servlets.Api.V1.AbstractApiServlet;
 import hoot.model.entities.Follower;
 import hoot.model.repositories.FollowerRepository;
 import hoot.model.search.FollowsSearchCriteria;
-import hoot.system.Annotation.AuthenticationRequired;
+import hoot.system.Security.AuthenticationRequired;
 import hoot.system.Exception.EntityNotFoundException;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.ObjectManager;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

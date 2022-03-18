@@ -1,9 +1,9 @@
 package hoot.system.Cache;
 
 import hoot.system.Logger.LoggerInterface;
-import hoot.system.ObjectManager.ObjectManager;
 import hoot.system.Redis.RedisManager;
 import hoot.system.Serializer.Serializer;
+import hoot.system.objects.Inject;
 
 import java.io.IOException;
 
@@ -11,16 +11,9 @@ public abstract class AbstractRedisCache<Type>
 {
     public static String PREFIX = "cache-";
 
-    protected final Serializer      serializer;
-    protected final LoggerInterface logger;
-    private final   RedisManager    redisManager;
-
-    public AbstractRedisCache()
-    {
-        this.serializer   = (Serializer) ObjectManager.get(Serializer.class);
-        this.redisManager = (RedisManager) ObjectManager.get(RedisManager.class);
-        this.logger       = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
-    }
+    @Inject protected Serializer      serializer;
+    @Inject protected LoggerInterface logger;
+    @Inject private   RedisManager    redisManager;
 
     protected abstract String getKey(Type type);
 

@@ -5,10 +5,10 @@ import hoot.app.Servlets.Api.V1.AbstractApiServlet;
 import hoot.model.entities.*;
 import hoot.model.query.api.IsValidUserSession;
 import hoot.model.repositories.ReactionRepository;
-import hoot.system.Annotation.AuthenticationRequired;
+import hoot.system.Security.AuthenticationRequired;
 import hoot.system.Exception.CouldNotDeleteException;
 import hoot.system.Exception.CouldNotSaveException;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.ObjectManager;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

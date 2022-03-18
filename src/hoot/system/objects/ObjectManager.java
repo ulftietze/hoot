@@ -1,10 +1,13 @@
-package hoot.system.ObjectManager;
+package hoot.system.objects;
 
 import hoot.system.Logger.LoggerInterface;
 import hoot.system.Logger.NullLogger;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,13 +30,13 @@ public class ObjectManager
      * @param className of the Object to create.
      * @return an instance of the given className. This may be a child class.
      */
-    public static Object get(Class<?> className)
+    public static Object get(Class<?> className, Object... arguments)
     {
         ObjectManager om          = ObjectManager.getInstance();
         Class<?>      actualClass = om.getActualClassToCreate(className);
 
         if (om.objectMap.get(className) == null) {
-            om.objectMap.put(className, om.create(className, actualClass));
+            om.objectMap.put(className, om.create(className, actualClass, arguments));
         }
 
         return om.objectMap.get(className);
@@ -45,32 +48,12 @@ public class ObjectManager
      * @param className of the Object to create.
      * @return an instance of the given className. This may be a child class.
      */
-    public static Object create(Class<?> className)
+    public static Object create(Class<?> className, Object... arguments)
     {
         ObjectManager om          = ObjectManager.getInstance();
         Class<?>      actualClass = om.getActualClassToCreate(className);
 
-        return om.create(className, actualClass);
-    }
-
-    /**
-     * Get an instance of an object for the given class name.
-     * When the class does not exist, try to create this. This is kind of a lazy loading the class.
-     *
-     * @param className   of the Object to create.
-     * @param newInstance Flag which determines if a new instance of an object should be created.
-     * @return an instance of the given className. This may be a child class.
-     */
-    public static Object get(Class<?> className, boolean newInstance)
-    {
-        ObjectManager om          = ObjectManager.getInstance();
-        Class<?>      actualClass = om.getActualClassToCreate(className);
-
-        if (newInstance) {
-            return om.create(className, actualClass);
-        }
-
-        return ObjectManager.get(className);
+        return om.create(className, actualClass, arguments);
     }
 
     /**
@@ -144,7 +127,7 @@ public class ObjectManager
         return actualClass != null ? actualClass : className;
     }
 
-    private Object create(Class<?> className, Class<?> actualClass)
+    private Object create(Class<?> className, Class<?> actualClass, Object... arguments)
     {
         FactoryInterface<?> factory = this.getFactoryIfExists(className, actualClass);
 
@@ -157,19 +140,70 @@ public class ObjectManager
                 throw new InstantiationException("Can't create instance.");
             }
 
+            Object instance;
+
             if (actualClass.getEnclosingClass() != null) {
-                Constructor<?> constructor = actualClass.getConstructor(actualClass.getEnclosingClass());
+                Class<?>[] argumentTypes = new Class[arguments.length];
+                argumentTypes[0] = actualClass.getEnclosingClass();
+
+                for (int i = 1; i <= arguments.length; i++) {
+                    argumentTypes[i] = arguments[i].getClass();
+                }
+
+                Object[] argumentObjects = new Object[arguments.length + 1];
+                argumentObjects[0] = ObjectManager.get(actualClass.getEnclosingClass());
+
+                System.arraycopy(arguments, 0, argumentObjects, 1, arguments.length);
+
+                Constructor<?> constructor = actualClass.getConstructor(argumentTypes);
                 constructor.setAccessible(true);
-                return constructor.newInstance(ObjectManager.get(actualClass.getEnclosingClass()));
+                instance = constructor.newInstance(argumentObjects);
+            } else {
+                Class<?>[] argumentTypes = new Class[arguments.length];
+
+                for (int i = 0; i < arguments.length; i++) {
+                    argumentTypes[i] = arguments[i].getClass();
+                }
+
+                Constructor<?> constructor = actualClass.getConstructor(argumentTypes);
+                constructor.setAccessible(true);
+                instance = constructor.newInstance(arguments);
             }
 
-            Constructor<?> constructor = actualClass.getConstructor();
-            constructor.setAccessible(true);
-            return constructor.newInstance();
+            this.injectFields(instance);
+
+            return instance;
         } catch (ReflectiveOperationException e) {
             String message = "[ERROR] Could not instantiate class " + className.getName() + ": " + e.getMessage();
             this.getLogger().logException(message, e);
             throw new RuntimeException(message);
+        }
+    }
+
+    private void injectFields(Object instance) throws IllegalAccessException
+    {
+        ArrayList<Field> declaredFields = new ArrayList<>(Arrays.asList(instance.getClass().getDeclaredFields()));
+        Class<?>         currentCass    = instance.getClass();
+
+        while (currentCass.getSuperclass() != null) {
+            currentCass = currentCass.getSuperclass();
+
+            declaredFields.addAll(Arrays.asList(currentCass.getDeclaredFields()));
+        }
+
+        for (Field field : declaredFields) {
+            if (field.getAnnotation(Inject.class) == null) {
+                continue;
+            }
+
+            Class<?> concreteClass = field.getType();
+
+            if (field.getAnnotation(Inject.class).concrete() != Object.class) {
+                concreteClass = field.getAnnotation(Inject.class).concrete();
+            }
+
+            field.setAccessible(true);
+            field.set(instance, field.getAnnotation(Inject.class).create() ? create(concreteClass) : get(concreteClass));
         }
     }
 

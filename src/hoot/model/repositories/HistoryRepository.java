@@ -9,7 +9,8 @@ import hoot.system.Exception.CouldNotDeleteException;
 import hoot.system.Exception.CouldNotSaveException;
 import hoot.system.Exception.EntityNotFoundException;
 import hoot.system.Monitoring.CollectorResult;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.Inject;
+import hoot.system.objects.ObjectManager;
 import hoot.system.Serializer.Serializer;
 
 import java.io.IOException;
@@ -18,12 +19,7 @@ import java.util.ArrayList;
 
 public class HistoryRepository extends AbstractRepository<History>
 {
-    private final Serializer serializer;
-
-    public HistoryRepository()
-    {
-        this.serializer = (Serializer) ObjectManager.get(Serializer.class);
-    }
+    @Inject private Serializer serializer;
 
     public History getById(Long id) throws EntityNotFoundException
     {

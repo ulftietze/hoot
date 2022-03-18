@@ -1,6 +1,6 @@
 package hoot.model.entities;
 
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.ObjectManager;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;

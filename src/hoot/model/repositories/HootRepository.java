@@ -11,36 +11,20 @@ import hoot.system.Database.QueryResultRow;
 import hoot.system.Exception.CouldNotDeleteException;
 import hoot.system.Exception.CouldNotSaveException;
 import hoot.system.Exception.EntityNotFoundException;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.Inject;
+import hoot.system.objects.ObjectManager;
 
 import java.sql.*;
 import java.util.ArrayList;
 
 public class HootRepository extends AbstractRepository<Hoot>
 {
-    private final MentionRepository mentionRepository;
-
-    private final TagRepository tagRepository;
-
-    private final UserRepository userRepository;
-
-    private final HootTagRepository hootTagRepository;
-
-    private final HootMentionRepository hootMentionRepository;
-
-    private final HootCacheInterface hootCache;
-
-    public HootRepository()
-    {
-        super();
-
-        this.mentionRepository     = (MentionRepository) ObjectManager.get(MentionRepository.class);
-        this.hootMentionRepository = (HootMentionRepository) ObjectManager.get(HootMentionRepository.class);
-        this.tagRepository         = (TagRepository) ObjectManager.get(TagRepository.class);
-        this.hootTagRepository     = (HootTagRepository) ObjectManager.get(HootTagRepository.class);
-        this.userRepository        = (UserRepository) ObjectManager.get(UserRepository.class);
-        this.hootCache             = (HootCacheInterface) ObjectManager.get(HootCacheInterface.class);
-    }
+    @Inject private MentionRepository     mentionRepository;
+    @Inject private TagRepository         tagRepository;
+    @Inject private UserRepository        userRepository;
+    @Inject private HootTagRepository     hootTagRepository;
+    @Inject private HootMentionRepository hootMentionRepository;
+    @Inject private HootCacheInterface    hootCache;
 
     public Hoot getById(Integer id) throws EntityNotFoundException
     {

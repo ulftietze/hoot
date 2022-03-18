@@ -1,7 +1,7 @@
 package hoot.system.Database;
 
 import hoot.system.Logger.LoggerInterface;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.ObjectManager;
 
 import java.sql.*;
 import java.time.Duration;

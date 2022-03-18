@@ -6,22 +6,19 @@ import hoot.model.repositories.HistoryRepository;
 import hoot.model.search.HistorySearchCriteria;
 import hoot.system.Exception.EntityNotFoundException;
 import hoot.system.Logger.LoggerInterface;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.Inject;
+import hoot.system.objects.ObjectManager;
 import hoot.system.Service.ServiceInterface;
 
 import java.util.ArrayList;
 
 public class MonitorGraphCreationService implements ServiceInterface
 {
-    private final HistoryRepository historyRepository;
+    @Inject
+    private HistoryRepository historyRepository;
 
-    private final LoggerInterface logger;
-
-    public MonitorGraphCreationService()
-    {
-        this.historyRepository = (HistoryRepository) ObjectManager.get(HistoryRepository.class);
-        this.logger            = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
-    }
+    @Inject
+    private LoggerInterface logger;
 
     @Override
     public void execute()

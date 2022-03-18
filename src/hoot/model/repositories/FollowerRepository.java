@@ -8,7 +8,7 @@ import hoot.system.Database.QueryResultRow;
 import hoot.system.Exception.CouldNotDeleteException;
 import hoot.system.Exception.CouldNotSaveException;
 import hoot.system.Exception.EntityNotFoundException;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.ObjectManager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -27,7 +27,7 @@ public class FollowerRepository extends AbstractRepository<Follower>
         Long followerCount = 0L;
 
         try (Connection connection = this.getConnection()) {
-            QueryBuilder queryBuilder = (QueryBuilder) ObjectManager.get(QueryBuilder.class, true);
+            QueryBuilder queryBuilder = (QueryBuilder) ObjectManager.create(QueryBuilder.class);
 
             queryBuilder.SELECT.add("COUNT(user) as quantity");
             queryBuilder.FROM = "Follower";
@@ -53,7 +53,7 @@ public class FollowerRepository extends AbstractRepository<Follower>
         Long followsCount = 0L;
 
         try (Connection connection = this.getConnection()) {
-            QueryBuilder queryBuilder = (QueryBuilder) ObjectManager.get(QueryBuilder.class, true);
+            QueryBuilder queryBuilder = (QueryBuilder) ObjectManager.create(QueryBuilder.class);
 
             queryBuilder.SELECT.add("COUNT(user) as quantity");
             queryBuilder.FROM = "Follower";

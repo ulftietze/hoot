@@ -7,7 +7,7 @@ import hoot.model.repositories.HootRepository;
 import hoot.model.repositories.UserRepository;
 import hoot.system.Cache.CacheManager;
 import hoot.system.Logger.LoggerInterface;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.ObjectManager;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

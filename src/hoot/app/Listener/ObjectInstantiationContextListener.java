@@ -9,7 +9,7 @@ import hoot.system.Logger.ContextLogger;
 import hoot.system.Logger.LoggerInterface;
 import hoot.system.Logger.NullLogger;
 import hoot.system.Logger.QueryLoggerInterface;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.ObjectManager;
 import nl.melp.redis.Redis;
 
 import javax.servlet.ServletContext;

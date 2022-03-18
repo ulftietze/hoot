@@ -8,9 +8,10 @@ import hoot.system.Exception.EntityNotFoundException;
 import hoot.system.Logger.LoggerInterface;
 import hoot.system.Monitoring.CollectorInterface;
 import hoot.system.Monitoring.CollectorResult;
-import hoot.system.ObjectManager.ObjectManager;
 import hoot.system.Queue.ConsumerInterface;
 import hoot.system.Queue.QueueManager;
+import hoot.system.objects.Inject;
+import hoot.system.objects.ObjectManager;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -25,27 +26,24 @@ public class RequestsCollector extends Thread implements CollectorInterface, Con
     public final static  String COLLECTOR_NAME                     = "RequestsCollector";
     private final static long   PERIOD_CURRENTLY_LOGGED_IN_MINUTES = 10;
 
-    private final QueueManager                           queueManager;
     private final NavigableMap<Instant, ArrayList<User>> curLoggedIn;
     private final NavigableMap<Integer, Instant>         userCurLoggedIn;
-    private final AtomicInteger                          requestsCurrentSecond;
-    private final AtomicInteger                          requestsLastSecond;
-    private final UserRepository                         userRepository;
-    private final LoggerInterface                        logger;
+
+    private final AtomicInteger requestsCurrentSecond;
+    private final AtomicInteger requestsLastSecond;
 
     private boolean running = true;
 
+    @Inject private QueueManager    queueManager;
+    @Inject private UserRepository  userRepository;
+    @Inject private LoggerInterface logger;
+
     public RequestsCollector()
     {
-        this.queueManager = (QueueManager) ObjectManager.get(QueueManager.class);
-
         this.userCurLoggedIn       = Collections.synchronizedNavigableMap(new TreeMap<>());
         this.curLoggedIn           = Collections.synchronizedNavigableMap(new TreeMap<>());
         this.requestsLastSecond    = new AtomicInteger(0);
         this.requestsCurrentSecond = new AtomicInteger(0);
-
-        this.userRepository = (UserRepository) ObjectManager.get(UserRepository.class);
-        this.logger         = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package hoot.app.Factory;
 
-import hoot.system.ObjectManager.FactoryInterface;
+import hoot.system.objects.FactoryInterface;
 
 import java.util.concurrent.Executors;
 

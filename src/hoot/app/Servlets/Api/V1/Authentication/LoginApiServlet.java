@@ -7,7 +7,7 @@ import hoot.model.query.api.GetUserIdIfValidLogin;
 import hoot.model.query.api.IsValidUserSession;
 import hoot.model.repositories.UserRepository;
 import hoot.system.Exception.CouldNotSaveException;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.ObjectManager;
 import hoot.system.Queue.QueueManager;
 
 import javax.servlet.ServletException;

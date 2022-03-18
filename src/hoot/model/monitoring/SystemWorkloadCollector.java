@@ -5,7 +5,8 @@ import hoot.system.Exception.CollectorException;
 import hoot.system.Logger.LoggerInterface;
 import hoot.system.Monitoring.CollectorInterface;
 import hoot.system.Monitoring.CollectorResult;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.Inject;
+import hoot.system.objects.ObjectManager;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -37,17 +38,15 @@ public class SystemWorkloadCollector extends Thread implements CollectorInterfac
     public final static String MEMORY_HEAP_USAGE       = "Heap Usage";
     public final static String MEMORY_NON_HEAP_USAGE   = "NonHeap Usage";
 
-    private final OperatingSystemMXBean system;
-
-    private final ThreadMXBean thread;
-
-    private final LoggerInterface logger;
-
     private final Map<String, Integer> memoryInfo;
 
-    private final MemoryMXBean memory;
+    private final OperatingSystemMXBean system;
+    private final ThreadMXBean          thread;
+    private final MemoryMXBean          memory;
 
     private boolean running = true;
+
+    @Inject private LoggerInterface logger;
 
     public SystemWorkloadCollector()
     {
@@ -55,7 +54,6 @@ public class SystemWorkloadCollector extends Thread implements CollectorInterfac
         this.system     = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
         this.memory     = ManagementFactory.getMemoryMXBean();
         this.thread     = ManagementFactory.getThreadMXBean();
-        this.logger     = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
     }
 
     @Override

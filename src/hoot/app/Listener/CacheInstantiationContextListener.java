@@ -3,7 +3,7 @@ package hoot.app.Listener;
 import hoot.model.cache.HootCacheInterface;
 import hoot.model.cache.UserCacheInterface;
 import hoot.system.Cache.CacheManager;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.ObjectManager;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;

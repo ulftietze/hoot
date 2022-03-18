@@ -1,7 +1,7 @@
 package hoot.model.search;
 
 import hoot.system.Database.QueryBuilder;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.ObjectManager;
 
 import java.sql.SQLException;
 import java.util.ArrayList;

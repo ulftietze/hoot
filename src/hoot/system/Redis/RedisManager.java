@@ -1,7 +1,7 @@
 package hoot.system.Redis;
 
 import hoot.system.Logger.LoggerInterface;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.Inject;
 import nl.melp.redis.Redis;
 
 import java.io.IOException;
@@ -11,14 +11,9 @@ import java.util.List;
 public class RedisManager
 {
     private final static int EXPIRE_IN_SECONDS = 60 * 60 * 6;
-    private final Redis           redisInstance;
-    private final LoggerInterface logger;
 
-    public RedisManager()
-    {
-        this.redisInstance = (Redis) ObjectManager.get(Redis.class);
-        this.logger        = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
-    }
+    @Inject private Redis           redisInstance;
+    @Inject private LoggerInterface logger;
 
     public synchronized boolean set(String key, String value)
     {

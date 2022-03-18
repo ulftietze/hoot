@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper.Builder;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import hoot.model.entities.Hoot;
 import hoot.model.serializer.HootDeserializer;
-import hoot.system.ObjectManager.FactoryInterface;
+import hoot.system.objects.FactoryInterface;
 
 public class JacksonSerializerFactory implements FactoryInterface<ObjectMapper>
 {

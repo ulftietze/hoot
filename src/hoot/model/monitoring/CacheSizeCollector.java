@@ -5,21 +5,15 @@ import hoot.model.cache.UserCacheInterface;
 import hoot.system.Exception.CollectorException;
 import hoot.system.Monitoring.CollectorInterface;
 import hoot.system.Monitoring.CollectorResult;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.Inject;
 
 public class CacheSizeCollector extends Thread implements CollectorInterface
 {
     public final static String COLLECTOR_NAME = "Cache Sizes";
 
-    private final UserCacheInterface userCache;
+    @Inject private UserCacheInterface userCache;
 
-    private final HootCacheInterface hootCache;
-
-    public CacheSizeCollector()
-    {
-        this.userCache = (UserCacheInterface) ObjectManager.get(UserCacheInterface.class);
-        this.hootCache = (HootCacheInterface) ObjectManager.get(HootCacheInterface.class);
-    }
+    @Inject private HootCacheInterface hootCache;
 
     @Override
     public String getCollectorName()

@@ -1,8 +1,6 @@
 package hoot.model.query.api;
 
-import hoot.system.Annotation.AuthenticationRequired;
-import hoot.system.Logger.LoggerInterface;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.Security.AuthenticationRequired;
 
 import javax.servlet.ServletException;
 

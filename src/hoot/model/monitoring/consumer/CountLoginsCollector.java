@@ -6,9 +6,10 @@ import hoot.system.Exception.CollectorException;
 import hoot.system.Logger.LoggerInterface;
 import hoot.system.Monitoring.CollectorInterface;
 import hoot.system.Monitoring.CollectorResult;
-import hoot.system.ObjectManager.ObjectManager;
 import hoot.system.Queue.ConsumerInterface;
 import hoot.system.Queue.QueueManager;
+import hoot.system.objects.Inject;
+import hoot.system.objects.ObjectManager;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -22,19 +23,18 @@ public class CountLoginsCollector extends Thread implements CollectorInterface, 
     public final static  String COLLECTOR_NAME            = "CountLogins";
     private final static long   PERIOD_LOGINS_SINCE_HOURS = 24;
 
-    private final QueueManager                           queueManager;
     private final NavigableMap<Instant, ArrayList<User>> loginsInPeriod;
     private final NavigableMap<Integer, Instant>         userLoggedInInPeriod;
-    private final LoggerInterface                        logger;
 
     private boolean running = true;
 
+    @Inject private QueueManager    queueManager;
+    @Inject private LoggerInterface logger;
+
     public CountLoginsCollector()
     {
-        this.queueManager         = (QueueManager) ObjectManager.get(QueueManager.class);
         this.loginsInPeriod       = Collections.synchronizedNavigableMap(new TreeMap<>());
         this.userLoggedInInPeriod = Collections.synchronizedNavigableMap(new TreeMap<>());
-        this.logger               = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
     }
 
     @Override

@@ -5,26 +5,19 @@ import hoot.model.entities.authentication.Login;
 import hoot.model.repositories.UserRepository;
 import hoot.system.Exception.EntityNotFoundException;
 import hoot.system.Logger.LoggerInterface;
-import hoot.system.ObjectManager.ObjectManager;
 import hoot.system.Security.Hasher;
+import hoot.system.objects.Inject;
 
 import java.security.GeneralSecurityException;
 import java.util.Objects;
 
 public class GetUserIdIfValidLogin
 {
-    private final UserRepository userRepository;
+    @Inject private UserRepository userRepository;
 
-    private final Hasher hasher;
+    @Inject private Hasher hasher;
 
-    LoggerInterface logger;
-
-    public GetUserIdIfValidLogin()
-    {
-        this.userRepository = (UserRepository) ObjectManager.get(UserRepository.class);
-        this.hasher         = (Hasher) ObjectManager.get(Hasher.class);
-        this.logger         = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
-    }
+    @Inject private LoggerInterface logger;
 
     /**
      * // TODO: Documentation
