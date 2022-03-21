@@ -1,7 +1,7 @@
 package hoot.app.Factory;
 
 import hoot.system.Filesystem.FileHandler;
-import hoot.system.ObjectManager.FactoryInterface;
+import hoot.system.objects.FactoryInterface;
 
 import javax.servlet.ServletContext;
 import java.net.MalformedURLException;

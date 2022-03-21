@@ -1,7 +1,7 @@
 package hoot.app.Servlets;
 
 import hoot.model.monitoring.Gnuplotter;
-import hoot.system.Annotation.AuthenticationRequired;
+import hoot.system.Security.AuthenticationRequired;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -9,8 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.UUID;
 
 @AuthenticationRequired(authenticationRequired = false)

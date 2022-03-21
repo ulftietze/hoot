@@ -3,7 +3,7 @@ package hoot.app.Filter;
 import hoot.model.query.api.IsAuthenticationRequired;
 import hoot.model.query.api.IsValidUserSession;
 import hoot.model.queue.publisher.HttpRequestPublisher;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.ObjectManager;
 import hoot.system.Serializer.Serializer;
 
 import javax.servlet.*;

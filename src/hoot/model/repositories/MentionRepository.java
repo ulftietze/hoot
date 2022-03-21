@@ -8,7 +8,8 @@ import hoot.system.Database.QueryResultRow;
 import hoot.system.Exception.CouldNotDeleteException;
 import hoot.system.Exception.CouldNotSaveException;
 import hoot.system.Exception.EntityNotFoundException;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.Inject;
+import hoot.system.objects.ObjectManager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,14 +18,7 @@ import java.util.ArrayList;
 
 public class MentionRepository extends AbstractRepository<Mention>
 {
-    private final UserRepository userRepository;
-
-    public MentionRepository()
-    {
-        super();
-
-        this.userRepository = (UserRepository) ObjectManager.get(UserRepository.class);
-    }
+    @Inject private UserRepository userRepository;
 
     @Override
     public ArrayList<Mention> getList(SearchCriteriaInterface searchCriteria) throws EntityNotFoundException

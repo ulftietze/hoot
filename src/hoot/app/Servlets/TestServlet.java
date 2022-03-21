@@ -2,9 +2,9 @@ package hoot.app.Servlets;
 
 import hoot.model.entities.User;
 import hoot.model.repositories.UserRepository;
-import hoot.system.Annotation.AuthenticationRequired;
+import hoot.system.Security.AuthenticationRequired;
 import hoot.system.Exception.EntityNotFoundException;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.ObjectManager;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;

@@ -11,7 +11,7 @@ import hoot.model.monitoring.consumer.CountRegistrationsCollector;
 import hoot.model.monitoring.consumer.RequestDurationCollector;
 import hoot.model.monitoring.consumer.RequestsCollector;
 import hoot.system.Monitoring.Monitor;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.ObjectManager;
 import hoot.system.Service.ServiceInterface;
 
 import javax.servlet.ServletContextEvent;

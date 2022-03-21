@@ -1,4 +1,4 @@
-package hoot.system.ObjectManager;
+package hoot.system.objects;
 
 public interface FactoryInterface<Type>
 {

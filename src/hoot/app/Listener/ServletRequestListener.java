@@ -2,7 +2,7 @@ package hoot.app.Listener;
 
 import hoot.model.queue.publisher.HttpRequestDurationPublisher;
 import hoot.system.Logger.LoggerInterface;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.ObjectManager;
 import hoot.system.util.Pair;
 
 import javax.servlet.ServletRequestEvent;

@@ -6,7 +6,7 @@ import hoot.model.repositories.HootRepository;
 import hoot.model.search.SearchCriteriaInterface;
 import hoot.model.search.hoot.TimelineGlobalSearchCriteria;
 import hoot.system.Exception.EntityNotFoundException;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.ObjectManager;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

@@ -1,7 +1,7 @@
 package hoot.system.Filesystem;
 
 import hoot.system.Logger.LoggerInterface;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.Inject;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,13 +18,12 @@ public class MediaFileHandler
     private final String webrootOnFilesystem;
     private final String contextUriPath;
 
-    private final LoggerInterface logger;
+    @Inject private LoggerInterface logger;
 
     public MediaFileHandler(String webrootOnFilesystem, String contextUriPath)
     {
         this.webrootOnFilesystem = webrootOnFilesystem;
         this.contextUriPath      = contextUriPath;
-        this.logger              = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
     }
 
     /**

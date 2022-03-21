@@ -16,29 +16,23 @@ import hoot.system.Logger.LoggerInterface;
 import hoot.system.Monitoring.CollectorResult;
 import hoot.system.Monitoring.Monitor;
 import hoot.system.Monitoring.MonitorData;
-import hoot.system.ObjectManager.ObjectManager;
 import hoot.system.Serializer.Serializer;
 import hoot.system.Service.ServiceInterface;
+import hoot.system.objects.Inject;
+import hoot.system.objects.ObjectManager;
 
 import java.util.ArrayList;
 
 public class HistoryService implements ServiceInterface
 {
-    private final Monitor monitor;
+    @Inject
+    private Monitor monitor;
 
-    private final HistoryRepository historyRepository;
+    @Inject
+    private HistoryRepository historyRepository;
 
-    private final Serializer serializer;
-
-    private final LoggerInterface logger;
-
-    public HistoryService()
-    {
-        this.monitor           = (Monitor) ObjectManager.get(Monitor.class);
-        this.historyRepository = (HistoryRepository) ObjectManager.get(HistoryRepository.class);
-        this.serializer        = (Serializer) ObjectManager.get(Serializer.class);
-        this.logger            = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
-    }
+    @Inject
+    private LoggerInterface logger;
 
     @Override
     public void execute()
@@ -71,7 +65,7 @@ public class HistoryService implements ServiceInterface
             entity.systemLoadAverage = (Double) workload.get("System Load Average");
             entity.systemCPULoad     = (Double) workload.get("System CPU Load");
             entity.processCPULoad    = (Double) workload.get("Process CPU Load");
-            entity.trendingHashtags = (ArrayList<Tag>) mostUsedTags.get("popularTags");
+            entity.trendingHashtags  = (ArrayList<Tag>) mostUsedTags.get("popularTags");
 
             try {
                 historyRepository.save(entity);

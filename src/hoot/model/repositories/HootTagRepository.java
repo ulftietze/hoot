@@ -7,7 +7,8 @@ import hoot.system.Exception.CouldNotDeleteException;
 import hoot.system.Exception.CouldNotSaveException;
 import hoot.system.Exception.EntityNotFoundException;
 import hoot.system.Logger.QueryLoggerInterface;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.Inject;
+import hoot.system.objects.ObjectManager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,14 +18,7 @@ import java.util.stream.Collectors;
 
 public class HootTagRepository extends AbstractRepository<HootTags>
 {
-    private final TagRepository tagRepository;
-
-    public HootTagRepository()
-    {
-        super();
-
-        this.tagRepository = (TagRepository) ObjectManager.get(TagRepository.class);
-    }
+    @Inject private TagRepository tagRepository;
 
     /**
      * This method never makes sense. Use TagRepository.getList() instead.

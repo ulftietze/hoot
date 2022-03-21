@@ -1,7 +1,7 @@
 package hoot.system.Cache;
 
 import hoot.system.Logger.LoggerInterface;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.Inject;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -12,15 +12,14 @@ import java.util.concurrent.TimeUnit;
 
 public abstract class AbstractCache<Type>
 {
-    protected static final Long            hoursUntilDestroy = 6L;
-    protected final        LoggerInterface logger;
+    protected static final Long hoursUntilDestroy = 6L;
 
     protected final TreeMap<LocalDateTime, ArrayList<CacheObject>> timedDeleteMap = new TreeMap<>();
 
+    @Inject protected LoggerInterface logger;
+
     public AbstractCache()
     {
-        this.logger = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
-
         // TODO: We need to ensure that this executor is shut-down properly when context is destroyed
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
         executor.scheduleAtFixedRate(this::clearCache, hoursUntilDestroy * 4 * 15, 15, TimeUnit.MINUTES);

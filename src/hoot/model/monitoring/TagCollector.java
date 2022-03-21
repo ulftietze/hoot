@@ -8,8 +8,8 @@ import hoot.system.Exception.EntityNotFoundException;
 import hoot.system.Logger.LoggerInterface;
 import hoot.system.Monitoring.CollectorInterface;
 import hoot.system.Monitoring.CollectorResult;
-import hoot.system.ObjectManager.ObjectManager;
-import hoot.system.Queue.ConsumerInterface;
+import hoot.system.objects.Inject;
+import hoot.system.objects.ObjectManager;
 
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
@@ -19,9 +19,8 @@ public class TagCollector extends Thread implements CollectorInterface
     public final static String COLLECTOR_NAME                = "Popular Tags";
     public final        int    INTERVAL_LOAD_TAGS_IN_MINUTES = 10;
 
-    private final TagRepository tagRepository;
-
-    private final LoggerInterface logger;
+    @Inject private TagRepository   tagRepository;
+    @Inject private LoggerInterface logger;
 
     private ArrayList<Tag> mostUsedTags;
 
@@ -29,8 +28,6 @@ public class TagCollector extends Thread implements CollectorInterface
 
     public TagCollector()
     {
-        this.tagRepository = (TagRepository) ObjectManager.get(TagRepository.class);
-        this.logger        = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
         this.mostUsedTags = new ArrayList<>();
     }
 

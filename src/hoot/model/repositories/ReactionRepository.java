@@ -9,7 +9,8 @@ import hoot.system.Database.QueryResultRow;
 import hoot.system.Exception.CouldNotDeleteException;
 import hoot.system.Exception.CouldNotSaveException;
 import hoot.system.Exception.EntityNotFoundException;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.Inject;
+import hoot.system.objects.ObjectManager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,17 +19,8 @@ import java.util.ArrayList;
 
 public class ReactionRepository extends AbstractRepository<Reaction>
 {
-    private final UserRepository userRepository;
-
-    private final HootRepository hootRepository;
-
-    public ReactionRepository()
-    {
-        super();
-
-        this.userRepository = (UserRepository) ObjectManager.get(UserRepository.class);
-        this.hootRepository = (HootRepository) ObjectManager.get(HootRepository.class);
-    }
+    @Inject private UserRepository userRepository;
+    @Inject private HootRepository hootRepository;
 
     @Override
     public ArrayList<Reaction> getList(SearchCriteriaInterface searchCriteria) throws EntityNotFoundException

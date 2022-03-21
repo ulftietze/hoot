@@ -5,9 +5,10 @@ import hoot.system.Exception.CollectorException;
 import hoot.system.Logger.LoggerInterface;
 import hoot.system.Monitoring.CollectorInterface;
 import hoot.system.Monitoring.CollectorResult;
-import hoot.system.ObjectManager.ObjectManager;
 import hoot.system.Queue.ConsumerInterface;
 import hoot.system.Queue.QueueManager;
+import hoot.system.objects.Inject;
+import hoot.system.objects.ObjectManager;
 import hoot.system.util.Pair;
 
 import java.time.Duration;
@@ -26,19 +27,16 @@ public class RequestDurationCollector extends Thread implements CollectorInterfa
     public final static String DELETE         = "DELETE";
     public final static String OPTION         = "OPTION";
 
-    private final QueueManager    queueManager;
-    private final LoggerInterface logger;
-
     private final Map<String, List<Duration>> methodDurations;
     private final Map<String, Duration>       methodAverageDuration;
 
     private boolean running = true;
 
+    @Inject private QueueManager    queueManager;
+    @Inject private LoggerInterface logger;
+
     public RequestDurationCollector()
     {
-        this.queueManager = (QueueManager) ObjectManager.get(QueueManager.class);
-        this.logger       = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
-
         this.methodAverageDuration = Collections.synchronizedNavigableMap(new TreeMap<>());
         this.methodDurations       = Collections.synchronizedNavigableMap(new TreeMap<>());
         this.resetAverage();

@@ -7,9 +7,10 @@ import hoot.system.Exception.CollectorException;
 import hoot.system.Logger.LoggerInterface;
 import hoot.system.Monitoring.CollectorInterface;
 import hoot.system.Monitoring.CollectorResult;
-import hoot.system.ObjectManager.ObjectManager;
 import hoot.system.Queue.ConsumerInterface;
 import hoot.system.Queue.QueueManager;
+import hoot.system.objects.Inject;
+import hoot.system.objects.ObjectManager;
 
 import java.sql.SQLException;
 import java.util.concurrent.ScheduledExecutorService;
@@ -25,26 +26,19 @@ public class CountRegistrationsCollector extends Thread implements CollectorInte
 
     private final static long PERIOD_REGISTRATIONS_MINUTES = 360;
 
-    private final QueueManager queueManager;
-
-    private final UserRepository userRepository;
-
     private final AtomicLong userRegisteredInPeriod;
-
     private final AtomicLong currentlyRegisteredUsers;
-
-    private final LoggerInterface logger;
 
     private boolean running = true;
 
+    @Inject private QueueManager    queueManager;
+    @Inject private UserRepository  userRepository;
+    @Inject private LoggerInterface logger;
+
     public CountRegistrationsCollector()
     {
-        this.userRepository = (UserRepository) ObjectManager.get(UserRepository.class);
-
-        this.queueManager             = (QueueManager) ObjectManager.get(QueueManager.class);
         this.userRegisteredInPeriod   = new AtomicLong();
         this.currentlyRegisteredUsers = new AtomicLong();
-        this.logger                   = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
     }
 
     @Override

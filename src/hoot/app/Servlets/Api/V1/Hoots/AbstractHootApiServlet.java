@@ -7,7 +7,7 @@ import hoot.model.entities.Mention;
 import hoot.model.entities.Tag;
 import hoot.model.repositories.UserRepository;
 import hoot.system.Exception.EntityNotFoundException;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.ObjectManager;
 
 import java.util.ArrayList;
 import java.util.StringTokenizer;

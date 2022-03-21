@@ -1,7 +1,7 @@
 package hoot.system.Filesystem;
 
 import hoot.system.Logger.LoggerInterface;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.Inject;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,13 +12,13 @@ import java.util.ArrayList;
 
 public class FileHandler
 {
-    private final String          webrootOnFilesystem;
-    private final LoggerInterface logger;
+    private final String webrootOnFilesystem;
+
+    @Inject private LoggerInterface logger;
 
     public FileHandler(String webrootOnFilesystem)
     {
         this.webrootOnFilesystem = webrootOnFilesystem;
-        this.logger              = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
     }
 
     /**

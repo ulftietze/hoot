@@ -1,8 +1,8 @@
 package hoot.app.Factory;
 
 import hoot.system.Logger.LoggerInterface;
-import hoot.system.ObjectManager.FactoryInterface;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.FactoryInterface;
+import hoot.system.objects.ObjectManager;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;

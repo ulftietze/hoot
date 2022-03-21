@@ -1,7 +1,8 @@
 package hoot.system.Queue;
 
 import hoot.system.Logger.LoggerInterface;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.Inject;
+import hoot.system.objects.ObjectManager;
 import hoot.system.Queue.concurrent.LinkedBlockingQueue;
 
 import java.util.*;
@@ -10,12 +11,11 @@ public class QueueManager
 {
     private final NavigableMap<String, LinkedBlockingQueue<Object>> queues;
 
-    private final LoggerInterface logger;
+    @Inject private LoggerInterface logger;
 
     public QueueManager()
     {
         this.queues = Collections.synchronizedNavigableMap(new TreeMap<>());
-        this.logger = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
     }
 
     public void add(String queueName, Object data)

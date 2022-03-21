@@ -3,7 +3,7 @@ package hoot.model.search.hoot;
 import hoot.model.entities.HootType;
 import hoot.model.search.SearchCriteriaInterface;
 import hoot.system.Database.QueryBuilder;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.ObjectManager;
 
 import java.sql.SQLException;
 import java.util.ArrayList;

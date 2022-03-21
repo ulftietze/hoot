@@ -1,21 +1,20 @@
 package hoot.system.Cache;
 
-import hoot.system.ObjectManager.ObjectManager;
 import hoot.system.Redis.RedisManager;
+import hoot.system.objects.Inject;
 
 import java.util.List;
 import java.util.TreeMap;
 
 public class CacheManager
 {
-    private final RedisManager redisManager;
+    @Inject private RedisManager redisManager;
 
-    private TreeMap<String, CacheInterface<?>> caches;
+    private final TreeMap<String, CacheInterface<?>> caches;
 
     public CacheManager()
     {
-        this.redisManager = (RedisManager) ObjectManager.get(RedisManager.class);
-        this.caches       = new TreeMap<>();
+        this.caches = new TreeMap<>();
     }
 
     public void registerCache(CacheInterface<?> cache)
@@ -32,14 +31,14 @@ public class CacheManager
         System.gc();
     }
 
-    public void cleanCache(String ...cacheIdentifier)
+    public void cleanCache(String... cacheIdentifier)
     {
         if (cacheIdentifier.length == 0) {
             this.caches.forEach((s, c) -> this.redisManager.delete(AbstractRedisCache.PREFIX + c.getIdentifier()));
             return;
         }
 
-        for (String cacheId: cacheIdentifier) {
+        for (String cacheId : cacheIdentifier) {
             if (this.caches.get(cacheId) == null) {
                 continue;
             }

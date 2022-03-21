@@ -5,7 +5,7 @@ import hoot.model.entities.Hoot;
 import hoot.model.repositories.HootRepository;
 import hoot.model.search.hoot.HootSearchCriteria;
 import hoot.system.Exception.EntityNotFoundException;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.ObjectManager;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

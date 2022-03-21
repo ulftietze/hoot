@@ -6,7 +6,7 @@ import hoot.model.entities.authentication.Registration;
 import hoot.model.queue.publisher.RegistrationPublisher;
 import hoot.model.repositories.UserRepository;
 import hoot.system.Exception.CouldNotSaveException;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.ObjectManager;
 import hoot.system.Security.Hasher;
 
 import javax.servlet.ServletException;

@@ -2,7 +2,7 @@ package hoot.system.Monitoring;
 
 import hoot.system.Exception.CollectorException;
 import hoot.system.Logger.LoggerInterface;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.Inject;
 
 import java.util.ArrayList;
 
@@ -10,16 +10,17 @@ public class Monitor extends Thread
 {
     private final static long ONE_SEC = 1_000_000_000;
 
-    private final LoggerInterface               logger;
-    private final MonitorData                   monitorData;
     private final ArrayList<CollectorInterface> collectorList;
-    private       boolean                       running = true;
+
+    private boolean running = true;
+
+    @Inject private LoggerInterface logger;
+
+    @Inject(create = true) private MonitorData monitorData;
 
     public Monitor()
     {
         this.collectorList = new ArrayList<>();
-        this.monitorData   = (MonitorData) ObjectManager.create(MonitorData.class);
-        this.logger        = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
     }
 
     public synchronized MonitorData getMonitorData()

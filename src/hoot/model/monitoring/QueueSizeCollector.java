@@ -3,19 +3,15 @@ package hoot.model.monitoring;
 import hoot.system.Exception.CollectorException;
 import hoot.system.Monitoring.CollectorInterface;
 import hoot.system.Monitoring.CollectorResult;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.Inject;
+import hoot.system.objects.ObjectManager;
 import hoot.system.Queue.QueueManager;
 
 public class QueueSizeCollector extends Thread implements CollectorInterface
 {
     public final static String COLLECTOR_NAME = "MessageQueue Sizes";
 
-    private final QueueManager queueManager;
-
-    public QueueSizeCollector()
-    {
-        this.queueManager = (QueueManager) ObjectManager.get(QueueManager.class);
-    }
+    @Inject private QueueManager queueManager;
 
     @Override
     public String getCollectorName()

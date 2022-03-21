@@ -7,7 +7,7 @@ import hoot.model.monitoring.consumer.RequestDurationCollector;
 import hoot.system.Filesystem.FileHandler;
 import hoot.system.Filesystem.MediaFileHandler;
 import hoot.system.Logger.LoggerInterface;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.ObjectManager;
 
 import java.io.File;
 import java.io.IOException;

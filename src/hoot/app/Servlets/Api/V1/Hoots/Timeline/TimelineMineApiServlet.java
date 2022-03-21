@@ -5,9 +5,9 @@ import hoot.model.entities.Hoot;
 import hoot.model.query.api.IsValidUserSession;
 import hoot.model.repositories.HootRepository;
 import hoot.model.search.hoot.TimelineMineSearchCriteria;
-import hoot.system.Annotation.AuthenticationRequired;
+import hoot.system.Security.AuthenticationRequired;
 import hoot.system.Exception.EntityNotFoundException;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.ObjectManager;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

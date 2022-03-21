@@ -8,7 +8,8 @@ import hoot.system.Exception.CouldNotSaveException;
 import hoot.system.Exception.EntityNotFoundException;
 import hoot.system.Filesystem.MediaFileHandler;
 import hoot.system.Logger.LoggerInterface;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.Inject;
+import hoot.system.objects.ObjectManager;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -20,18 +21,11 @@ import java.util.ArrayList;
 
 public abstract class AbstractRepository<Type>
 {
-    protected final StatementFetcher statementFetcher;
+    @Inject protected StatementFetcher statementFetcher;
 
-    protected final MediaFileHandler mediaFileHandler;
+    @Inject protected MediaFileHandler mediaFileHandler;
 
-    protected final LoggerInterface logger;
-
-    public AbstractRepository()
-    {
-        this.statementFetcher = (StatementFetcher) ObjectManager.get(StatementFetcher.class);
-        this.mediaFileHandler = (MediaFileHandler) ObjectManager.get(MediaFileHandler.class);
-        this.logger           = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
-    }
+    @Inject protected LoggerInterface logger;
 
     public ArrayList<Type> getList() throws EntityNotFoundException
     {

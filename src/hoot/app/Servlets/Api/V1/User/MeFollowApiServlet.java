@@ -6,9 +6,9 @@ import hoot.model.entities.Follower;
 import hoot.model.entities.User;
 import hoot.model.query.api.IsValidUserSession;
 import hoot.model.repositories.FollowerRepository;
-import hoot.system.Annotation.AuthenticationRequired;
+import hoot.system.Security.AuthenticationRequired;
 import hoot.system.Exception.CouldNotSaveException;
-import hoot.system.ObjectManager.ObjectManager;
+import hoot.system.objects.ObjectManager;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
