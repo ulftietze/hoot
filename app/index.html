@@ -1,15 +1,197 @@
 <!doctype html>
 <html lang="en">
-<head>
-    <meta charset='utf-8'>
-    <link HREF="static/assets/main.css" rel="stylesheet">
-    <title>Mini Java Web Application</title>
-</head>
-<body>
-<h1>Hoots <span>- a howling social media network</span></h1>
-<p>This is just a plain html-page as a replacement before implementing hoots, the real implementation.</p>
-<p>You may or may not take a look at the current state of the api specification
-    <a href='./swagger'>Open API 3.0 Specification - V1</a>.
-</p>
-</body>
+    <head>
+        <meta charset="utf-8">
+        <script src="static/js/lib/popperjs_core@2.10.2_dist_umd_popper.js" type="application/javascript"></script>
+        <script src="static/js/lib/bootstrap@5.1.3_dist_js_bootstrap.js"></script>
+        <script src="static/js/lib/bootstrap@5.1.3_dist_js_bootstrap.bundle.js"></script>
+        <script src="static/js/sidebar.js"></script>
+        <script src="static/js/Menu.js"></script>
+        <script src="static/js/hoot.js"></script>
+        <link href="static/css/5.1.3_dist_css_bootstrap.css" rel="stylesheet" type="text/css">
+        <link href="static/css/bootstrap-icons@1.8.1_font_bootstrap-icons.css" rel="stylesheet">
+        <link href="static/css/sidebar.css" rel="stylesheet" type="text/css">
+        <link href="static/css/main.css" rel="stylesheet" type="text/css">
+        <title>hoot</title>
+    </head>
+    <body>
+        <!--main>
+            <div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark d-none d-lg-block" style="width: 280px">
+                <a href="#" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-primary text-decoration-none">
+                    <svg class="bi me-2" width="40" height="32">
+                        <use xlink:href="static/icons/bootstrap-icons.svg#bootstrap"/>
+                    </svg>
+                    <span class="fs-1 font-heading">hoot</span>
+                </a>
+                <hr>
+                <ul class="nav nav-pills flex-column mb-auto">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link active" aria-current="page">
+                            <svg class="bi me-2" width="16" height="16">
+                                <use xlink:href="static/icons/bootstrap-icons.svg#house-door"/>
+                            </svg>
+                            Heimat
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#explore" class="nav-link text-white">
+                            <svg class="bi me-2" width="16" height="16">
+                                <use xlink:href="static/icons/bootstrap-icons.svg#binoculars"/>
+                            </svg>
+                            Entdecken
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#search" class="nav-link text-white">
+                            <svg class="bi me-2" width="16" height="16">
+                                <use xlink:href="static/icons/bootstrap-icons.svg#search"/>
+                            </svg>
+                            <span>Suche</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#profile" class="nav-link text-white">
+                            <svg class="bi me-2" width="16" height="16">
+                                <use xlink:href="static/icons/bootstrap-icons.svg#person-fill"/>
+                            </svg>
+                            Profil
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#monitor" class="nav-link text-white">
+                            <svg class="bi me-2" width="16" height="16">
+                                <use xlink:href="static/icons/bootstrap-icons.svg#graph-down"/>
+                            </svg>
+                            Monitor
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#swagger" class="nav-link text-white">
+                            <svg class="bi me-2" width="16" height="16">
+                                <use xlink:href="static/icons/bootstrap-icons.svg#braces"/>
+                            </svg>
+                            OpenApi3.0
+                        </a>
+                    </li>
+                </ul>
+                <hr>
+                <div class="dropdown">
+                    <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
+                        <strong>mdo</strong>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
+                        <li><a class="dropdown-item" href="#">Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#">Sign out</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="d-flex flex-column flex-shrink-0 text-white bg-dark d-lg-none" style="width: 4.5rem;">
+                <a href="#"
+                   class="d-block p-3 link-light text-decoration-none text-primary"
+                   title="Icon-only"
+                   data-bs-toggle="tooltip"
+                   data-bs-placement="right">
+                    <svg class="bi" width="40" height="32">
+                        <use xlink:href="static/icons/bootstrap-icons.svg#bootstrap"/>
+                    </svg>
+                    <span class="visually-hidden">Icon-only</span>
+                </a>
+                <ul class="nav nav-pills nav-flush flex-column mb-auto text-center">
+                    <li class="nav-item">
+                        <a href="#"
+                           class="nav-link active py-3 border-bottom text-white"
+                           aria-current="page"
+                           title="Heimat"
+                           data-bs-toggle="tooltip"
+                           data-bs-placement="right">
+                            <svg class="bi" width="24" height="24" role="img" aria-label="Home">
+                                <use xlink:href="static/icons/bootstrap-icons.svg#house-door"/>
+                            </svg>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#explore"
+                           class="nav-link py-3 border-bottom text-white"
+                           title="Entdecken"
+                           data-bs-toggle="tooltip"
+                           data-bs-placement="right">
+                            <svg class="bi" width="24" height="24" role="img" aria-label="Dashboard">
+                                <use xlink:href="static/icons/bootstrap-icons.svg#binoculars"/>
+                            </svg>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#search"
+                           class="nav-link py-3 border-bottom text-white"
+                           title="Suche"
+                           data-bs-toggle="tooltip"
+                           data-bs-placement="right">
+                            <svg class="bi" width="24" height="24" role="img" aria-label="Orders">
+                                <use xlink:href="static/icons/bootstrap-icons.svg#search"/>
+                            </svg>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#profile"
+                           class="nav-link py-3 border-bottom text-white"
+                           title="Profil"
+                           data-bs-toggle="tooltip"
+                           data-bs-placement="right">
+                            <svg class="bi" width="24" height="24" role="img" aria-label="Products">
+                                <use xlink:href="static/icons/bootstrap-icons.svg#person-fill"/>
+                            </svg>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#monitor"
+                           class="nav-link py-3 border-bottom text-white"
+                           title="Monitor"
+                           data-bs-toggle="tooltip"
+                           data-bs-placement="right">
+                            <svg class="bi" width="24" height="24" role="img" aria-label="Products">
+                                <use xlink:href="static/icons/bootstrap-icons.svg#graph-down"/>
+                            </svg>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#swagger"
+                           class="nav-link py-3 border-bottom text-white"
+                           title="OpenApi3.0"
+                           data-bs-toggle="tooltip"
+                           data-bs-placement="right">
+                            <svg class="bi" width="24" height="24" role="img" aria-label="Products">
+                                <use xlink:href="static/icons/bootstrap-icons.svg#braces"/>
+                            </svg>
+                        </a>
+                    </li>
+                </ul>
+                <div class="dropdown border-top">
+                    <a href="#"
+                       class="d-flex align-items-center justify-content-center p-3 link-dark text-decoration-none dropdown-toggle"
+                       id="dropdownUser3"
+                       data-bs-toggle="dropdown"
+                       aria-expanded="false">
+                        <img src="https://github.com/mdo.png" alt="mdo" width="24" height="24" class="rounded-circle">
+                    </a>
+                    <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser3">
+                        <li><a class="dropdown-item" href="#">Settings</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="#">Sign out</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="container text-white m-3">
+                <h1 class="h1">Hoots <span>- a howling social media network</span></h1>
+                <p>This is just a plain html-page as a replacement before implementing hoots, the real implementation.</p>
+                <p>You may or may not take a look at the current state of the api specification
+                    <a href='./swagger'>Open API 3.0 Specification - V1</a>.
+                </p>
+            </div>
+        </main-->
+    </body>
 </html>

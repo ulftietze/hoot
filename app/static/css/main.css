@@ -1,0 +1,22 @@
+:root {
+    --bs-dark-rgb: 68, 67, 101;
+    --bs-dark: #444365;
+    --bs-primary-rgb: 213, 106, 78;
+    --bs-primary: #d56a4e;
+    --bs-secondary-rgb: 68, 67, 101;
+    --bs-secondary: #444365;
+    --bs-font-headings: "Impact", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+body {
+    height: 100%;
+    background-color: rgba(var(--bs-dark-rgb));
+}
+
+.font-heading {
+    font-family: var(--bs-font-headings);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--bs-font-headings);
+}

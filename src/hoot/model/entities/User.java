@@ -6,8 +6,12 @@ import java.time.LocalDateTime;
 public class User implements Serializable
 {
     public Integer id;
-    public Long    followerCount, followsCount;
+
+    public Long followerCount, followsCount;
+
     public String username, imagePath;
-    public String        passwordHash;
+
+    public transient String passwordHash;
+
     public LocalDateTime lastLogin, created;
 }

@@ -98,6 +98,39 @@ public class UserRepository extends AbstractRepository<User>
     }
 
     /**
+     * Try to return a User object representing the database entry by given username.
+     * TODO: Check if synchronisation is required!
+     *
+     * @param username User.id (Primary Key)
+     * @return User object if the user was found and no SQL errors occurred, null otherwise
+     */
+    public User getByUsernameAndPassword(String username, String passwordHash) throws EntityNotFoundException
+    {
+        User user;
+
+        try (Connection connection = this.getConnection()) {
+            QueryBuilder queryBuilder = (QueryBuilder) ObjectManager.create(QueryBuilder.class);
+            queryBuilder.SELECT.add("*");
+            queryBuilder.FROM = "User";
+            queryBuilder.addWhere("username = ?", username);
+            queryBuilder.addWhere("passwordHash = ?", passwordHash);
+
+            PreparedStatement statement = queryBuilder.build(connection);
+
+            QueryResultRow resultRow = this.statementFetcher.fetchOne(statement);
+            connection.close();
+
+            user = this.mapResultSetToUser(resultRow);
+        } catch (SQLException e) {
+            throw new EntityNotFoundException("Invalid username and password combination for: " + username);
+        }
+
+        this.userCache.put(user);
+
+        return user;
+    }
+
+    /**
      * TODO: Check if synchronisation is required!
      *
      * @param searchCriteria
@@ -248,11 +281,10 @@ public class UserRepository extends AbstractRepository<User>
             user = searchedUser;
         }
 
-        user.username     = (String) resultRow.get("User.username");
-        user.imagePath    = (String) resultRow.get("User.imagePath");
-        user.passwordHash = (String) resultRow.get("User.passwordHash");
-        user.created      = this.getLocalDateTimeFromSQLTimestamp((Timestamp) resultRow.get("User.created"));
-        user.lastLogin    = this.getLocalDateTimeFromSQLTimestamp((Timestamp) resultRow.get("User.lastLogin"));
+        user.username  = (String) resultRow.get("User.username");
+        user.imagePath = (String) resultRow.get("User.imagePath");
+        user.created   = this.getLocalDateTimeFromSQLTimestamp((Timestamp) resultRow.get("User.created"));
+        user.lastLogin = this.getLocalDateTimeFromSQLTimestamp((Timestamp) resultRow.get("User.lastLogin"));
 
         try {
             user.followerCount = this.followerRepository.getFollowerCountForUser(user.id);

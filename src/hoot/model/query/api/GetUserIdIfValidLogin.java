@@ -28,13 +28,7 @@ public class GetUserIdIfValidLogin
     public User execute(Login login)
     {
         try {
-            User user = this.userRepository.getByUsername(login.username);
-
-            if (!Objects.equals(user.passwordHash, this.hasher.hash(login.password))) {
-                return null;
-            }
-
-            return user;
+            return this.userRepository.getByUsernameAndPassword(login.username, this.hasher.hash(login.password));
         } catch (EntityNotFoundException e) {
             return null;
         } catch (GeneralSecurityException e) {
