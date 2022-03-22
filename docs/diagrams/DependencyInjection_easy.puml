@@ -1,0 +1,83 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+
+<style>
+activityDiagram {
+  BackgroundColor #444365
+  BorderColor #444365
+  LineColor #444365
+  FontColor #FFF
+  FontSize 17
+  FontName arial
+
+  diamond {
+    BackgroundColor #d56a4e
+    BorderColor #d56a4e
+    LineColor #d56a4e
+    FontColor #444365
+    FontName arial
+    FontSize 17
+  }
+  arrow {
+    LineColor #d56a4e
+    FontColor #d56a4e
+    FontName Impact
+    FontSize 13
+  }
+  partition {
+    LineColor #d56a4e
+    FontColor #d56a4e
+    FontSize 17
+    RoundCorner 10
+    BackgroundColor lightgray
+  }
+}
+document {
+   BackgroundColor white
+}
+</style>
+
+start
+:zu erstellende Klasse]
+if (Mapping zu einer hinterlegten Klasse existiert) is (wahr) then
+  :konkrete Klasse = hinterlegte Klasse;
+else (falsch)
+  :konkrete Klasse = zu erstellende Klasse;
+endif
+
+:Factory für konkrete Klasse aus Mapping laden;
+if (Factory existiert) is (wahr) then
+else (falsch)
+  :Factory für zu erstellende Klasse aus Mapping laden;
+endif
+
+if (Factory existiert) is (wahr) then
+  :Factory erstellt Instanz;
+  stop
+else (falsch)
+endif
+
+:Konstruktor anhand Argumenttypen finden;
+:Instanz erzeugen;
+
+partition DependencyInjection {
+    :Instanzvariablen laden;
+
+    while (Instanzvariablen übrig)
+      if (Instanzvariable hat Inject-Annotation) is (wahr) then
+        if (Annotation hat konkrete Klasse konfiguriert) is (wahr) then
+          :konkrete Klasse = an Annotation konfigurierte Klasse;
+        else (falsch)
+          :konkrete Klasse = Typ der Instanzvariable;
+        endif
+        :Laden und setzen der konkreten Klasse durch ObjectManager;
+      else (falsch)
+      endif
+      :nächste Instanzvariable;
+    endwhile (alle Variablen abgearbeitet)
+}
+:Zurückgeben der Instanz;
+
+stop
+
+@enduml

@@ -1,0 +1,92 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+
+<style>
+activityDiagram {
+  BackgroundColor #444365
+  BorderColor #444365
+  LineColor #444365
+  FontColor #FFF
+  FontSize 17
+  FontName arial
+
+  diamond {
+    BackgroundColor #d56a4e
+    BorderColor #d56a4e
+    LineColor #d56a4e
+    FontColor #444365
+    FontName arial
+    FontSize 17
+  }
+  arrow {
+    LineColor #d56a4e
+    FontColor #d56a4e
+    FontName Impact
+    FontSize 15
+  }
+  partition {
+    LineColor #d56a4e
+    FontColor #d56a4e
+    FontSize 20
+    RoundCorner 10
+    BackgroundColor lightgray
+  }
+}
+document {
+   BackgroundColor white
+}
+</style>
+
+start
+:classToCreate]
+:...arguments]
+:ObjectManager.create(classToCreate, ...arguments);
+:actualClass = classMapping.get(classToCreate);
+:actualClass]
+if (actualClass != null) is (true) then
+  :actualClass = actualClass;
+  :actualClass]
+else (false)
+  :actualClass = classToCreate;
+  :actualClass]
+endif
+:ObjectManager.create(classToCreate, actualClass, ...arguments);
+
+:factory = objectFactoryMapping.get(actualClass);
+:factory]
+if (factory == null) is (true) then
+  :factory = objectFactoryMapping.get(classToCreate);
+endif
+
+if (factory != null)) is (true) then
+  :return factory.create();
+  stop
+endif
+
+:argumentTypes = collectArgumentTypes(...arguments);
+:constructor = actualClass.getConstructor(argumentTypes);
+:constructor]
+:constructor.setAccessible(true);
+:instance = constructor.getInstance(...arguments);
+:instance]
+:declaredFieldsOfClass = loadDeclaredFieldsInherited(instance);
+:declaredFieldsOfClass]
+:field = declaredFieldsOfClass.next();
+:field]
+
+while (field != null)
+  if (field.hasAnnotation(Inject.class)) is (true) then
+    :concreteClass = field.getType();
+    if (annotation is specified) is (yes) then
+      :concreteClass = annotation.loadConcreteClass();
+    endif
+    :field.setAccessible(true);
+    :field.set(ObjectManager.get(concreteClass));
+  endif
+endwhile
+
+:instance]
+
+stop
+
+@enduml
