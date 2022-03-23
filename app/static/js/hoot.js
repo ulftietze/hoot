@@ -5,4 +5,8 @@ window.addEventListener('popstate', (event) => {
 
 window.addEventListener('load', () => {
     Menu.buildMenu();
+
+    [].slice
+        .call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        .forEach(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 });

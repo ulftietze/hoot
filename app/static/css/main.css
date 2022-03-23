@@ -6,6 +6,7 @@
     --bs-secondary-rgb: 68, 67, 101;
     --bs-secondary: #444365;
     --bs-font-headings: "Impact", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --bs-body-font-size-main-menu: 1.3rem;
 }
 
 body {
@@ -19,4 +20,9 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
     font-family: var(--bs-font-headings);
+}
+
+.main-menu {
+    font-size: var(--bs-body-font-size-main-menu);
+    height: 100%;
 }

@@ -16,6 +16,19 @@ class Api
     }
 
     /**
+     * @param {function} promiseOnSuccess
+     * @param {function} promiseOnError
+     */
+    static logout(promiseOnSuccess, promiseOnError)
+    {
+        fetch('api/V1/logout', {
+            method: 'POST', headers: {
+                'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
+            },
+        }).then(promiseOnSuccess).catch(promiseOnError);
+    }
+
+    /**
      * @param {RegisterDTO} component
      * @param {function}    promiseOnSuccess
      * @param {function}    promiseOnError
@@ -23,7 +36,7 @@ class Api
     static register(component, promiseOnSuccess, promiseOnError)
     {
         // TODO: Set Cookie for Auth
-        fetch('api/V1/login', {
+        fetch('api/V1/register', {
             method: 'POST', body: component, headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
@@ -76,14 +89,67 @@ class Api
     }
 
     /**
-     * @param {int}      lastPostId
+     * @param {int}      userIdToFollow
+     * @param {function} promiseOnSuccess
+     * @param {function} promiseOnError
+     */
+    static followUser(userIdToFollow, promiseOnSuccess, promiseOnError)
+    {
+        // TODO: Set Cookie for Auth
+        fetch('api/V1/user/me/follow', {
+            method: 'POST', body: userIdToFollow, headers: {
+                'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
+            },
+        }).then(promiseOnSuccess).catch(promiseOnError);
+    }
+
+    /**
+     * @param {int}      userIdToUnfollow
+     * @param {function} promiseOnSuccess
+     * @param {function} promiseOnError
+     */
+    static unfollowUser(userIdToUnfollow, promiseOnSuccess, promiseOnError)
+    {
+        // TODO: Set Cookie for Auth
+        fetch('api/V1/user/me/unfollow', {
+            method: 'POST', body: userIdToUnfollow, headers: {
+                'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
+            },
+        }).then(promiseOnSuccess).catch(promiseOnError);
+    }
+
+    /**
+     * @param {int}      userId
+     * @param {int}      lastUserId
      * @param {int}      quantity
      * @param {function} promiseOnSuccess
      * @param {function} promiseOnError
      */
-    static getHootTimelineGlobal(lastPostId, quantity, promiseOnSuccess, promiseOnError)
+    static getUserFollower(userId, lastUserId, quantity, promiseOnSuccess, promiseOnError)
     {
-        fetch('/api/V1/hoot/timeline/global?lastPostId=' + lastPostId + '&quantity=' + quantity, {
+        let url = '/api/V1/user/follower?userId=' + userId + '&quantity=' + quantity ? quantity : '50';
+        url += lastUserId ? '&lastUserId=' + lastUserId : '';
+
+        fetch(url, {
+            method: 'GET', headers: {
+                'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
+            },
+        }).then(promiseOnSuccess).catch(promiseOnError);
+    }
+
+    /**
+     * @param {int}      userId
+     * @param {int}      lastUserId
+     * @param {int}      quantity
+     * @param {function} promiseOnSuccess
+     * @param {function} promiseOnError
+     */
+    static getUserFollows(userId, lastUserId, quantity, promiseOnSuccess, promiseOnError)
+    {
+        let url = '/api/V1/user/follows?userId=' + userId + '&quantity=' + quantity ? quantity : '50';
+        url += lastUserId ? '&lastUserId=' + lastUserId : '';
+
+        fetch(url, {
             method: 'GET', headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
@@ -93,13 +159,36 @@ class Api
     /**
      * @param {int}      lastPostId
      * @param {int}      quantity
+     * @param {String}   tags
      * @param {function} promiseOnSuccess
      * @param {function} promiseOnError
      */
-    static getHootTimelineMine(lastPostId, quantity, promiseOnSuccess, promiseOnError)
+    static getHootTimelineGlobal(lastPostId, quantity, tags, promiseOnSuccess, promiseOnError)
     {
+        let url = '/api/V1/hoot/timeline/global?lastPostId=' + lastPostId + '&quantity=' + quantity;
+        url += tags ? '&tags=' + tags : '';
+
+        fetch(url, {
+            method: 'GET', headers: {
+                'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
+            },
+        }).then(promiseOnSuccess).catch(promiseOnError);
+    }
+
+    /**
+     * @param {int}      lastPostId
+     * @param {int}      quantity
+     * @param {String}   tags
+     * @param {function} promiseOnSuccess
+     * @param {function} promiseOnError
+     */
+    static getHootTimelineMine(lastPostId, quantity, tags, promiseOnSuccess, promiseOnError)
+    {
+        let url = '/api/V1/hoot/timeline/mine?lastPostId=' + lastPostId + '&quantity=' + quantity;
+        url += tags ? '&tags=' + tags : '';
+
         // TODO: Set Cookie for Auth
-        fetch('/api/V1/hoot/timeline/mine?lastPostId=' + lastPostId + '&quantity=' + quantity, {
+        fetch(url, {
             method: 'GET', headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
@@ -169,6 +258,36 @@ class Api
         // TODO: Set Cookie for Auth
         fetch('/api/V1/hoot/image', {
             method: 'POST', body: component, headers: {
+                'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
+            },
+        }).then(promiseOnSuccess).catch(promiseOnError);
+    }
+
+    /**
+     * @param {ReactionDTO} component
+     * @param {function}    promiseOnSuccess
+     * @param {function}    promiseOnError
+     */
+    static postHootReaction(component, promiseOnSuccess, promiseOnError)
+    {
+        // TODO: Set Cookie for Auth
+        fetch('/api/V1/hoot/me/reaction', {
+            method: 'POST', body: component, headers: {
+                'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
+            },
+        }).then(promiseOnSuccess).catch(promiseOnError);
+    }
+
+    /**
+     * @param {ReactionDTO} component
+     * @param {function}    promiseOnSuccess
+     * @param {function}    promiseOnError
+     */
+    static deleteHootReaction(component, promiseOnSuccess, promiseOnError)
+    {
+        // TODO: Set Cookie for Auth
+        fetch('/api/V1/hoot/me/reaction', {
+            method: 'DELETE', body: component, headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
         }).then(promiseOnSuccess).catch(promiseOnError);

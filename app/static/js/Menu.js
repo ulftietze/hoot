@@ -1,7 +1,7 @@
 class Menu
 {
     static menuItems = [
-        {target: '#', text: 'Heimat', icon: '#house-door'},
+        {target: '#home', text: 'Heimat', icon: '#house-door'},
         {target: '#explore', text: 'Entdecken', icon: '#binoculars'},
         {target: '#search', text: 'Suche', icon: '#search'},
         {target: '#profile', text: 'Profil', icon: '#person-fill'},
@@ -17,15 +17,11 @@ class Menu
 
     static buildMenu()
     {
-        let main = document.createElement('main');
-
-        this.#buildDesktop(main);
-        this.#buildMobile(main);
-
-        document.body.prepend(main);
+        this.#buildDesktop(document.body, UserData.isLoggedIn() ? this.menuItems : this.menuItemsLoggedOut);
+        this.#buildMobile(document.body, UserData.isLoggedIn() ? this.menuItems : this.menuItemsLoggedOut);
     }
 
-    static #buildDesktop(mainElement)
+    static #buildDesktop(mainElement, menuItems)
     {
         let wrapper = document.createElement('div');
         wrapper.classList.add(
@@ -37,35 +33,42 @@ class Menu
             'bg-dark',
             'd-none',
             'd-lg-block',
+            'main-menu',
         );
         wrapper.style.width = '280px';
 
         wrapper.appendChild(this.#getIconDesktop());
         wrapper.appendChild(document.createElement('hr'));
+        wrapper.appendChild(this.#buildMenuItemsDesktop(menuItems));
+        wrapper.appendChild(document.createElement('hr'));
+        wrapper.appendChild(this.#buildMenuFooterDesktop());
 
+        mainElement.prepend(wrapper);
+    }
+
+    static #buildMenuItemsDesktop(menuItems)
+    {
         let ul = document.createElement('ul');
         ul.classList.add('nav', 'nav-pills', 'flex-column', 'mb-auto', 'text-white');
 
-        this.menuItems.forEach(menuItem => {
+        menuItems.forEach(menuItem => {
             let menuLi = document.createElement('li');
             menuLi.classList.add('nav-item');
 
-            let menuLiLink = document.createElement('a');
+            let menuLiLink  = document.createElement('a');
             menuLiLink.href = menuItem.target;
             menuLiLink.classList.add('nav-link', 'text-white');
             menuLiLink.setAttribute('aria-current', 'page');
-            menuLiLink.appendChild(this.#createBootstrapSvg(menuItem.icon, 18, 18));
+            menuLiLink.appendChild(this.#createBootstrapSvg(menuItem.icon, 24, 24, 'bi', 'me-2'));
 
-            let menuText = document.createElement('span');
+            let menuText       = document.createElement('span');
             menuText.innerText = menuItem.text;
 
             menuLiLink.appendChild(menuText);
             ul.appendChild(menuLiLink);
         });
 
-        wrapper.appendChild(ul);
-
-        mainElement.appendChild(wrapper);
+        return ul;
     }
 
     static #getIconDesktop()
@@ -86,21 +89,181 @@ class Menu
         spanHeading.classList.add('fs-1', 'font-heading');
         spanHeading.innerText = 'hoot';
 
-        iconLink.appendChild(this.#createBootstrapSvg('#bootstrap', 40, 32));
+        iconLink.appendChild(this.#createBootstrapSvg('#bootstrap', 40, 32, 'bi', 'me-2'));
         iconLink.appendChild(spanHeading);
 
         return iconLink;
     }
 
-    static #buildMobile(mainElement)
+    static #buildMenuFooterDesktop()
     {
+        let dropdownDiv = document.createElement('div');
+        dropdownDiv.classList.add('dropdown');
 
+        let dropdownLink  = document.createElement('a');
+        dropdownLink.href = '#';
+        dropdownLink.classList.add(
+            'd-flex',
+            'align-items-center',
+            'text-white',
+            'text-decoration-none',
+            'dropdown-toggle',
+        );
+        dropdownLink.id = 'dropdown-menu-profile';
+        dropdownLink.setAttribute('data-bs-toggle', 'dropdown');
+        dropdownLink.setAttribute('aria-expanded', 'false');
+
+        let profileImage = document.createElement('img');
+        profileImage.classList.add('rounded-circle', 'me-2');
+        profileImage.src    = UserData.getProfileImage();
+        profileImage.alt    = '';
+        profileImage.width  = 32;
+        profileImage.height = 32;
+
+        let strong       = document.createElement('strong');
+        strong.innerText = 'mdo';
+
+        dropdownLink.appendChild(profileImage);
+        dropdownLink.appendChild(strong);
+        dropdownDiv.appendChild(dropdownLink);
+
+        let dropdownList = document.createElement('ul');
+        dropdownList.setAttribute('aria-labelledby', 'dropdown-menu-profile');
+        dropdownList.classList.add('dropdown-menu', 'dropdown-menu-dark', 'text-small', 'shadow');
+        dropdownList.appendChild(this.#createListLink('drp-ite', 'dropdown-item', '#settings', 'Einstellungen'));
+        dropdownList.appendChild(this.#createListLink('drp-ite', 'dropdown-item', '#logout', 'Logout'));
+
+        dropdownDiv.appendChild(dropdownList);
+
+        return dropdownDiv;
     }
 
-    static #createBootstrapSvg(identifier, width, height)
+    static #buildMobile(mainElement, menuItems)
+    {
+        let wrapper = document.createElement('div');
+        wrapper.classList.add(
+            'd-flex',
+            'flex-column',
+            'flex-shrink-0',
+            'text-white',
+            'bg-dark',
+            'd-lg-none',
+            'main-menu',
+        );
+        wrapper.style.width = '4.5rem';
+
+        wrapper.appendChild(this.#getIconMobile());
+        wrapper.appendChild(document.createElement('hr'));
+        wrapper.appendChild(this.#buildMenuItemsMobile(menuItems));
+        wrapper.appendChild(this.#buildMenuFooterMobile());
+
+        mainElement.prepend(wrapper);
+    }
+
+    static #buildMenuItemsMobile(menuItems)
+    {
+        let ul = document.createElement('ul');
+        ul.classList.add('nav', 'nav-pills', 'nav-flush', 'flex-column', 'mb-auto', 'text-center');
+
+        menuItems.forEach(menuItem => {
+            let menuLi = document.createElement('li');
+            menuLi.classList.add('nav-item');
+
+            let menuLiLink   = document.createElement('a');
+            menuLiLink.href  = menuItem.target;
+            menuLiLink.title = menuItem.text;
+            menuLiLink.classList.add('nav-link', 'py-3', 'text-white');
+            menuLiLink.setAttribute('data-bs-toggle', 'tooltip');
+            menuLiLink.setAttribute('data-bs-placement', 'right');
+            menuLiLink.appendChild(this.#createBootstrapSvg(menuItem.icon, 24, 24, 'bi', 'me-2'));
+            ul.appendChild(menuLiLink);
+        });
+
+        return ul;
+    }
+
+    static #getIconMobile()
+    {
+        let iconLink  = document.createElement('a');
+        iconLink.href = '#';
+        iconLink.classList.add(
+            'd-block',
+            'p-3',
+            'link-light',
+            'text-decoration-none',
+            'text-primary',
+        );
+
+        let spanHidden = document.createElement('span');
+        spanHidden.classList.add('visually-hidden');
+        spanHidden.innerText = 'Icon-only';
+
+        iconLink.appendChild(this.#createBootstrapSvg('#bootstrap', 40, 32, 'bi'));
+        iconLink.appendChild(spanHidden);
+
+        return iconLink;
+    }
+
+    static #buildMenuFooterMobile()
+    {
+        let dropdownDiv = document.createElement('div');
+        dropdownDiv.classList.add('dropdown', 'border-top');
+
+        let dropdownLink  = document.createElement('a');
+        dropdownLink.href = '#';
+        dropdownLink.classList.add(
+            'd-flex',
+            'align-items-center',
+            'justify-content-center',
+            'p-3',
+            'link-dark',
+            'text-decoration-none',
+            'dropdown-toggle',
+        );
+        dropdownLink.id = 'dropdown-menu-profile-mobile';
+        dropdownLink.setAttribute('data-bs-toggle', 'dropdown');
+        dropdownLink.setAttribute('aria-expanded', 'false');
+
+        let profileImage = document.createElement('img');
+        profileImage.classList.add('rounded-circle');
+        profileImage.src    = UserData.getProfileImage();
+        profileImage.alt    = 'mdo';
+        profileImage.width  = 32;
+        profileImage.height = 32;
+
+        dropdownLink.appendChild(profileImage);
+        dropdownDiv.appendChild(dropdownLink);
+
+        let dropdownList = document.createElement('ul');
+        dropdownList.setAttribute('aria-labelledby', 'dropdown-menu-profile-mobile');
+        dropdownList.classList.add('dropdown-menu', 'text-small', 'shadow');
+        dropdownList.appendChild(this.#createListLink('drp-ite', 'dropdown-item', '#settings', 'Einstellungen'));
+        dropdownList.appendChild(this.#createListLink('drp-ite', 'dropdown-item', '#logout', 'Logout'));
+
+        dropdownDiv.appendChild(dropdownList);
+
+        return dropdownDiv;
+    }
+
+    static #createListLink(listClass, linkClass, linkHref, linkText)
+    {
+        let listItem = document.createElement('li');
+        listItem.classList.add(listClass);
+
+        let link = document.createElement('a');
+        link.classList.add(linkClass);
+        link.href      = linkHref;
+        link.innerText = linkText;
+
+        listItem.appendChild(link);
+
+        return listItem;
+    }
+
+    static #createBootstrapSvg(identifier, width, height, ...cssClass)
     {
         let iconSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        iconSvg.classList.add('bi', 'me-2');
+        iconSvg.classList.add(...cssClass);
         iconSvg.setAttribute('width', width);
         iconSvg.setAttribute('height', height);
 
