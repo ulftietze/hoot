@@ -1,4 +1,4 @@
-package hoot.app.Servlets.Api.V1.Cache;
+package hoot.app.Servlets.Api.V1.System;
 
 import hoot.app.Servlets.Api.V1.AbstractApiServlet;
 import hoot.system.Cache.CacheManager;
@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet("/api/V1/cache/flush")
+@WebServlet("/api/V1/system/cache/flush")
 public class FlushCacheServlet extends AbstractApiServlet
 {
     private CacheManager cacheManager;

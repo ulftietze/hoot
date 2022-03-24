@@ -2,15 +2,24 @@ package hoot.app.Filter;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @WebFilter(filterName = "CharacterSetFilter", urlPatterns = {"/*"})
 public class CharacterSetFilter implements Filter
 {
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain next) throws IOException, ServletException
+    public void doFilter(
+            ServletRequest request, ServletResponse response, FilterChain next
+    ) throws IOException, ServletException
     {
-        request.setCharacterEncoding("UTF-8");
-        response.setCharacterEncoding("UTF-8");
+        var httpRequest  = (HttpServletRequest) request;
+        var httpResponse = (HttpServletResponse) response;
+
+        httpRequest.setCharacterEncoding("UTF-8");
+        httpResponse.setCharacterEncoding("UTF-8");
+        httpResponse.setHeader("Access-Control-Allow-Origin", "*");
+
         next.doFilter(request, response);
     }
 }

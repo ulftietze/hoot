@@ -3,11 +3,24 @@
     <head>
         <meta charset="utf-8">
         <script src="static/js/lib/popperjs_core@2.10.2_dist_umd_popper.js" type="application/javascript"></script>
+        <script src="static/js/lib/swagger-ui-dist@4.5.0_swagger-ui-bundle.js"></script>
         <script src="static/js/lib/bootstrap@5.1.3_dist_js_bootstrap.js"></script>
-        <script src="static/js/UserData.js"></script>
+        <script src="static/js/api.js"></script>
+        <script src="static/js/exception/ControllerException.js"></script>
+        <script src="static/js/controller/BaseController.js"></script>
+        <script src="static/js/controller/HomeController.js"></script>
+        <script src="static/js/controller/ExploreController.js"></script>
+        <script src="static/js/controller/MonitorController.js"></script>
+        <script src="static/js/controller/ProfileController.js"></script>
+        <script src="static/js/controller/SearchController.js"></script>
+        <script src="static/js/controller/SwaggerController.js"></script>
+        <script src="static/js/controller/LoginController.js"></script>
         <script src="static/js/Config.js"></script>
-        <script src="static/js/Menu.js"></script>
+        <script src="static/js/UserData.js"></script>
+        <script src="static/js/components/Menu.js"></script>
+        <script src="static/js/Router.js"></script>
         <script src="static/js/hoot.js"></script>
+        <link href="static/css/swagger-ui-dist@4.5.0_swagger-ui.css" rel="stylesheet">
         <link href="static/css/5.1.3_dist_css_bootstrap.css" rel="stylesheet" type="text/css">
         <link href="static/css/bootstrap-icons@1.8.1_font_bootstrap-icons.css" rel="stylesheet">
         <link href="static/css/menu.css" rel="stylesheet" type="text/css">
@@ -16,8 +29,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
     <body>
-        <main>
-            <div class="container text-white m-3">
+        <main id="content">
+            <div id="content-container" class="container text-white m-3">
                 <h1 class="h1">Hoots <span>- a howling social media network</span></h1>
                 <p>This is just a plain html-page as a replacement before implementing hoots, the real implementation.</p>
                 <p>You may or may not take a look at the current state of the api specification

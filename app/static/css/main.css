@@ -26,3 +26,7 @@ h1, h2, h3, h4, h5, h6 {
     font-size: var(--bs-body-font-size-main-menu);
     height: 100%;
 }
+
+main {
+    overflow: auto;
+}

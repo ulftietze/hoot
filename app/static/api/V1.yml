@@ -484,6 +484,26 @@ paths:
             application/json:
               schema:
                 type: boolean
+  /system/monitor/diagrams:
+    get:
+      description: Load monitor diagrams
+      summary: Load monitor diagrams
+      tags:
+        - system
+      responses:
+        '200':
+          description: The urls of the diagrams
+          content:
+            application/json:
+              schema:
+                type: object
+                description: "Object with list of diagrams"
+                example:
+                  threads: "https://.../threads.png"
+                  memory: "https://.../memory.png"
+                  heapMemory: "https://.../heapMemory.png"
+                  cpuLoad: "https://.../cpuLoad.png"
+
 components:
   securitySchemes:
     cookieAuth: # arbitrary name for the security scheme; will be used in the "security" key later

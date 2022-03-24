@@ -1,18 +1,18 @@
 class Menu
 {
     static menuItems = [
-        {target: '#home', text: 'Heimat', icon: '#house-door'},
-        {target: '#explore', text: 'Entdecken', icon: '#binoculars'},
-        {target: '#search', text: 'Suche', icon: '#search'},
-        {target: '#profile', text: 'Profil', icon: '#person-fill'},
-        {target: '#monitor', text: 'Monitor', icon: '#graph-down'},
-        {target: '#swagger', text: 'OpenApi3.0', icon: '#braces'},
+        {target: '#route=' + Config.routeMapping.home.target, text: 'Heimat', icon: '#house-door'},
+        {target: '#route=' + Config.routeMapping.explore.target, text: 'Entdecken', icon: '#binoculars'},
+        {target: '#route=' + Config.routeMapping.search.target, text: 'Suche', icon: '#search'},
+        {target: '#route=' + Config.routeMapping.profile.target, text: 'Profil', icon: '#person-fill'},
+        {target: '#route=' + Config.routeMapping.monitor.target, text: 'Monitor', icon: '#graph-down'},
+        {target: '#route=' + Config.routeMapping.swagger.target, text: 'OpenApi3.0', icon: '#braces'},
     ];
 
     static menuItemsLoggedOut = [
-        {target: '#explore', text: 'Entdecken', icon: '#binoculars'},
-        {target: '#monitor', text: 'Monitor', icon: '#graph-down'},
-        {target: '#swagger', text: 'OpenApi3.0', icon: '#braces'},
+        {target: '#route=' + Config.routeMapping.explore.target, text: 'Entdecken', icon: '#binoculars'},
+        {target: '#route=' + Config.routeMapping.monitor.target, text: 'Monitor', icon: '#graph-down'},
+        {target: '#route=' + Config.routeMapping.swagger.target, text: 'OpenApi3.0', icon: '#braces'},
     ];
 
     static buildMenu()

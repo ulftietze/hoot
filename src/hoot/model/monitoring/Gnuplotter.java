@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 interface DataWriter
 {
@@ -32,6 +33,17 @@ public class Gnuplotter
         MediaFileHandler fileHandler = (MediaFileHandler) ObjectManager.get(MediaFileHandler.class);
 
         return fileHandler.getImageUrl(graphFolder + "/" + graphtype + ".png");
+    }
+
+    public static Map<GraphType, String> getGraphUrls()
+    {
+        HashMap<GraphType, String> graphUrls = new HashMap<>();
+
+        for (GraphType type : GraphType.values()) {
+            graphUrls.put(type, getGraphUrl(type));
+        }
+
+        return graphUrls;
     }
 
     public static void createGraph(GraphType graphType, ArrayList<History> input)
