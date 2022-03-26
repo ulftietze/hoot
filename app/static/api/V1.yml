@@ -496,13 +496,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                description: "Object with list of diagrams"
-                example:
-                  threads: "https://.../threads.png"
-                  memory: "https://.../memory.png"
-                  heapMemory: "https://.../heapMemory.png"
-                  cpuLoad: "https://.../cpuLoad.png"
+                $ref: '#/components/schemas/graphList'
 
 components:
   securitySchemes:
@@ -544,17 +538,23 @@ components:
           type: string
           description: Base64 Encoded
     followers:
+      type: object
       required:
-        - user
+        - followers
       properties:
-        user:
-          $ref: '#/components/schemas/user'
+        followers:
+          type: array
+          items:
+            $ref: '#/components/schemas/user'
     follows:
+      type: object
       required:
-        - user
+        - follows
       properties:
-        user:
-          $ref: '#/components/schemas/user'
+        follows:
+          type: array
+          items:
+            $ref: '#/components/schemas/user'
     login:
       required:
         - username
@@ -579,12 +579,17 @@ components:
         imageFilename:
           type: string
     hoots:
-      type: array
-      items:
-        oneOf:
-          - $ref: '#/components/schemas/post'
-          - $ref: '#/components/schemas/image'
-          - $ref: '#/components/schemas/comment'
+      type: object
+      required:
+        - hoots
+      properties:
+        hoots:
+          type: array
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/post'
+              - $ref: '#/components/schemas/image'
+              - $ref: '#/components/schemas/comment'
     hoot:
       type: object
       required:
@@ -630,6 +635,11 @@ components:
       type: array
       items:
         type: string
+    tag:
+      type: string
+      properties:
+        tag:
+          type: string
     image:
       allOf:
         - $ref: '#/components/schemas/hoot'
@@ -738,3 +748,17 @@ components:
         parentHootId:
           type: integer
           format: int64
+    graphList:
+      type: object
+      readOnly: true
+      required:
+        - graphList
+      properties:
+        graphList:
+          type: object
+          description: "Object with list of diagrams"
+          example:
+            threads: "/path/to/threads.png"
+            memory: "/path/to/memory.png"
+            heapMemory: "/path/to/heapMemory.png"
+            cpuLoad: "/path/to/cpuLoad.png"

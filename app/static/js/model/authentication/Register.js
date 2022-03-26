@@ -1,4 +1,4 @@
-class RegisterDTO
+class Register
 {
     /**
      * @type {String}
@@ -11,12 +11,14 @@ class RegisterDTO
     password;
 
     /**
+     * Base64 encoded image string
+     *
      * @type {String}
      */
-    imageFilename;
+    image;
 
     /**
      * @type {String}
      */
-    image;
+    imageFilename;
 }

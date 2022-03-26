@@ -1,14 +1,14 @@
-class ImageDTO extends HootDTO
+class UserMeSave
 {
     /**
      * @type {String}
      */
-    content;
+    username;
 
     /**
      * @type {String}
      */
-    imageUrl;
+    password;
 
     /**
      * @type {String}
@@ -16,7 +16,7 @@ class ImageDTO extends HootDTO
     imageFilename;
 
     /**
-     * @type {String} // TODO: Declare as base64
+     * @type {String}
      */
     image;
 }

@@ -2,7 +2,10 @@ package hoot.app.Listener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hoot.app.Factory.*;
-import hoot.model.cache.*;
+import hoot.model.cache.HootCache;
+import hoot.model.cache.HootCacheInterface;
+import hoot.model.cache.UserCache;
+import hoot.model.cache.UserCacheInterface;
 import hoot.system.Filesystem.FileHandler;
 import hoot.system.Filesystem.MediaFileHandler;
 import hoot.system.Logger.ContextLogger;
@@ -32,7 +35,7 @@ public class ObjectInstantiationContextListener implements ServletContextListene
 
         // System
         ObjectManager.set(LoggerInterface.class, ContextLogger.class);
-        ObjectManager.set(QueryLoggerInterface.class, NullLogger.class);
+        ObjectManager.set(QueryLoggerInterface.class, ContextLogger.class);
         ObjectManager.setFactory(ContextLogger.class, new ContextLoggerFactory(context));
         //ObjectManager.set(LoggerInterface.class, NullLogger.class);
         ObjectManager.setFactory(DataSource.class, new DataSourceFactory());

@@ -22,7 +22,7 @@ public class GetUserIdIfValidLogin
     /**
      * // TODO: Documentation
      *
-     * @param login The LoginDTO which is used to transport data via the API
+     * @param login The Login which is used to transport data via the API
      * @return The UserId if the login data matches the database data
      */
     public User execute(Login login)

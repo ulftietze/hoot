@@ -1,9 +1,10 @@
 window.addEventListener('load', () => {
     Menu.buildMenu();
 
-    window.hootObjects = {};
-    window.hootObjects.router = new Router();
-    window.hootObjects.controller = [];
+    window.hootObjects                   = {};
+    window.hootObjects.router            = new Router();
+    window.hootObjects.controller        = [];
+    window.hootObjects.persistentStorage = new PersistentStorage();
 
     [].slice
         .call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))

@@ -8,8 +8,7 @@ class Router
 
     dispatch()
     {
-        let routeConfig = new URLSearchParams(window.location.hash.substring(1));
-        let route       = routeConfig.get('route') ?? Config.routeMapping.home.target;
+        let route = this.getCurrentRoute();
 
         let controller = Object
             .entries(Config.getRouteMapping())
@@ -31,5 +30,11 @@ class Router
         content.appendChild(newContentContainer);
 
         controller[1].controller.execute();
+    }
+
+    getCurrentRoute()
+    {
+        let routeConfig = new URLSearchParams(window.location.hash.substring(1));
+        return routeConfig.get('route') ?? Config.routeMapping.home.target;
     }
 }

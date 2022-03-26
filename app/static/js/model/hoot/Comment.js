@@ -1,7 +1,7 @@
-class CommentDTO extends HootDTO
+class Comment extends Hoot
 {
     /**
-     * @type {HootDTO}
+     * @type {Hoot}
      */
     parent;
 

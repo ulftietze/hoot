@@ -40,7 +40,7 @@ public class Gnuplotter
         HashMap<GraphType, String> graphUrls = new HashMap<>();
 
         for (GraphType type : GraphType.values()) {
-            graphUrls.put(type, getGraphUrl(type));
+            graphUrls.put(type, Gnuplotter.getGraphUrl(type));
         }
 
         return graphUrls;

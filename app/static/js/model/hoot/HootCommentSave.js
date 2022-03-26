@@ -1,17 +1,17 @@
-class FollowerDTO
+class HootCommentSave
 {
     /**
      * @type {int}
      */
-    userId;
+    id;
+
+    /**
+     * @type {int}
+     */
+    parentHootId;
 
     /**
      * @type {String}
      */
-    userName;
-
-    /**
-     * @type {String}
-     */
-    imageUrl;
+    content;
 }

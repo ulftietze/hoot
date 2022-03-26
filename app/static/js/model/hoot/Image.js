@@ -1,14 +1,9 @@
-class FollowDTO
+class Image extends Hoot
 {
-    /**
-     * @type {int}
-     */
-    userId;
-
     /**
      * @type {String}
      */
-    userName;
+    content;
 
     /**
      * @type {String}

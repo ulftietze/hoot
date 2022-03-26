@@ -1,4 +1,4 @@
-class PostDTO extends HootDTO
+class Post extends Hoot
 {
     /**
      * @type {String}

@@ -18,8 +18,6 @@ public class CharacterSetFilter implements Filter
 
         httpRequest.setCharacterEncoding("UTF-8");
         httpResponse.setCharacterEncoding("UTF-8");
-        httpResponse.setHeader("Access-Control-Allow-Origin", "*");
-
         next.doFilter(request, response);
     }
 }

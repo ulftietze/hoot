@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 //@AuthenticationRequired
 @WebServlet("/api/V1/hoot/search")
@@ -25,7 +26,8 @@ public class SearchApiServlet extends AbstractApiServlet
         HootSearchCriteria searchCriteria = this.createSearchCriteriaFromRequest(request);
 
         try {
-            ArrayList<Hoot> hoots = repository.getList(searchCriteria);
+            HashMap<String, ArrayList<Hoot>> hoots = new HashMap<>();
+            hoots.put("hoots", repository.getList(searchCriteria));
             this.sendResponse(response, HttpServletResponse.SC_OK, this.serialize(hoots));
         } catch (EntityNotFoundException e) {
             int httpStatus = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;

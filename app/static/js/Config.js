@@ -1,7 +1,9 @@
 class Config
 {
     // TODO: This must be per instance.
-    static BASE_URL = 'https://informatik.hs-bremerhaven.de/docker-swe3-21-team-d-java/';
+    static BASE_URL   = 'https://informatik.hs-bremerhaven.de';
+
+    static CONTEXT_URL = '/docker-swe3-21-team-d-java/';
 
     static routeMapping = {
         home   : {target: 'home', controller: new HomeController()},
@@ -13,14 +15,19 @@ class Config
         login  : {target: 'login', controller: new LoginController()},
     };
 
-    static getBaseUrl()
+    static getRemoteBaseUrl()
     {
         return Config.BASE_URL;
     }
 
+    static getWebappUrl()
+    {
+        return this.getRemoteBaseUrl() + Config.CONTEXT_URL;
+    }
+
     static getApiUrl()
     {
-        return Config.getBaseUrl() + 'api/V1/';
+        return Config.getWebappUrl() + 'api/V1/';
     }
 
     static getRouteMapping()

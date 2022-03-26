@@ -1,4 +1,4 @@
-class LoginDTO
+class Login
 {
     /**
      * @type {String}

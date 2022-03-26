@@ -1,7 +1,7 @@
 class Api
 {
     /**
-     * @param {LoginDTO} component
+     * @param {Login} component
      * @param {function} promiseOnSuccess
      * @param {function} promiseOnError
      */
@@ -12,7 +12,7 @@ class Api
             method: 'POST', body: component, headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
-        }).then(promiseOnSuccess).catch(promiseOnError);
+        }).then(response => response.json()).then(promiseOnSuccess).catch(promiseOnError);
     }
 
     /**
@@ -25,11 +25,11 @@ class Api
             method: 'POST', headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
-        }).then(promiseOnSuccess).catch(promiseOnError);
+        }).then(response => response.json()).then(promiseOnSuccess).catch(promiseOnError);
     }
 
     /**
-     * @param {RegisterDTO} component
+     * @param {Register} component
      * @param {function}    promiseOnSuccess
      * @param {function}    promiseOnError
      */
@@ -40,7 +40,7 @@ class Api
             method: 'POST', body: component, headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
-        }).then(promiseOnSuccess).catch(promiseOnError);
+        }).then(response => response.json()).then(promiseOnSuccess).catch(promiseOnError);
     }
 
     /**
@@ -56,7 +56,10 @@ class Api
             method: 'GET', headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
-        }).then(promiseOnSuccess).catch(promiseOnError);
+        })
+            .then(response => response.json().then(response => Object.assign(new User(), response)))
+            .then(promiseOnSuccess)
+            .catch(promiseOnError);
     }
 
     /**
@@ -70,11 +73,14 @@ class Api
             method: 'GET', headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
-        }).then(promiseOnSuccess).catch(promiseOnError);
+        })
+            .then(response => response.json().then(response => Object.assign(new User(), response)))
+            .then(promiseOnSuccess)
+            .catch(promiseOnError);
     }
 
     /**
-     * @param {UserDTO}  component
+     * @param {User}  component
      * @param {function} promiseOnSuccess
      * @param {function} promiseOnError
      */
@@ -85,7 +91,10 @@ class Api
             method: 'PUT', body: component, headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
-        }).then(promiseOnSuccess).catch(promiseOnError);
+        })
+            .then(response => response.json().then(response => Object.assign(new User(), response)))
+            .then(promiseOnSuccess)
+            .catch(promiseOnError);
     }
 
     /**
@@ -100,7 +109,7 @@ class Api
             method: 'POST', body: userIdToFollow, headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
-        }).then(promiseOnSuccess).catch(promiseOnError);
+        }).then(response => response.json()).then(promiseOnSuccess).catch(promiseOnError);
     }
 
     /**
@@ -115,7 +124,7 @@ class Api
             method: 'POST', body: userIdToUnfollow, headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
-        }).then(promiseOnSuccess).catch(promiseOnError);
+        }).then(response => response.json()).then(promiseOnSuccess).catch(promiseOnError);
     }
 
     /**
@@ -134,7 +143,10 @@ class Api
             method: 'GET', headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
-        }).then(promiseOnSuccess).catch(promiseOnError);
+        })
+            .then(response => response.json().then(response => Object.assign(new Followers(), response)))
+            .then(promiseOnSuccess)
+            .catch(promiseOnError);
     }
 
     /**
@@ -153,11 +165,14 @@ class Api
             method: 'GET', headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
-        }).then(promiseOnSuccess).catch(promiseOnError);
+        })
+            .then(response => response.json().then(response => Object.assign(new Follows(), response)))
+            .then(promiseOnSuccess)
+            .catch(promiseOnError);
     }
 
     /**
-     * @param {int}      lastPostId
+     * @param {int|null} lastPostId
      * @param {int}      quantity
      * @param {String}   tags
      * @param {function} promiseOnSuccess
@@ -165,14 +180,18 @@ class Api
      */
     static getHootTimelineGlobal(lastPostId, quantity, tags, promiseOnSuccess, promiseOnError)
     {
-        let url = Config.getApiUrl() + 'hoot/timeline/global?lastPostId=' + lastPostId + '&quantity=' + quantity;
+        let url = Config.getApiUrl() + 'hoot/timeline/global?' + '&quantity=' + quantity;
+        url += lastPostId ? '&lastPostId=' + lastPostId : '';
         url += tags ? '&tags=' + tags : '';
 
         fetch(url, {
             method: 'GET', headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
-        }).then(promiseOnSuccess).catch(promiseOnError);
+        })// TODO: Convert hoots into correct types
+            .then(response => response.json().then(response => Object.assign(new Hoots(), response)))
+            .then(promiseOnSuccess)
+            .catch(promiseOnError);
     }
 
     /**
@@ -192,7 +211,10 @@ class Api
             method: 'GET', headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
-        }).then(promiseOnSuccess).catch(promiseOnError);
+        })// TODO: Convert hoots into correct types
+            .then(response => response.json().then(response => Object.assign(new Hoots(), response)))
+            .then(promiseOnSuccess)
+            .catch(promiseOnError);
     }
 
     /**
@@ -215,11 +237,14 @@ class Api
             method: 'GET', headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
-        }).then(promiseOnSuccess).catch(promiseOnError);
+        })// TODO: Convert hoots into correct types
+            .then(response => response.json().then(response => Object.assign(new Hoots(), response)))
+            .then(promiseOnSuccess)
+            .catch(promiseOnError);
     }
 
     /**
-     * @param {PostDTO}  component
+     * @param {Post}  component
      * @param {function} promiseOnSuccess
      * @param {function} promiseOnError
      */
@@ -230,11 +255,14 @@ class Api
             method: 'POST', body: component, headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
-        }).then(promiseOnSuccess).catch(promiseOnError);
+        })
+            .then(response => response.json().then(response => Object.assign(new Post(), response)))
+            .then(promiseOnSuccess)
+            .catch(promiseOnError);
     }
 
     /**
-     * @param {CommentDTO} component
+     * @param {Comment} component
      * @param {function}   promiseOnSuccess
      * @param {function}   promiseOnError
      */
@@ -245,11 +273,14 @@ class Api
             method: 'POST', body: component, headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
-        }).then(promiseOnSuccess).catch(promiseOnError);
+        })
+            .then(response => response.json().then(response => Object.assign(new Comment(), response)))
+            .then(promiseOnSuccess)
+            .catch(promiseOnError);
     }
 
     /**
-     * @param {ImageDTO} component
+     * @param {Image} component
      * @param {function} promiseOnSuccess
      * @param {function} promiseOnError
      */
@@ -260,13 +291,16 @@ class Api
             method: 'POST', body: component, headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
-        }).then(response => response.json().then(promiseOnSuccess)).catch(promiseOnError);
+        })
+            .then(response => response.json().then(response => Object.assign(new Image(), response)))
+            .then(promiseOnSuccess)
+            .catch(promiseOnError);
     }
 
     /**
-     * @param {ReactionDTO} component
-     * @param {function}    promiseOnSuccess
-     * @param {function}    promiseOnError
+     * @param {ReactionMeSend} component
+     * @param {function}       promiseOnSuccess
+     * @param {function}       promiseOnError
      */
     static postHootReaction(component, promiseOnSuccess, promiseOnError)
     {
@@ -275,13 +309,13 @@ class Api
             method: 'POST', body: component, headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
-        }).then(response => response.json().then(promiseOnSuccess)).catch(promiseOnError);
+        }).then(response => response.json()).then(promiseOnSuccess).catch(promiseOnError);
     }
 
     /**
-     * @param {ReactionDTO} component
-     * @param {function}    promiseOnSuccess
-     * @param {function}    promiseOnError
+     * @param {ReactionMeSend} component
+     * @param {function}       promiseOnSuccess
+     * @param {function}       promiseOnError
      */
     static deleteHootReaction(component, promiseOnSuccess, promiseOnError)
     {
@@ -290,7 +324,7 @@ class Api
             method: 'DELETE', body: component, headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
-        }).then(response => response.json().then(promiseOnSuccess)).catch(promiseOnError);
+        }).then(response => response.json().then(response => response)).then(promiseOnSuccess).catch(promiseOnError);
     }
 
     /**
@@ -304,6 +338,9 @@ class Api
             method: 'GET', headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
-        }).then(response => response.json().then(promiseOnSuccess)).catch(promiseOnError);
+        })
+            .then(response => response.json().then(response => Object.assign(new GraphList(), response)))
+            .then(promiseOnSuccess)
+            .catch(promiseOnError);
     }
 }

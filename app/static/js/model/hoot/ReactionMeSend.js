@@ -1,4 +1,4 @@
-class ReactionDTO extends HootDTO
+class ReactionMeSend extends Hoot
 {
     /**
      * @type {int}
@@ -6,9 +6,9 @@ class ReactionDTO extends HootDTO
     hootId;
 
     /**
-     * @type {String}
+     * @type {string}
      */
-    hootType; // TODO: enum
+    hootType;
 
     /**
      * @type {String}
