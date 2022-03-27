@@ -21,7 +21,7 @@ public class AccessControlHeaderFilter implements Filter
         httpResponse.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
         httpResponse.setHeader(
                 "Access-Control-Allow-Headers",
-                "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers"
+                "Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers"
         );
 
         next.doFilter(request, response);

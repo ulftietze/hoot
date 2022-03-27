@@ -6,6 +6,19 @@ class Router
         this.dispatch();
     }
 
+    /**
+     * Set route which will trigger the popstate event
+     *
+     * @param route
+     */
+    setRoute(route)
+    {
+        let url = new URL(window.location);
+        url.searchParams.set('route', route);
+
+        window.history.pushState({}, '', url);
+    }
+
     dispatch()
     {
         let route = this.getCurrentRoute();
@@ -35,6 +48,14 @@ class Router
     getCurrentRoute()
     {
         let routeConfig = new URLSearchParams(window.location.hash.substring(1));
-        return routeConfig.get('route') ?? Config.routeMapping.home.target;
+        let route       = routeConfig.get('route');
+
+        return route && route !== '' ? route : this.getDefaultRoute();
+    }
+
+    getDefaultRoute()
+    {
+        return UserData.isLoggedIn() ? Config.routeMapping.home.target : Config.routeMapping.explore.target;
+        ;
     }
 }

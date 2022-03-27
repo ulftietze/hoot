@@ -8,7 +8,6 @@ class HootsComponent
      */
     static prependHootsToElement(hoots, element)
     {
-        element.classList.add('container');
         hoots.hoots.forEach(hoot => {
             let el = document.querySelector('#' + element.id + ' > div[data-hoot-id="' + hoot.id + '"]');
 
@@ -16,6 +15,23 @@ class HootsComponent
                 element.prepend(HootComponent.drawHoot(hoot));
             } else {
                 el.replaceWith(HootComponent.drawHoot(hoot))
+            }
+        });
+    }
+
+    /**
+     * Append hoots to a given element
+     *
+     * @param {Hoots} hoots
+     * @param {Element} element
+     */
+    static appendHootsToElement(hoots, element)
+    {
+        hoots.hoots.forEach(hoot => {
+            let el = document.querySelector('#' + element.id + ' > div[data-hoot-id="' + hoot.id + '"]');
+
+            if (!el) {
+                element.append(HootComponent.drawHoot(hoot));
             }
         });
     }

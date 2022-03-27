@@ -11,6 +11,11 @@ class Hoot
     type; // TODO: ENUM
 
     /**
+     * @type {User}
+     */
+    user;
+
+    /**
      * @type {Date}
      */
     created;

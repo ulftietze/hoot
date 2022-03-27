@@ -13,12 +13,25 @@ class Menu
         {target: '#route=' + Config.routeMapping.explore.target, text: 'Entdecken', icon: '#binoculars'},
         {target: '#route=' + Config.routeMapping.monitor.target, text: 'Monitor', icon: '#graph-down'},
         {target: '#route=' + Config.routeMapping.swagger.target, text: 'OpenApi3.0', icon: '#braces'},
+        {target: '#route=' + Config.routeMapping.login.target, text: 'Login', icon: '#door-open-fill'},
+        {target: '#route=' + Config.routeMapping.register.target, text: 'Register', icon: '#ui-checks'},
     ];
 
     static buildMenu()
     {
         this.#buildDesktop(document.body, UserData.isLoggedIn() ? this.menuItems : this.menuItemsLoggedOut);
         this.#buildMobile(document.body, UserData.isLoggedIn() ? this.menuItems : this.menuItemsLoggedOut);
+    }
+
+    static rebuildMenu()
+    {
+        let menuItems = document.getElementsByClassName('main-menu');
+
+        while (menuItems.length > 0) {
+            menuItems[0].parentNode.removeChild(menuItems[0]);
+        }
+
+        this.buildMenu();
     }
 
     static #buildDesktop(mainElement, menuItems)
@@ -34,6 +47,7 @@ class Menu
             'd-none',
             'd-lg-block',
             'main-menu',
+            'position-fixed',
         );
         wrapper.style.width = '280px';
 
@@ -98,10 +112,14 @@ class Menu
     static #buildMenuFooterDesktop()
     {
         let dropdownDiv = document.createElement('div');
+
+        if (!UserData.isLoggedIn()) {
+            return dropdownDiv;
+        }
+
         dropdownDiv.classList.add('dropdown');
 
-        let dropdownLink  = document.createElement('a');
-        dropdownLink.href = '#';
+        let dropdownLink = document.createElement('a');
         dropdownLink.classList.add(
             'd-flex',
             'align-items-center',
@@ -130,8 +148,14 @@ class Menu
         let dropdownList = document.createElement('ul');
         dropdownList.setAttribute('aria-labelledby', 'dropdown-menu-profile');
         dropdownList.classList.add('dropdown-menu', 'dropdown-menu-dark', 'text-small', 'shadow');
+
         dropdownList.appendChild(this.#createListLink('drp-ite', 'dropdown-item', '#settings', 'Einstellungen'));
-        dropdownList.appendChild(this.#createListLink('drp-ite', 'dropdown-item', '#logout', 'Logout'));
+        dropdownList.appendChild(this.#createListLink(
+            'drp-ite',
+            'dropdown-item',
+            '#route=' + Config.routeMapping.logout.target,
+            'Logout',
+        ));
 
         dropdownDiv.appendChild(dropdownList);
 
@@ -149,6 +173,7 @@ class Menu
             'bg-dark',
             'd-lg-none',
             'main-menu',
+            'position-fixed',
         );
         wrapper.style.width = '4.5rem';
 
@@ -186,13 +211,7 @@ class Menu
     {
         let iconLink  = document.createElement('a');
         iconLink.href = '#';
-        iconLink.classList.add(
-            'd-block',
-            'p-3',
-            'link-light',
-            'text-decoration-none',
-            'text-primary',
-        );
+        iconLink.classList.add('d-block', 'p-3', 'link-light', 'text-decoration-none', 'text-primary');
 
         let spanHidden = document.createElement('span');
         spanHidden.classList.add('visually-hidden');

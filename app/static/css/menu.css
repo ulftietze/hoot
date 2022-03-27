@@ -3,15 +3,9 @@ html {
 }
 
 body {
-    min-height: 100%;
-    min-height: -webkit-fill-available;
     display: flex;
     flex-wrap: nowrap;
-    height: 100vh;
-    height: -webkit-fill-available;
-    max-height: 100vh;
     overflow-x: auto;
-    overflow-y: hidden;
 }
 
 .b-example-divider {

@@ -35,7 +35,7 @@ public class ObjectInstantiationContextListener implements ServletContextListene
 
         // System
         ObjectManager.set(LoggerInterface.class, ContextLogger.class);
-        ObjectManager.set(QueryLoggerInterface.class, ContextLogger.class);
+        ObjectManager.set(QueryLoggerInterface.class, NullLogger.class);
         ObjectManager.setFactory(ContextLogger.class, new ContextLoggerFactory(context));
         //ObjectManager.set(LoggerInterface.class, NullLogger.class);
         ObjectManager.setFactory(DataSource.class, new DataSourceFactory());

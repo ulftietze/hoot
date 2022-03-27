@@ -3,14 +3,17 @@
     --bs-dark: #444365;
     --bs-primary-rgb: 213, 106, 78;
     --bs-primary: #d56a4e;
+    --bs-primary-darker-rgb: 208, 83, 49;
+    --bs-primary-darker: #d05331;
     --bs-secondary-rgb: 68, 67, 101;
     --bs-secondary: #444365;
+    --bs-secondary-darker-rgb: 60, 59, 95;
+    --bs-secondary-darker: #3c3b5f;
     --bs-font-headings: "Impact", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     --bs-body-font-size-main-menu: 1.3rem;
 }
 
 body {
-    height: 100%;
     background-color: rgba(var(--bs-dark-rgb));
 }
 
@@ -28,7 +31,73 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 main {
-    overflow: auto;
     width: 100%;
-    max-width: 1024px;
+    padding-top: 30px;
+    margin-left: 280px;
+}
+
+@media (max-width: 991.98px) {
+    main {
+        margin-left: 4.5rem;
+    }
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+.btn-primary:hover {
+    color: #fff;
+    background-color: var(--bs-primary-darker);
+    border-color: var(--bs-primary-darker);
+}
+.btn-check:focus + .btn-primary, .btn-primary:focus {
+    color: #fff;
+    background-color: var(--bs-primary-darker);
+    border-color: var(--bs-primary-darker);
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-darker), 0.5);
+}
+.btn-check:checked + .btn-primary, .btn-check:active + .btn-primary, .btn-primary:active, .btn-primary.active, .show > .btn-primary.dropdown-toggle {
+    color: #fff;
+    background-color: var(--bs-primary-darker);
+    border-color: var(--bs-primary-darker);
+}
+.btn-check:checked + .btn-primary:focus, .btn-check:active + .btn-primary:focus, .btn-primary:active:focus, .btn-primary.active:focus, .show > .btn-primary.dropdown-toggle:focus {
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-darker), 0.5);
+}
+.btn-primary:disabled, .btn-primary.disabled {
+    color: #fff;
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+
+.btn-secondary {
+    color: #fff;
+    background-color: var(--bs-secondary);
+    border-color: var(--bs-secondary);
+}
+.btn-secondary:hover {
+    color: #fff;
+    background-color: var(--bs-secondary-darker);
+    border-color: var(--bs-secondary-darker);
+}
+.btn-check:focus + .btn-secondary, .btn-secondary:focus {
+    color: #fff;
+    background-color: var(--bs-secondary-darker);
+    border-color: var(--bs-secondary-darker);
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-secondary-darker), 0.5);
+}
+.btn-check:checked + .btn-secondary, .btn-check:active + .btn-secondary, .btn-secondary:active, .btn-secondary.active, .show > .btn-secondary.dropdown-toggle {
+    color: #fff;
+    background-color: var(--bs-secondary-darker);
+    border-color: var(--bs-secondary-darker);
+}
+.btn-check:checked + .btn-secondary:focus, .btn-check:active + .btn-secondary:focus, .btn-secondary:active:focus, .btn-secondary.active:focus, .show > .btn-secondary.dropdown-toggle:focus {
+    box-shadow: 0 0 0 0.25rem rgba(130, 138, 145, 0.5);
+}
+.btn-secondary:disabled, .btn-secondary.disabled {
+    color: #fff;
+    background-color: var(--bs-secondary-darker);
+    border-color: var(--bs-secondary-darker);
 }

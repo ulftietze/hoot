@@ -240,6 +240,7 @@ public class UserRepository extends AbstractRepository<User>
                 throw new SQLException("User with username " + user.username + " was not saved.");
             }
         } catch (SQLException e) {
+            this.logger.logException("Could not update user " + user.id + ": " + e.getMessage(), e);
             throw new CouldNotSaveException("User with username " + user.username);
         } finally {
             this.userCache.purge(user);
@@ -281,10 +282,11 @@ public class UserRepository extends AbstractRepository<User>
             user = searchedUser;
         }
 
-        user.username  = (String) resultRow.get("User.username");
-        user.imagePath = (String) resultRow.get("User.imagePath");
-        user.created   = this.getLocalDateTimeFromSQLTimestamp((Timestamp) resultRow.get("User.created"));
-        user.lastLogin = this.getLocalDateTimeFromSQLTimestamp((Timestamp) resultRow.get("User.lastLogin"));
+        user.username     = (String) resultRow.get("User.username");
+        user.imagePath    = (String) resultRow.get("User.imagePath");
+        user.passwordHash = (String) resultRow.get("User.passwordHash");
+        user.created      = this.getLocalDateTimeFromSQLTimestamp((Timestamp) resultRow.get("User.created"));
+        user.lastLogin    = this.getLocalDateTimeFromSQLTimestamp((Timestamp) resultRow.get("User.lastLogin"));
 
         try {
             user.followerCount = this.followerRepository.getFollowerCountForUser(user.id);

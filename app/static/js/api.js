@@ -9,7 +9,9 @@ class Api
     {
         // TODO: Set Cookie for Auth
         fetch(Config.getApiUrl() + 'login', {
-            method: 'POST', body: component, headers: {
+            method: 'POST',
+            credentials: 'include',
+            body: JSON.stringify(component), headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
         }).then(response => response.json()).then(promiseOnSuccess).catch(promiseOnError);
@@ -22,7 +24,9 @@ class Api
     static logout(promiseOnSuccess, promiseOnError)
     {
         fetch(Config.getApiUrl() + 'logout', {
-            method: 'POST', headers: {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
         }).then(response => response.json()).then(promiseOnSuccess).catch(promiseOnError);
@@ -37,7 +41,9 @@ class Api
     {
         // TODO: Set Cookie for Auth
         fetch(Config.getApiUrl() + 'register', {
-            method: 'POST', body: component, headers: {
+            method: 'POST',
+            credentials: 'include',
+            body: JSON.stringify(component), headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
         }).then(response => response.json()).then(promiseOnSuccess).catch(promiseOnError);
@@ -52,8 +58,10 @@ class Api
     {
         // TODO: Set Cookie for Auth
         // TODO: Check for easier query params
-        fetch('/api/V1/user?id=' + userId, {
-            method: 'GET', headers: {
+        fetch(Config.getApiUrl() + 'user?id=' + userId, {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
         })
@@ -69,8 +77,10 @@ class Api
     static getUserMe(promiseOnSuccess, promiseOnError)
     {
         // TODO: Set Cookie for Auth
-        fetch('/api/V1/user/me', {
-            method: 'GET', headers: {
+        fetch(Config.getApiUrl() + 'user/me', {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
         })
@@ -87,8 +97,10 @@ class Api
     static putUserMe(component, promiseOnSuccess, promiseOnError)
     {
         // TODO: Set Cookie for Auth
-        fetch('/api/V1/user/me', {
-            method: 'PUT', body: component, headers: {
+        fetch(Config.getApiUrl() + 'user/me', {
+            method: 'PUT',
+            credentials: 'include',
+            body: JSON.stringify(component), headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
         })
@@ -106,7 +118,9 @@ class Api
     {
         // TODO: Set Cookie for Auth
         fetch(Config.getApiUrl() + 'user/me/follow', {
-            method: 'POST', body: userIdToFollow, headers: {
+            method: 'POST',
+            credentials: 'include',
+            body: userIdToFollow, headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
         }).then(response => response.json()).then(promiseOnSuccess).catch(promiseOnError);
@@ -121,7 +135,9 @@ class Api
     {
         // TODO: Set Cookie for Auth
         fetch(Config.getApiUrl() + 'user/me/unfollow', {
-            method: 'POST', body: userIdToUnfollow, headers: {
+            method: 'POST',
+            credentials: 'include',
+            body: userIdToUnfollow, headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
         }).then(response => response.json()).then(promiseOnSuccess).catch(promiseOnError);
@@ -252,7 +268,7 @@ class Api
     {
         // TODO: Set Cookie for Auth
         fetch(Config.getApiUrl() + 'hoot/post', {
-            method: 'POST', body: component, headers: {
+            method: 'POST', body: JSON.stringify(component), headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
         })
@@ -270,7 +286,7 @@ class Api
     {
         // TODO: Set Cookie for Auth
         fetch(Config.getApiUrl() + 'hoot/comment', {
-            method: 'POST', body: component, headers: {
+            method: 'POST', body: JSON.stringify(component), headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
         })
@@ -288,7 +304,7 @@ class Api
     {
         // TODO: Set Cookie for Auth
         fetch(Config.getApiUrl() + 'hoot/image', {
-            method: 'POST', body: component, headers: {
+            method: 'POST', body: JSON.stringify(component), headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
         })
@@ -306,7 +322,7 @@ class Api
     {
         // TODO: Set Cookie for Auth
         fetch(Config.getApiUrl() + 'hoot/me/reaction', {
-            method: 'POST', body: component, headers: {
+            method: 'POST', body: JSON.stringify(component), headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
         }).then(response => response.json()).then(promiseOnSuccess).catch(promiseOnError);
@@ -321,7 +337,7 @@ class Api
     {
         // TODO: Set Cookie for Auth
         fetch(Config.getApiUrl() + 'hoot/me/reaction', {
-            method: 'DELETE', body: component, headers: {
+            method: 'DELETE', body: JSON.stringify(component), headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
         }).then(response => response.json().then(response => response)).then(promiseOnSuccess).catch(promiseOnError);
