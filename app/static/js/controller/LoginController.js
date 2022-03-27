@@ -35,7 +35,7 @@ class LoginController extends BaseController
             Api.getUserMe(user => {
                 UserData.setUser(user);
                 Menu.rebuildMenu();
-                window.hootObjects.router.setRoute('');
+                window.hootObjects.router.setRoute(window.hootObjects.router.getDefaultRoute());
             }, er => {});
         } else {
             console.log(response);

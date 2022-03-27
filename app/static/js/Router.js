@@ -13,10 +13,10 @@ class Router
      */
     setRoute(route)
     {
-        let url = new URL(window.location);
-        url.searchParams.set('route', route);
+        let routeConfig = new URLSearchParams(window.location.hash.substring(1));
+        routeConfig.set('route', route);
 
-        window.history.pushState({}, '', url);
+        window.location.hash = '#' + routeConfig.toString();
     }
 
     dispatch()

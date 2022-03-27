@@ -219,10 +219,10 @@ class Api
      */
     static getHootTimelineMine(lastPostId, quantity, tags, promiseOnSuccess, promiseOnError)
     {
-        let url = Config.getApiUrl() + 'hoot/timeline/mine?lastPostId=' + lastPostId + '&quantity=' + quantity;
+        let url = Config.getApiUrl() + 'hoot/timeline/mine?' + '&quantity=' + quantity;
+        url += lastPostId ? '&lastPostId=' + lastPostId : '';
         url += tags ? '&tags=' + tags : '';
 
-        // TODO: Set Cookie for Auth
         fetch(url, {
             method: 'GET', headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',

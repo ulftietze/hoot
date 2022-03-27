@@ -1,0 +1,15 @@
+#!/bin/bash
+
+export $(echo $(cat .env | sed 's/#.*//g' | sed 's/\r//g' | xargs) | envsubst)
+
+echo -n "Upload Files"
+bin/uploadFiles
+echo " - DONE"
+
+echo -n "Copy index.html"
+ssh "$REMOTE_USER"@"$REMOTE_HOST" "sudo -u tomcat cp ${REMOTE_PATH}app/index.html /var/lib/tomcat9/webapps/${REMOTE_USER}-java/index.html"
+echo " - DONE"
+
+echo -n "Copy static files"
+ssh "$REMOTE_USER"@"$REMOTE_HOST" "sudo -u tomcat rsync -ar ${REMOTE_PATH}app/static/ /var/lib/tomcat9/webapps/${REMOTE_USER}-java/static"
+echo " - DONE"

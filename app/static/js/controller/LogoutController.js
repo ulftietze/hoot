@@ -7,6 +7,17 @@ class LogoutController extends BaseController
 
     execute()
     {
-        console.log(self);
+        Api.logout(response => {
+            if (response === 'true') {
+                UserData.setUser(null);
+                Menu.rebuildMenu();
+            } else {
+                /** TODO: Show error message */
+                console.log(response);
+            }
+        }, er => {
+            /** TODO: Show error message */
+            console.log(er);
+        });
     }
 }
