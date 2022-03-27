@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 @AuthenticationRequired
-@WebServlet({"/api/V1/user", "/api/V1/user/me"})
+@WebServlet({"/api/V1/user"})
 public class UserApiServlet extends AbstractApiServlet
 {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
@@ -41,54 +41,5 @@ public class UserApiServlet extends AbstractApiServlet
             int httpStatus = HttpServletResponse.SC_NOT_FOUND;
             this.sendResponse(response, httpStatus, this.serialize(e.getMessage()));
         }
-    }
-
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
-    {
-        UserRepository repository = (UserRepository) ObjectManager.get(UserRepository.class);
-        SecureUser     secureUser = (SecureUser) this.deserializeJsonRequestBody(request, SecureUser.class);
-
-        try {
-            User entity = this.map(secureUser);
-            repository.save(entity);
-
-            this.sendResponse(response, HttpServletResponse.SC_OK, this.serialize("saved"));
-        } catch (CouldNotSaveException | EntityNotFoundException | GeneralSecurityException e) {
-            int httpStatus = HttpServletResponse.SC_NOT_ACCEPTABLE;
-            this.sendResponse(response, httpStatus, this.serialize(e.getMessage()));
-        }
-    }
-
-    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
-    {
-        UserRepository repository = (UserRepository) ObjectManager.get(UserRepository.class);
-        SecureUser     secureUser = (SecureUser) this.deserializeJsonRequestBody(request, SecureUser.class);
-
-        try {
-            User entity = this.map(secureUser);
-            repository.save(entity);
-
-            this.sendResponse(response, HttpServletResponse.SC_OK, this.serialize("saved"));
-        } catch (CouldNotSaveException | EntityNotFoundException | GeneralSecurityException e) {
-            int httpStatus = HttpServletResponse.SC_NOT_ACCEPTABLE;
-            this.sendResponse(response, httpStatus, this.serialize(e.getMessage()));
-        }
-    }
-
-    public User map(SecureUser secureUser) throws EntityNotFoundException, GeneralSecurityException
-    {
-        UserRepository repository = (UserRepository) ObjectManager.get(UserRepository.class);
-        Hasher         hasher     = (Hasher) ObjectManager.get(Hasher.class);
-        User           user       = repository.getById(secureUser.id);
-
-        user.username = secureUser.username;
-
-        if (secureUser.password != null) {
-            user.passwordHash = hasher.hash(secureUser.password);
-        }
-
-        this.saveImage(secureUser.imageFilename, secureUser.image);
-
-        return user;
     }
 }

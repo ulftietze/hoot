@@ -4,7 +4,9 @@ class UserData
 
     static isLoggedIn()
     {
-        return this.getUser() !== null;
+        let user = this.getUser();
+
+        return user !== null && typeof user === 'object' && 'id' in user;
 
     }
 
