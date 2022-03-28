@@ -62,6 +62,10 @@ class ExploreController extends BaseController
             documentElement.removeChild(documentElement.lastChild);
         }
 
+        if (UserData.isLoggedIn()) {
+            documentElement.appendChild(HootComponent.drawCreateHoot());
+        }
+
         Api.getHootTimelineGlobal(null, 50, '', hoots => {
             this.hoots = hoots;
             HootsComponent.appendHootsToElement(this.hoots, documentElement);

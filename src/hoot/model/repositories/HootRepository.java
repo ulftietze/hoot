@@ -207,6 +207,23 @@ public class HootRepository extends AbstractRepository<Hoot>
     @Override
     public void save(Hoot hoot) throws CouldNotSaveException
     {
+        if (hoot.hootType == HootType.Post) {
+            Post postHoot = (Post) hoot;
+            if (postHoot.content.equals("")) {
+                throw new CouldNotSaveException("Post with empty content");
+            }
+        } else if (hoot.hootType == HootType.Image) {
+            Image postImage = (Image) hoot;
+            if (postImage.content.equals("")) {
+                throw new CouldNotSaveException("Image post with empty content");
+            }
+        } else if (hoot.hootType == HootType.Comment) {
+            Comment postImage = (Comment) hoot;
+            if (postImage.content.equals("")) {
+                throw new CouldNotSaveException("Comment with empty content");
+            }
+        }
+
         if (hoot.id == null) {
             if (hoot.user != null && hoot.user.id != null) {
                 this.create(hoot);

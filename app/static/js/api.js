@@ -260,9 +260,9 @@ class Api
     }
 
     /**
-     * @param {Post}  component
-     * @param {function} promiseOnSuccess
-     * @param {function} promiseOnError
+     * @param {HootPostSave} component
+     * @param {function}     promiseOnSuccess
+     * @param {function}     promiseOnError
      */
     static postHootPost(component, promiseOnSuccess, promiseOnError)
     {
@@ -278,9 +278,9 @@ class Api
     }
 
     /**
-     * @param {Comment} component
-     * @param {function}   promiseOnSuccess
-     * @param {function}   promiseOnError
+     * @param {HootCommentSave} component
+     * @param {function}        promiseOnSuccess
+     * @param {function}        promiseOnError
      */
     static postHootComment(component, promiseOnSuccess, promiseOnError)
     {
@@ -296,9 +296,9 @@ class Api
     }
 
     /**
-     * @param {Image} component
-     * @param {function} promiseOnSuccess
-     * @param {function} promiseOnError
+     * @param {HootImageSave} component
+     * @param {function}      promiseOnSuccess
+     * @param {function}      promiseOnError
      */
     static postHootImage(component, promiseOnSuccess, promiseOnError)
     {

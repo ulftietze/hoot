@@ -42,6 +42,16 @@ main {
     }
 }
 
+.input-new-post {
+    background-color: var(--bs-dark);
+    border-color: var(--bs-dark);
+}
+
+.input-new-post:focus {
+    background-color: var(--bs-dark);
+    border-color: var(--bs-dark);
+}
+
 .btn-primary {
     color: #fff;
     background-color: var(--bs-primary);
@@ -100,4 +110,41 @@ main {
     color: #fff;
     background-color: var(--bs-secondary-darker);
     border-color: var(--bs-secondary-darker);
+}
+
+.profile-card > .card-img-top {
+    height: 120px;
+    object-fit: cover;
+    width: 100%;
+}
+
+.user {
+    position: relative
+}
+
+.profile img {
+    height: 80px;
+    width: 80px;
+    margin-top: 2px
+}
+
+.profile {
+    position: absolute;
+    top: -50px;
+    left: 38%;
+    height: 90px;
+    width: 90px;
+    border: 3px solid #fff;
+    border-radius: 50%
+}
+
+.follow {
+    border-radius: 15px;
+    padding-left: 20px;
+    padding-right: 20px;
+    height: 35px
+}
+
+.stats span {
+    font-size: 29px
 }

@@ -7,6 +7,15 @@ class ProfileController extends BaseController
 
     execute()
     {
-        console.log(self);
+        if (!UserData.isLoggedIn()) {
+            return;
+        }
+
+        let component                  = ProfileComponent.drawProfileHead(UserData.getUser());
+        let documentElement            = document.getElementById('content-container');
+        documentElement.style.maxWidth = '720px';
+        documentElement.classList.add('container');
+
+        documentElement.appendChild(component);
     }
 }

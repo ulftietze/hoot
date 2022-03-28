@@ -62,6 +62,10 @@ class HomeController extends BaseController
             documentElement.removeChild(documentElement.lastChild);
         }
 
+        if (UserData.isLoggedIn()) {
+            documentElement.appendChild(HootComponent.drawCreateHoot());
+        }
+
         Api.getHootTimelineMine(null, 50, '', hoots => {
             this.hoots = hoots;
             HootsComponent.appendHootsToElement(this.hoots, documentElement);

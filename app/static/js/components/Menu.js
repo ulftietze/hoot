@@ -73,7 +73,7 @@ class Menu
             menuLiLink.href = menuItem.target;
             menuLiLink.classList.add('nav-link', 'text-white');
             menuLiLink.setAttribute('aria-current', 'page');
-            menuLiLink.appendChild(this.#createBootstrapSvg(menuItem.icon, 24, 24, 'bi', 'me-2'));
+            menuLiLink.appendChild(UtilComponent.createBootstrapSvg(menuItem.icon, 24, 24, 'bi', 'me-2'));
 
             let menuText       = document.createElement('span');
             menuText.innerText = menuItem.text;
@@ -103,7 +103,7 @@ class Menu
         spanHeading.classList.add('fs-1', 'font-heading');
         spanHeading.innerText = 'hoot';
 
-        iconLink.appendChild(this.#createBootstrapSvg('#bootstrap', 40, 32, 'bi', 'me-2'));
+        iconLink.appendChild(UtilComponent.createBootstrapSvg('#bootstrap', 40, 32, 'bi', 'me-2'));
         iconLink.appendChild(spanHeading);
 
         return iconLink;
@@ -149,7 +149,12 @@ class Menu
         dropdownList.setAttribute('aria-labelledby', 'dropdown-menu-profile');
         dropdownList.classList.add('dropdown-menu', 'dropdown-menu-dark', 'text-small', 'shadow');
 
-        dropdownList.appendChild(this.#createListLink('drp-ite', 'dropdown-item', '#settings', 'Einstellungen'));
+        dropdownList.appendChild(this.#createListLink(
+            'drp-ite',
+            'dropdown-item',
+            '#route=' + Config.routeMapping.settings.target,
+            'Einstellungen',
+        ));
         dropdownList.appendChild(this.#createListLink(
             'drp-ite',
             'dropdown-item',
@@ -200,7 +205,7 @@ class Menu
             menuLiLink.classList.add('nav-link', 'py-3', 'text-white');
             menuLiLink.setAttribute('data-bs-toggle', 'tooltip');
             menuLiLink.setAttribute('data-bs-placement', 'right');
-            menuLiLink.appendChild(this.#createBootstrapSvg(menuItem.icon, 24, 24, 'bi', 'me-2'));
+            menuLiLink.appendChild(UtilComponent.createBootstrapSvg(menuItem.icon, 24, 24, 'bi', 'me-2'));
             ul.appendChild(menuLiLink);
         });
 
@@ -217,7 +222,7 @@ class Menu
         spanHidden.classList.add('visually-hidden');
         spanHidden.innerText = 'Icon-only';
 
-        iconLink.appendChild(this.#createBootstrapSvg('#bootstrap', 40, 32, 'bi'));
+        iconLink.appendChild(UtilComponent.createBootstrapSvg('#bootstrap', 40, 32, 'bi'));
         iconLink.appendChild(spanHidden);
 
         return iconLink;
@@ -226,6 +231,11 @@ class Menu
     static #buildMenuFooterMobile()
     {
         let dropdownDiv = document.createElement('div');
+
+        if (!UserData.isLoggedIn()) {
+            return dropdownDiv;
+        }
+
         dropdownDiv.classList.add('dropdown', 'border-top');
 
         let dropdownLink  = document.createElement('a');
@@ -256,8 +266,18 @@ class Menu
         let dropdownList = document.createElement('ul');
         dropdownList.setAttribute('aria-labelledby', 'dropdown-menu-profile-mobile');
         dropdownList.classList.add('dropdown-menu', 'text-small', 'shadow');
-        dropdownList.appendChild(this.#createListLink('drp-ite', 'dropdown-item', '#settings', 'Einstellungen'));
-        dropdownList.appendChild(this.#createListLink('drp-ite', 'dropdown-item', '#logout', 'Logout'));
+        dropdownList.appendChild(this.#createListLink(
+            'drp-ite',
+            'dropdown-item',
+            '#route=' + Config.routeMapping.settings.target,
+            'Einstellungen',
+        ));
+        dropdownList.appendChild(this.#createListLink(
+            'drp-ite',
+            'dropdown-item',
+            '#route=' + Config.routeMapping.logout.target,
+            'Logout',
+        ));
 
         dropdownDiv.appendChild(dropdownList);
 
@@ -277,24 +297,5 @@ class Menu
         listItem.appendChild(link);
 
         return listItem;
-    }
-
-    static #createBootstrapSvg(identifier, width, height, ...cssClass)
-    {
-        let iconSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        iconSvg.classList.add(...cssClass);
-        iconSvg.setAttribute('width', width);
-        iconSvg.setAttribute('height', height);
-
-        let svgUse = document.createElementNS('http://www.w3.org/2000/svg', 'use');
-        svgUse.setAttributeNS(
-            'http://www.w3.org/1999/xlink',
-            'xlink:href',
-            'static/icons/bootstrap-icons.svg' + identifier,
-        );
-
-        iconSvg.appendChild(svgUse);
-
-        return iconSvg;
     }
 }

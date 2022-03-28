@@ -12,6 +12,7 @@ class Config
         profile : {target: 'profile', controller: new ProfileController()},
         monitor : {target: 'monitor', controller: new MonitorController()},
         swagger : {target: 'swagger', controller: new SwaggerController()},
+        settings: {target: 'settings', controller: new SettingsController()},
         login   : {target: 'login', controller: new LoginController()},
         logout  : {target: 'logout', controller: new LogoutController()},
         register: {target: 'register', controller: new RegisterController()},

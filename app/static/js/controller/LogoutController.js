@@ -8,8 +8,8 @@ class LogoutController extends BaseController
     execute()
     {
         Api.logout(response => {
+            UserData.setUser(null);
             if (response === 'true') {
-                UserData.setUser(null);
                 Menu.rebuildMenu();
             } else {
                 /** TODO: Show error message */
