@@ -9,9 +9,9 @@ class Api
     {
         // TODO: Set Cookie for Auth
         fetch(Config.getApiUrl() + 'login', {
-            method: 'POST',
+            method     : 'POST',
             credentials: 'include',
-            body: JSON.stringify(component), headers: {
+            body       : JSON.stringify(component), headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
         }).then(response => response.json()).then(promiseOnSuccess).catch(promiseOnError);
@@ -24,9 +24,9 @@ class Api
     static logout(promiseOnSuccess, promiseOnError)
     {
         fetch(Config.getApiUrl() + 'logout', {
-            method: 'POST',
+            method     : 'POST',
             credentials: 'include',
-            headers: {
+            headers    : {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
         }).then(response => response.json()).then(promiseOnSuccess).catch(promiseOnError);
@@ -41,9 +41,9 @@ class Api
     {
         // TODO: Set Cookie for Auth
         fetch(Config.getApiUrl() + 'register', {
-            method: 'POST',
+            method     : 'POST',
             credentials: 'include',
-            body: JSON.stringify(component), headers: {
+            body       : JSON.stringify(component), headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
         }).then(response => response.json()).then(promiseOnSuccess).catch(promiseOnError);
@@ -59,9 +59,9 @@ class Api
         // TODO: Set Cookie for Auth
         // TODO: Check for easier query params
         fetch(Config.getApiUrl() + 'user?id=' + userId, {
-            method: 'GET',
+            method     : 'GET',
             credentials: 'include',
-            headers: {
+            headers    : {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
         })
@@ -78,9 +78,9 @@ class Api
     {
         // TODO: Set Cookie for Auth
         fetch(Config.getApiUrl() + 'user/me', {
-            method: 'GET',
+            method     : 'GET',
             credentials: 'include',
-            headers: {
+            headers    : {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
         })
@@ -98,9 +98,9 @@ class Api
     {
         // TODO: Set Cookie for Auth
         fetch(Config.getApiUrl() + 'user/me', {
-            method: 'PUT',
+            method     : 'PUT',
             credentials: 'include',
-            body: JSON.stringify(component), headers: {
+            body       : JSON.stringify(component), headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
         })
@@ -118,9 +118,9 @@ class Api
     {
         // TODO: Set Cookie for Auth
         fetch(Config.getApiUrl() + 'user/me/follow', {
-            method: 'POST',
+            method     : 'POST',
             credentials: 'include',
-            body: userIdToFollow, headers: {
+            body       : userIdToFollow, headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
         }).then(response => response.json()).then(promiseOnSuccess).catch(promiseOnError);
@@ -135,9 +135,9 @@ class Api
     {
         // TODO: Set Cookie for Auth
         fetch(Config.getApiUrl() + 'user/me/unfollow', {
-            method: 'POST',
+            method     : 'POST',
             credentials: 'include',
-            body: userIdToUnfollow, headers: {
+            body       : userIdToUnfollow, headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
             },
         }).then(response => response.json()).then(promiseOnSuccess).catch(promiseOnError);
@@ -196,7 +196,7 @@ class Api
      */
     static getHootTimelineGlobal(lastPostId, quantity, tags, promiseOnSuccess, promiseOnError)
     {
-        let url = Config.getApiUrl() + 'hoot/timeline/global?' + '&quantity=' + quantity;
+        let url = Config.getApiUrl() + 'hoot/timeline/global?quantity=' + quantity;
         url += lastPostId ? '&lastPostId=' + lastPostId : '';
         url += tags ? '&tags=' + tags : '';
 
@@ -219,7 +219,7 @@ class Api
      */
     static getHootTimelineMine(lastPostId, quantity, tags, promiseOnSuccess, promiseOnError)
     {
-        let url = Config.getApiUrl() + 'hoot/timeline/mine?' + '&quantity=' + quantity;
+        let url = Config.getApiUrl() + 'hoot/timeline/mine?quantity=' + quantity;
         url += lastPostId ? '&lastPostId=' + lastPostId : '';
         url += tags ? '&tags=' + tags : '';
 
@@ -234,7 +234,7 @@ class Api
     }
 
     /**
-     * @param {int}         lastPostId
+     * @param {int|null}    lastPostId
      * @param {int}         quantity
      * @param {String|null} tags
      * @param {int|null}    userId
@@ -243,10 +243,11 @@ class Api
      */
     static getHootSearch(lastPostId, quantity, tags, userId, promiseOnSuccess, promiseOnError)
     {
-        let url = Config.getApiUrl() + 'hoot/Search?lastPostId=' + lastPostId + '&quantity=' + quantity;
+        let url = Config.getApiUrl() + 'hoot/search?quantity=' + quantity;
 
+        url += lastPostId ? '&lastPostId=' + lastPostId : '';
         url += tags ? '&tags=' + tags : '';
-        url += userId ? '&userId' + userId : '';
+        url += userId ? '&userId=' + userId : '';
 
         // TODO: Set Cookie for Auth
         fetch(url, {
@@ -257,6 +258,21 @@ class Api
             .then(response => response.json().then(response => Object.assign(new Hoots(), response)))
             .then(promiseOnSuccess)
             .catch(promiseOnError);
+    }
+
+    /**
+     * @param {int}      hootId
+     * @param {function} promiseOnSuccess
+     * @param {function} promiseOnError
+     */
+    static deleteHoot(hootId, promiseOnSuccess, promiseOnError)
+    {
+        // TODO: Set Cookie for Auth
+        fetch(Config.getApiUrl() + 'hoot?hootId=' + hootId, {
+            method: 'DELETE', headers: {
+                'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
+            },
+        }).then(response => response.json()).then(promiseOnSuccess).catch(promiseOnError);
     }
 
     /**

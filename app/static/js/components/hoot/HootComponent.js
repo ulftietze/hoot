@@ -76,6 +76,23 @@ class HootComponent
         }, er => console.log(er));
     }
 
+    static #deleteHoot(event)
+    {
+        let hootId = event.target.getAttribute('data-hoot-id');
+
+        console.log(hootId);
+
+        Api.deleteHoot(hootId, boolean => {
+            if (boolean === 'true') {
+                let hootElement = document.querySelector('div[data-hoot-id="' + hootId + '"]');
+                hootElement.remove();
+            } else {
+                console.log('Could not delete hoot');
+            }
+        }, er => console.log(er));
+
+    }
+
     /**
      * Create hoot element
      *
@@ -121,7 +138,25 @@ class HootComponent
         rowGutter.appendChild(cardHead);
         rowGutter.appendChild(cardBody);
 
+        let hootFooter = document.createElement('div');
+
+        hootFooter.classList.add('card-footer', 'd-flex', 'justify-content-between');
+        let created       = document.createElement('p');
+        created.innerText = hoot.created.toLocaleString();
+        hootFooter.appendChild(created);
+        if (UserData.isLoggedIn() && hoot.user.id === UserData.getUser().id) {
+            let deleteButton  = document.createElement('button');
+            deleteButton.id   = 'delete-hoot-button';
+            deleteButton.type = 'button';
+            deleteButton.classList.add('btn', 'btn-primary', 'text-white');
+            deleteButton.setAttribute('data-hoot-id', hoot.id.toString());
+            deleteButton.addEventListener('click', this.#deleteHoot.bind(this));
+            let deleteIcon = UtilComponent.createBootstrapSvg('#trash', 20, 20, 'bi', 'me-2');
+            deleteButton.appendChild(deleteIcon);
+            hootFooter.appendChild(deleteButton);
+        }
         hootElement.appendChild(rowGutter);
+        hootElement.appendChild(hootFooter);
 
         return hootElement;
     }

@@ -3,18 +3,44 @@ class Router
     constructor()
     {
         window.addEventListener('popstate', () => this.dispatch());
-        this.dispatch();
     }
 
     /**
-     * Set route which will trigger the popstate event
+     * Set route which will trigger the popstate event.
      *
      * @param route
      */
     setRoute(route)
     {
-        let routeConfig = new URLSearchParams(window.location.hash.substring(1));
+        let routeConfig = new URLSearchParams('');
         routeConfig.set('route', route);
+
+        window.location.hash = '#' + routeConfig.toString();
+    }
+
+    /**
+     * Get parameter from hash url location.
+     *
+     * @param {String} param
+     */
+    getParameter(param)
+    {
+        let routeConfig = new URLSearchParams(window.location.hash.substring(1));
+
+        return routeConfig.get(param);
+    }
+
+    /**
+     * Set or update any parameter from hash url location
+     * This will - just like {@see setRoute} - trigger the popstate event.
+     *
+     * @param {String} param
+     * @param {any}    value
+     */
+    setParameter(param, value)
+    {
+        let routeConfig = new URLSearchParams(window.location.hash.substring(1));
+        routeConfig.set(param, value.toString());
 
         window.location.hash = '#' + routeConfig.toString();
     }
@@ -56,6 +82,5 @@ class Router
     getDefaultRoute()
     {
         return UserData.isLoggedIn() ? Config.routeMapping.home.target : Config.routeMapping.explore.target;
-        ;
     }
 }

@@ -378,6 +378,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/hoots'
+  /hoot:
+    delete:
+      summary: Delete hoot by id
+      tags:
+        - hoot
+      security:
+        - cookieAuth: [ ]
+      parameters:
+        - in: query
+          name: hootId
+          description: HootId of the hoot to delete
+          schema:
+            type: integer
+            nullable: false
+      responses:
+        '200':
+          description: 'successful deleted'
+          content:
+            'application/json':
+              schema:
+                type: boolean
   /hoot/post:
     post:
       summary: Save and publish a post

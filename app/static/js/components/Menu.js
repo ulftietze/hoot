@@ -4,7 +4,7 @@ class Menu
         {target: '#route=' + Config.routeMapping.home.target, text: 'Heimat', icon: '#house-door'},
         {target: '#route=' + Config.routeMapping.explore.target, text: 'Entdecken', icon: '#binoculars'},
         {target: '#route=' + Config.routeMapping.search.target, text: 'Suche', icon: '#search'},
-        {target: '#route=' + Config.routeMapping.profile.target, text: 'Profil', icon: '#person-fill'},
+        {target: '#route=' + Config.routeMapping.profile.target + '&userId=currentUser&test=t', text: 'Profil', icon: '#person-fill'},
         {target: '#route=' + Config.routeMapping.monitor.target, text: 'Monitor', icon: '#graph-down'},
         {target: '#route=' + Config.routeMapping.swagger.target, text: 'OpenApi3.0', icon: '#braces'},
     ];

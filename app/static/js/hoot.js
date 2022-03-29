@@ -3,6 +3,7 @@ window.addEventListener('load', () => {
     window.hootObjects.persistentStorage = new PersistentStorage();
     window.hootObjects.controller        = [];
     window.hootObjects.router            = new Router();
+    window.hootObjects.router.dispatch();
 
     Menu.buildMenu();
 

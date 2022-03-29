@@ -45,6 +45,7 @@ main {
 .input-new-post {
     background-color: var(--bs-dark);
     border-color: var(--bs-dark);
+    padding-left: 0;
 }
 
 .input-new-post:focus {

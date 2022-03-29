@@ -32,6 +32,7 @@ public class TimelineMineSearchCriteria implements SearchCriteriaInterface
         QueryBuilder queryBuilder = (QueryBuilder) ObjectManager.create(QueryBuilder.class);
 
         ArrayList<Integer> followIds = new ArrayList<>();
+        followIds.add(timelineForUserId);
         this.getFollowerForUserId(this.timelineForUserId).forEach(follower -> followIds.add(follower.follows.id));
 
         queryBuilder.addWhereIn("h.user", followIds);

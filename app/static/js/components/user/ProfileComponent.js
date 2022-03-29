@@ -45,7 +45,9 @@ class ProfileComponent
 
         profileBody.appendChild(profileHeadline);
         profileBody.appendChild(profileHeadlineSmall);
-        profileBody.appendChild(buttonFollow);
+        if (UserData.getUser().id !== user.id) {
+            profileBody.appendChild(buttonFollow);
+        }
         profileBody.appendChild(profileContent);
 
         wrapperCard.appendChild(profileBody);
