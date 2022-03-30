@@ -124,7 +124,9 @@ class HootComponent
         cardBody.classList.add('col-8');
         let cardBodyContent = document.createElement('div');
         cardBodyContent.classList.add('card-body');
-        let userHeadline = document.createElement('p');
+        let userHeadline                  = document.createElement('a');
+        userHeadline.style.textDecoration = 'none';
+        userHeadline.href = '#route=profile&userId=' + hoot.user.id;
         userHeadline.classList.add('text-monospace', 'text-muted');
         userHeadline.textContent = '@' + hoot.user.username;
         let content              = document.createElement('p');

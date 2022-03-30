@@ -58,6 +58,12 @@ class ProfileController extends BaseController
 
     execute()
     {
+        if (!UserData.isLoggedIn()) {
+            UtilComponent.createToast('Dafür musst du eingeloggt sein.');
+            window.hootObjects.router.setRoute(Config.routeMapping.login.target);
+            return;
+        }
+
         this.hoots                     = new Hoots();
         let documentElement            = document.getElementById('content-container');
         documentElement.style.maxWidth = '720px';

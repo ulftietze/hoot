@@ -4,7 +4,7 @@ class Menu
         {target: '#route=' + Config.routeMapping.home.target, text: 'Heimat', icon: '#house-door'},
         {target: '#route=' + Config.routeMapping.explore.target, text: 'Entdecken', icon: '#binoculars'},
         {target: '#route=' + Config.routeMapping.search.target, text: 'Suche', icon: '#search'},
-        {target: '#route=' + Config.routeMapping.profile.target + '&userId=currentUser&test=t', text: 'Profil', icon: '#person-fill'},
+        {target: '#route=' + Config.routeMapping.profile.target + '&userId=currentUser', text: 'Profil', icon: '#person-fill'},
         {target: '#route=' + Config.routeMapping.monitor.target, text: 'Monitor', icon: '#graph-down'},
         {target: '#route=' + Config.routeMapping.swagger.target, text: 'OpenApi3.0', icon: '#braces'},
     ];
@@ -103,7 +103,8 @@ class Menu
         spanHeading.classList.add('fs-1', 'font-heading');
         spanHeading.innerText = 'hoot';
 
-        iconLink.appendChild(UtilComponent.createBootstrapSvg('#bootstrap', 40, 32, 'bi', 'me-2'));
+        //iconLink.appendChild(UtilComponent.createBootstrapSvg('#bootstrap', 40, 32, 'bi', 'me-2'));
+        iconLink.appendChild(UtilComponent.createSvg('static/image/moin.svg', 40, 50, 'bi', 'me-2'));
         iconLink.appendChild(spanHeading);
 
         return iconLink;
@@ -222,7 +223,8 @@ class Menu
         spanHidden.classList.add('visually-hidden');
         spanHidden.innerText = 'Icon-only';
 
-        iconLink.appendChild(UtilComponent.createBootstrapSvg('#bootstrap', 40, 32, 'bi'));
+        //iconLink.appendChild(UtilComponent.createBootstrapSvg('#bootstrap', 40, 32, 'bi'));
+        iconLink.appendChild(UtilComponent.createSvg('static/image/moin.svg', 40, 50, 'bi', 'me-2'));
         iconLink.appendChild(spanHidden);
 
         return iconLink;

@@ -7,7 +7,7 @@ activityDiagram {
   BorderColor #444365
   LineColor #444365
   FontColor #FFF
-  FontSize 17
+  FontSize 30
   FontName arial
 
   diamond {
@@ -16,18 +16,18 @@ activityDiagram {
     LineColor #d56a4e
     FontColor #444365
     FontName arial
-    FontSize 17
+    FontSize 30
   }
   arrow {
     LineColor #d56a4e
     FontColor #d56a4e
     FontName Impact
-    FontSize 13
+    FontSize 26
   }
   partition {
     LineColor #d56a4e
     FontColor #d56a4e
-    FontSize 17
+    FontSize 26
     RoundCorner 10
     BackgroundColor lightgray
   }
@@ -66,9 +66,9 @@ partition DependencyInjection {
     while (Instanzvariablen übrig)
       if (Instanzvariable hat Inject-Annotation) is (wahr) then
         if (Annotation hat konkrete Klasse konfiguriert) is (wahr) then
-          :konkrete Klasse = an Annotation konfigurierte Klasse;
+          :Klasse = an Annotation konfigurierte Klasse;
         else (falsch)
-          :konkrete Klasse = Typ der Instanzvariable;
+          :Klasse = Typ der Instanzvariable;
         endif
         :Laden und setzen der konkreten Klasse durch ObjectManager;
       else (falsch)

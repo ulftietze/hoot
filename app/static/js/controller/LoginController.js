@@ -19,7 +19,7 @@ class LoginController extends BaseController
             login.username = document.getElementById('username').value;
             login.password = document.getElementById('password').value;
 
-            Api.login(login, this.#login, error => console.log(error));
+            Api.login(login, this.#login, error => UtilComponent.createToast('Das hat leider nicht geklappt'));
         });
         form.classList.add('container', 'text-white');
 
@@ -35,10 +35,11 @@ class LoginController extends BaseController
             Api.getUserMe(user => {
                 UserData.setUser(user);
                 Menu.rebuildMenu();
+                UtilComponent.createToast('Moin');
                 window.hootObjects.router.setRoute(window.hootObjects.router.getDefaultRoute());
-            }, er => {});
+            }, er => UtilComponent.createToast('Etwas ist ziemlich schiefgelaufen.'));
         } else {
-            console.log(response);
+            UtilComponent.createToast('Falscher Login');
         }
     }
 }
