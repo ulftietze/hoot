@@ -140,7 +140,7 @@ class Menu
         profileImage.height = 32;
 
         let strong       = document.createElement('strong');
-        strong.innerText = 'mdo';
+        strong.innerText = UserData.getUser()?.username;
 
         dropdownLink.appendChild(profileImage);
         dropdownLink.appendChild(strong);
@@ -258,7 +258,7 @@ class Menu
         let profileImage = document.createElement('img');
         profileImage.classList.add('rounded-circle');
         profileImage.src    = UserData.getProfileImage();
-        profileImage.alt    = 'mdo';
+        profileImage.alt    = UserData.getUser()?.username;
         profileImage.width  = 32;
         profileImage.height = 32;
 

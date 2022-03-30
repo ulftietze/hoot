@@ -45,6 +45,10 @@ class HomeController extends BaseController
         }
 
         Api.getHootTimelineMine(lastPostId, 50, '', hoots => {
+            if (!hoots.hoots.length) {
+                // Do not reset loading flag to prevent infinite loading
+                return;
+            }
             this.hoots.hoots = this.hoots.hoots.concat(hoots.hoots).sort((a, b) => a.id < b.id ? -1 : 1);
             HootsComponent.appendHootsToElement(this.hoots, documentElement);
             this.loading = false;
@@ -53,6 +57,7 @@ class HomeController extends BaseController
 
     execute()
     {
+        this.loading        = false;
         this.hoots          = new Hoots();
         let documentElement = document.getElementById('content-container');
         documentElement.classList.add('container');

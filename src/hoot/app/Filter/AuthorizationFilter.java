@@ -45,6 +45,7 @@ public class AuthorizationFilter implements Filter
         HttpServletRequest  httpRequest  = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
+        // TODO: Move to a dedicated place
         this.requestPublisher.publish(new HashMap<String, Object>()
         {{
             put("session", httpRequest.getSession(false));

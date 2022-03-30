@@ -45,6 +45,10 @@ class ExploreController extends BaseController
         }
 
         Api.getHootTimelineGlobal(lastPostId, 50, '', hoots => {
+            if (!hoots.hoots.length) {
+                // Do not reset loading flag to prevent infinite loading
+                return;
+            }
             this.hoots.hoots = this.hoots.hoots.concat(hoots.hoots).sort((a, b) => a.id < b.id ? -1 : 1);
             HootsComponent.appendHootsToElement(this.hoots, documentElement);
             this.loading = false;
@@ -55,6 +59,7 @@ class ExploreController extends BaseController
     {
         this.hoots          = new Hoots();
         let documentElement = document.getElementById('content-container');
+        this.loading        = false;
         documentElement.classList.add('container');
         documentElement.style.maxWidth = '720px';
 

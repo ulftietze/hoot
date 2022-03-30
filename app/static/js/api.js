@@ -90,6 +90,23 @@ class Api
     }
 
     /**
+     * @param {int}      userIdToCheck
+     * @param {function} promiseOnSuccess
+     * @param {function} promiseOnError
+     */
+    static getMeFollowsUser(userIdToCheck, promiseOnSuccess, promiseOnError)
+    {
+        // TODO: Set Cookie for Auth
+        fetch(Config.getApiUrl() + 'user/me/follows?userId=' + userIdToCheck, {
+            method     : 'GET',
+            credentials: 'include',
+            headers    : {
+                'Accept': 'application/json', 'Content-Type': 'application/json; charset=UTF-8',
+            },
+        }).then(response => response.json()).then(promiseOnSuccess).catch(promiseOnError);
+    }
+
+    /**
      * @param {User}  component
      * @param {function} promiseOnSuccess
      * @param {function} promiseOnError

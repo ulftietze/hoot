@@ -142,6 +142,28 @@ paths:
             'text/html':
               schema:
                 type: string
+  /user/me/follows:
+    get:
+      description: Check if current user follows specific user
+      summary: Check if current user follows specific user
+      tags:
+        - user
+      security:
+        - cookieAuth: [ ]
+      parameters:
+        - in: query
+          name: userId
+          description: UserId to check
+          schema:
+            type: integer
+            nullable: false
+      responses:
+        '200':
+          description: Boolean flag if followed or not
+          content:
+            'application/json':
+              schema:
+                type: boolean
   /user/me/follow:
     post:
       description: Current user follows another user

@@ -22,7 +22,6 @@ class ProfileController extends BaseController
             if (!this.match(window.hootObjects.router.getCurrentRoute())) {
                 return;
             }
-
             if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 1000) {
                 this.infiniteScrollLoad.bind(this)();
             }
@@ -50,9 +49,13 @@ class ProfileController extends BaseController
         }
 
         Api.getHootSearch(lastPostId, 50, null, userId, hoots => {
+            if (!hoots || !hoots.hoots || !hoots.hoots.length) {
+                // Do not reset loading flag to prevent infinite loading
+                return;
+            }
+            this.loading     = false;
             this.hoots.hoots = this.hoots.hoots.concat(hoots.hoots).sort((a, b) => a.id < b.id ? -1 : 1);
             HootsComponent.appendHootsToElement(this.hoots, hootsComponent);
-            this.loading = false;
         }, e => console.log(e));
     }
 
@@ -64,6 +67,7 @@ class ProfileController extends BaseController
             return;
         }
 
+        this.loading                   = false;
         this.hoots                     = new Hoots();
         let documentElement            = document.getElementById('content-container');
         documentElement.style.maxWidth = '720px';
@@ -96,14 +100,12 @@ class ProfileController extends BaseController
                 this.hoots = hoots;
                 HootsComponent.appendHootsToElement(this.hoots, hootsComponent);
             }, er => console.log(er));
-        }, er => console.log(er))
+        }, er => console.log(er));
     }
 
     getUserId()
     {
         let userId = window.hootObjects.router.getParameter(ProfileController.USER_ROUTE_IDENTIFIER);
-
-        console.log(userId);
 
         if (userId === 'currentUser') {
             userId = UserData.getUser().id;

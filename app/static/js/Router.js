@@ -45,10 +45,14 @@ class Router
         window.location.hash = '#' + routeConfig.toString();
     }
 
+    reload()
+    {
+        this.dispatch();
+    }
+
     dispatch()
     {
-        let route = this.getCurrentRoute();
-
+        let route      = this.getCurrentRoute();
         let controller = Object
             .entries(Config.getRouteMapping())
             .find(mapping => route === mapping[1].target);
