@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 @WebServlet("/api/V1/hoot/timeline/global")
 public class TimelineGlobalApiServlet extends AbstractApiServlet
@@ -23,9 +24,9 @@ public class TimelineGlobalApiServlet extends AbstractApiServlet
     {
         HootRepository          repository     = (HootRepository) ObjectManager.get(HootRepository.class);
         SearchCriteriaInterface searchCriteria = this.createSearchCriteriaFromRequest(request);
-
         try {
-            ArrayList<Hoot> hoots = repository.getList(searchCriteria);
+            HashMap<String, ArrayList<Hoot>> hoots = new HashMap<>();
+            hoots.put("hoots", repository.getList(searchCriteria));
             this.sendResponse(response, HttpServletResponse.SC_OK, this.serialize(hoots));
         } catch (EntityNotFoundException e) {
             int httpStatus = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;

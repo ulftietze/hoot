@@ -7,6 +7,7 @@ import hoot.model.query.api.GetUserIdIfValidLogin;
 import hoot.model.query.api.IsValidUserSession;
 import hoot.model.repositories.UserRepository;
 import hoot.system.Exception.CouldNotSaveException;
+import hoot.system.Logger.LoggerInterface;
 import hoot.system.objects.ObjectManager;
 import hoot.system.Queue.QueueManager;
 
@@ -21,6 +22,16 @@ import java.time.LocalDateTime;
 @WebServlet("/api/V1/login")
 public class LoginApiServlet extends AbstractApiServlet
 {
+    private LoggerInterface logger;
+
+    @Override
+    public void init() throws ServletException
+    {
+        super.init();
+
+        this.logger = (LoggerInterface) ObjectManager.get(LoggerInterface.class);
+    }
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
     {
         Login       login    = (Login) this.deserializeJsonRequestBody(request, Login.class);
@@ -51,7 +62,8 @@ public class LoginApiServlet extends AbstractApiServlet
             repository.save(user);
             session.setAttribute(IsValidUserSession.SESSION_USER_IDENTIFIER, user.id);
             queueManager.add("login", user);
-        } catch (CouldNotSaveException ignore) {
+        } catch (CouldNotSaveException e) {
+            this.logger.logException("Could not login user: " + e.getMessage(), e);
             return false;
         }
 

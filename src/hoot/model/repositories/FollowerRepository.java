@@ -1,5 +1,6 @@
 package hoot.model.repositories;
 
+import hoot.model.cache.UserCacheInterface;
 import hoot.model.entities.Follower;
 import hoot.model.search.SearchCriteriaInterface;
 import hoot.system.Database.QueryBuilder;
@@ -8,6 +9,7 @@ import hoot.system.Database.QueryResultRow;
 import hoot.system.Exception.CouldNotDeleteException;
 import hoot.system.Exception.CouldNotSaveException;
 import hoot.system.Exception.EntityNotFoundException;
+import hoot.system.objects.Inject;
 import hoot.system.objects.ObjectManager;
 
 import java.sql.Connection;
@@ -18,6 +20,8 @@ import java.util.Objects;
 
 public class FollowerRepository extends AbstractRepository<Follower>
 {
+    @Inject private UserCacheInterface userCache;
+
     public Long getFollowerCountForUser(Integer userID) throws EntityNotFoundException
     {
         if (userID == null) {
@@ -129,6 +133,9 @@ public class FollowerRepository extends AbstractRepository<Follower>
             String msg = "New Follower " + entity.user.id + " trying to follow " + entity.follows.id + e.getMessage();
             this.log(msg);
             throw new CouldNotSaveException(msg);
+        } finally {
+            this.userCache.purge(entity.user);
+            this.userCache.purge(entity.follows);
         }
     }
 
@@ -155,6 +162,9 @@ public class FollowerRepository extends AbstractRepository<Follower>
         } catch (SQLException e) {
             this.log(e.getMessage());
             throw new CouldNotDeleteException("Delete Follower " + entity.user.id + " following " + entity.follows.id);
+        } finally {
+            this.userCache.purge(entity.user);
+            this.userCache.purge(entity.follows);
         }
     }
 }

@@ -98,6 +98,39 @@ public class UserRepository extends AbstractRepository<User>
     }
 
     /**
+     * Try to return a User object representing the database entry by given username.
+     * TODO: Check if synchronisation is required!
+     *
+     * @param username User.id (Primary Key)
+     * @return User object if the user was found and no SQL errors occurred, null otherwise
+     */
+    public User getByUsernameAndPassword(String username, String passwordHash) throws EntityNotFoundException
+    {
+        User user;
+
+        try (Connection connection = this.getConnection()) {
+            QueryBuilder queryBuilder = (QueryBuilder) ObjectManager.create(QueryBuilder.class);
+            queryBuilder.SELECT.add("*");
+            queryBuilder.FROM = "User";
+            queryBuilder.addWhere("username = ?", username);
+            queryBuilder.addWhere("passwordHash = ?", passwordHash);
+
+            PreparedStatement statement = queryBuilder.build(connection);
+
+            QueryResultRow resultRow = this.statementFetcher.fetchOne(statement);
+            connection.close();
+
+            user = this.mapResultSetToUser(resultRow);
+        } catch (SQLException e) {
+            throw new EntityNotFoundException("Invalid username and password combination for: " + username);
+        }
+
+        this.userCache.put(user);
+
+        return user;
+    }
+
+    /**
      * TODO: Check if synchronisation is required!
      *
      * @param searchCriteria
@@ -207,6 +240,7 @@ public class UserRepository extends AbstractRepository<User>
                 throw new SQLException("User with username " + user.username + " was not saved.");
             }
         } catch (SQLException e) {
+            this.logger.logException("Could not update user " + user.id + ": " + e.getMessage(), e);
             throw new CouldNotSaveException("User with username " + user.username);
         } finally {
             this.userCache.purge(user);

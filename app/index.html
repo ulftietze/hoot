@@ -1,15 +1,74 @@
 <!doctype html>
 <html lang="en">
-<head>
-    <meta charset='utf-8'>
-    <link HREF="static/assets/main.css" rel="stylesheet">
-    <title>Mini Java Web Application</title>
-</head>
-<body>
-<h1>Hoots <span>- a howling social media network</span></h1>
-<p>This is just a plain html-page as a replacement before implementing hoots, the real implementation.</p>
-<p>You may or may not take a look at the current state of the api specification
-    <a href='./swagger'>Open API 3.0 Specification - V1</a>.
-</p>
-</body>
+    <head>
+        <meta charset="utf-8">
+        <script src="static/js/lib/popperjs_core@2.10.2_dist_umd_popper.js" type="application/javascript"></script>
+        <script src="static/js/lib/swagger-ui-dist@4.5.0_swagger-ui-bundle.js"></script>
+        <script src="static/js/lib/bootstrap@5.1.3_dist_js_bootstrap.js"></script>
+        <script src="static/js/model/authentication/Login.js"></script>
+        <script src="static/js/model/authentication/Register.js"></script>
+        <script src="static/js/model/hoot/Hoot.js"></script>
+        <script src="static/js/model/hoot/Comment.js"></script>
+        <script src="static/js/model/hoot/HootCommentSave.js"></script>
+        <script src="static/js/model/hoot/HootImageSave.js"></script>
+        <script src="static/js/model/hoot/HootPostSave.js"></script>
+        <script src="static/js/model/hoot/Hoots.js"></script>
+        <script src="static/js/model/hoot/HootTags.js"></script>
+        <script src="static/js/model/hoot/Image.js"></script>
+        <script src="static/js/model/hoot/Post.js"></script>
+        <script src="static/js/model/hoot/Reaction.js"></script>
+        <script src="static/js/model/hoot/ReactionMeSend.js"></script>
+        <script src="static/js/model/hoot/Tag.js"></script>
+        <script src="static/js/model/system/GraphList.js"></script>
+        <script src="static/js/model/user/Followers.js"></script>
+        <script src="static/js/model/user/Follows.js"></script>
+        <script src="static/js/model/user/Mentions.js"></script>
+        <script src="static/js/model/user/User.js"></script>
+        <script src="static/js/model/user/UserMeSave.js"></script>
+        <script src="static/js/PersistentStorage.js"></script>
+        <script src="static/js/api.js"></script>
+        <script src="static/js/exception/ControllerException.js"></script>
+        <script src="static/js/controller/BaseController.js"></script>
+        <script src="static/js/controller/HomeController.js"></script>
+        <script src="static/js/controller/ExploreController.js"></script>
+        <script src="static/js/controller/MonitorController.js"></script>
+        <script src="static/js/controller/ProfileController.js"></script>
+        <script src="static/js/controller/SearchController.js"></script>
+        <script src="static/js/controller/SettingsController.js"></script>
+        <script src="static/js/controller/SwaggerController.js"></script>
+        <script src="static/js/controller/RegisterController.js"></script>
+        <script src="static/js/controller/LoginController.js"></script>
+        <script src="static/js/controller/LogoutController.js"></script>
+        <script src="static/js/Config.js"></script>
+        <script src="static/js/UserData.js"></script>
+        <script src="static/js/components/hoot/HootComponent.js"></script>
+        <script src="static/js/components/hoot/HootsComponent.js"></script>
+        <script src="static/js/components/system/MonitorComponent.js"></script>
+        <script src="static/js/components/user/LoginFormComponent.js"></script>
+        <script src="static/js/components/user/RegisterFormComponent.js"></script>
+        <script src="static/js/components/user/ProfileComponent.js"></script>
+        <script src="static/js/components/UtilComponent.js"></script>
+        <script src="static/js/components/Menu.js"></script>
+        <script src="static/js/Router.js"></script>
+        <script defer src="static/js/hoot.js"></script>
+        <link href="static/css/swagger-ui-dist@4.5.0_swagger-ui.css" rel="stylesheet">
+        <link href="static/css/5.1.3_dist_css_bootstrap.css" rel="stylesheet" type="text/css">
+        <link href="static/css/bootstrap-icons@1.8.1_font_bootstrap-icons.css" rel="stylesheet">
+        <link href="static/css/menu.css" rel="stylesheet" type="text/css">
+        <link href="static/css/main.css" rel="stylesheet" type="text/css">
+        <title>hoot</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" href="static/image/hoot.svg" type="image/svg+xml">
+    </head>
+    <body>
+        <main id="content">
+            <div id="content-container" class="container text-white m-3">
+                <h1 class="h1">Hoots <span>- a howling social media network</span></h1>
+                <p>This is just a plain html-page as a replacement before implementing hoots, the real implementation.</p>
+                <p>You may or may not take a look at the current state of the api specification
+                    <a href='./swagger'>Open API 3.0 Specification - V1</a>.
+                </p>
+            </div>
+        </main>
+    </body>
 </html>

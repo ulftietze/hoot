@@ -15,6 +15,6 @@ public class LogoutApiServlet extends AbstractApiServlet
     {
         request.getSession().invalidate();
 
-        this.sendResponse(response, HttpServletResponse.SC_RESET_CONTENT, this.serialize("logged out"));
+        this.sendResponse(response, HttpServletResponse.SC_OK, this.serialize("true"));
     }
 }

@@ -22,7 +22,7 @@ public class UserFollowerApiServlet extends AbstractApiServlet
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
     {
         FollowerRepository      repository     = (FollowerRepository) ObjectManager.get(FollowerRepository.class);
-        FollowingSearchCriteria searchCriteria = createFollowingSearchCriteriaFromRequest(request);
+        FollowingSearchCriteria searchCriteria = this.createFollowingSearchCriteriaFromRequest(request);
 
         try {
             ArrayList<Follower> followers = repository.getList(searchCriteria);

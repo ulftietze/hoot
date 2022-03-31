@@ -7,7 +7,9 @@ import hoot.system.Exception.CouldNotDeleteException;
 import hoot.system.Exception.CouldNotSaveException;
 import hoot.system.Exception.EntityNotFoundException;
 import hoot.system.Filesystem.MediaFileHandler;
+import hoot.system.Logger.ContextLogger;
 import hoot.system.Logger.LoggerInterface;
+import hoot.system.Logger.QueryLoggerInterface;
 import hoot.system.objects.Inject;
 import hoot.system.objects.ObjectManager;
 
@@ -25,7 +27,8 @@ public abstract class AbstractRepository<Type>
 
     @Inject protected MediaFileHandler mediaFileHandler;
 
-    @Inject protected LoggerInterface logger;
+    @Inject(concrete = QueryLoggerInterface.class)
+    protected LoggerInterface logger;
 
     public ArrayList<Type> getList() throws EntityNotFoundException
     {

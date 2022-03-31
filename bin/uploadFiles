@@ -5,4 +5,4 @@ export $(echo $(cat .env | sed 's/#.*//g' | sed 's/\r//g' | xargs) | envsubst)
 ssh "$REMOTE_USER"@"$REMOTE_HOST" "mkdir -p $REMOTE_PATH"
 
 # shellcheck disable=SC2046
-rsync -var --delete --exclude 'build' --exclude '.git' --exclude '.idea' --exclude 'media' --exclude 'out' . "$REMOTE_USER"@"$REMOTE_HOST":"$REMOTE_PATH"
+rsync -ar --delete --exclude 'build' --exclude '.git' --exclude '.idea' --exclude 'media' --exclude 'out' . "$REMOTE_USER"@"$REMOTE_HOST":"$REMOTE_PATH"

@@ -6,8 +6,8 @@ import hoot.model.entities.authentication.Registration;
 import hoot.model.queue.publisher.RegistrationPublisher;
 import hoot.model.repositories.UserRepository;
 import hoot.system.Exception.CouldNotSaveException;
-import hoot.system.objects.ObjectManager;
 import hoot.system.Security.Hasher;
+import hoot.system.objects.ObjectManager;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -21,28 +21,31 @@ public class RegisterApiServlet extends AbstractApiServlet
 {
     private RegistrationPublisher registrationPublisher;
 
+    private UserRepository userRepository;
+
+    private Hasher hasher;
+
     @Override
     public void init() throws ServletException
     {
         super.init();
 
         this.registrationPublisher = (RegistrationPublisher) ObjectManager.get(RegistrationPublisher.class);
+        this.userRepository        = (UserRepository) ObjectManager.get(UserRepository.class);
+        this.hasher                = (Hasher) ObjectManager.get(Hasher.class);
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
     {
         Registration register = (Registration) this.deserializeJsonRequestBody(request, Registration.class);
 
-        UserRepository repository = (UserRepository) ObjectManager.get(UserRepository.class);
-        Hasher         hasher     = (Hasher) ObjectManager.get(Hasher.class);
-
         try {
             User entity = (User) ObjectManager.create(User.class);
             entity.username     = register.username;
-            entity.passwordHash = hasher.hash(register.password);
+            entity.passwordHash = this.hasher.hash(register.password);
             this.saveImage(register.imageFilename, register.image);
 
-            repository.save(entity);
+            this.userRepository.save(entity);
 
             this.registrationPublisher.publish(entity);
             this.sendResponse(response, HttpServletResponse.SC_CREATED, this.serialize("Registered"));

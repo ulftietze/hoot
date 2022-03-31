@@ -142,6 +142,28 @@ paths:
             'text/html':
               schema:
                 type: string
+  /user/me/follows:
+    get:
+      description: Check if current user follows specific user
+      summary: Check if current user follows specific user
+      tags:
+        - user
+      security:
+        - cookieAuth: [ ]
+      parameters:
+        - in: query
+          name: userId
+          description: UserId to check
+          schema:
+            type: integer
+            nullable: false
+      responses:
+        '200':
+          description: Boolean flag if followed or not
+          content:
+            'application/json':
+              schema:
+                type: boolean
   /user/me/follow:
     post:
       description: Current user follows another user
@@ -378,6 +400,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/hoots'
+  /hoot:
+    delete:
+      summary: Delete hoot by id
+      tags:
+        - hoot
+      security:
+        - cookieAuth: [ ]
+      parameters:
+        - in: query
+          name: hootId
+          description: HootId of the hoot to delete
+          schema:
+            type: integer
+            nullable: false
+      responses:
+        '200':
+          description: 'successful deleted'
+          content:
+            'application/json':
+              schema:
+                type: boolean
   /hoot/post:
     post:
       summary: Save and publish a post
@@ -484,6 +527,20 @@ paths:
             application/json:
               schema:
                 type: boolean
+  /system/monitor/diagrams:
+    get:
+      description: Load monitor diagrams
+      summary: Load monitor diagrams
+      tags:
+        - system
+      responses:
+        '200':
+          description: The urls of the diagrams
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/graphList'
+
 components:
   securitySchemes:
     cookieAuth: # arbitrary name for the security scheme; will be used in the "security" key later
@@ -524,17 +581,23 @@ components:
           type: string
           description: Base64 Encoded
     followers:
+      type: object
       required:
-        - user
+        - followers
       properties:
-        user:
-          $ref: '#/components/schemas/user'
+        followers:
+          type: array
+          items:
+            $ref: '#/components/schemas/user'
     follows:
+      type: object
       required:
-        - user
+        - follows
       properties:
-        user:
-          $ref: '#/components/schemas/user'
+        follows:
+          type: array
+          items:
+            $ref: '#/components/schemas/user'
     login:
       required:
         - username
@@ -559,12 +622,17 @@ components:
         imageFilename:
           type: string
     hoots:
-      type: array
-      items:
-        oneOf:
-          - $ref: '#/components/schemas/post'
-          - $ref: '#/components/schemas/image'
-          - $ref: '#/components/schemas/comment'
+      type: object
+      required:
+        - hoots
+      properties:
+        hoots:
+          type: array
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/post'
+              - $ref: '#/components/schemas/image'
+              - $ref: '#/components/schemas/comment'
     hoot:
       type: object
       required:
@@ -610,6 +678,11 @@ components:
       type: array
       items:
         type: string
+    tag:
+      type: string
+      properties:
+        tag:
+          type: string
     image:
       allOf:
         - $ref: '#/components/schemas/hoot'
@@ -718,3 +791,17 @@ components:
         parentHootId:
           type: integer
           format: int64
+    graphList:
+      type: object
+      readOnly: true
+      required:
+        - graphList
+      properties:
+        graphList:
+          type: object
+          description: "Object with list of diagrams"
+          example:
+            threads: "/path/to/threads.png"
+            memory: "/path/to/memory.png"
+            heapMemory: "/path/to/heapMemory.png"
+            cpuLoad: "/path/to/cpuLoad.png"
